@@ -7,9 +7,12 @@ import {randomDirection} from './utils/math.js';
 import {
 	randomElement,
 	randomValue,
+	randomFloat,
+	randomDiff,
 } from './utils/misc.js';
 import Interval from './utils/interval.js';
 
+export const ENNEMI_HIT = 'ENNEMI_HIT';
 export const BONUS_TAKE = 'BONUS_TAKE';
 export const EGG_EXPLOSION = 'EGG_EXPLOSION';
 export const WOLF_FALLING = 'WOLF_FALLING';
@@ -81,6 +84,9 @@ export function create(type, position, direction) {
 		case BONUS_TAKE:
 			createBonusTake(position);
 		break;
+		case ENNEMI_HIT:
+			createEnnemiHit(position, direction);
+		break;
 	}
 }
 
@@ -138,6 +144,30 @@ function createWolfCloud(position, radius, count) {
 	}
 }
 
+function createEnnemiHit(position, direction) {
+	const count = 30;
+
+	for (let i = 0; i < count; i ++) {
+		const color = randomElement([0xff0000, 0x880000]);
+		const angle = Math.atan2(direction.y, direction.x);
+		const curAngle = randomDiff(angle, 0.5);
+		const curDirX = Math.cos(curAngle);
+		const curDirY = Math.sin(curAngle);
+		const distance = Math.tan(randomFloat(0.1, 1.5));
+		const particule = new Particule(
+			position.x + curDirX * distance,
+			position.y + curDirY * distance,
+			0, // velocityX
+			0, // velocityY
+			60, // stepDuration
+			0.99, // scaleDecrease
+			0, // gravity
+			1, // airResistance
+			color,
+			0.5, // scale
+		);
+	}
+}
 function createWolfFallingTrail(position) {
 	const count = 1;
 
@@ -183,12 +213,12 @@ function createEggExplosion(position, direction) {
 }
 
 class Particule {
-	constructor(posX, posY, velocityX, velocityY, stepDuration, scaleDecrease, gravity, airResistance, color) {
+	constructor(posX, posY, velocityX, velocityY, stepDuration, scaleDecrease, gravity, airResistance, color, scale) {
 		this.gravity = gravity;
 		this.airResistance = airResistance;
 		this.velX = velocityX;
 		this.velY = velocityY;
-		this.scale = 1;
+		this.scale = scale ?? 1;
 		this.scaleDecrease = scaleDecrease;
 		this.position = new Vector2(posX, posY);
 		AnimationControl.registerToUpdate(this);

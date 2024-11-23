@@ -79,6 +79,7 @@ class Egg {
 			CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
 			// this.stopLaunchAndFall();
 			// const hitSprite = new HitSprite(this.position.x, this.position.y, 6);
+			Particules.create(Particules.ENNEMI_HIT, this.position, new Vector2(this.velX, this.velY));
 			SoundLoader.play('eggCrack', 0.2);
 		}
 
