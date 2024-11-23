@@ -252,6 +252,10 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'poussinBonusWalk',
 		frames: [],
 	},
+	pointer: {
+		textureId: 'pointer',
+		frames: [],
+	},
 }));
 
 const animations = {
@@ -339,6 +343,12 @@ const animations = {
 		spriteSheet: 'poule',
 		stepsByFrame: 10,
 		framesToDisplay: [1, 2],
+	},
+
+	pointer: {
+		spriteSheet: 'pointer',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
 	},
 
 	eggLaunch: {

@@ -48,6 +48,10 @@
 			"url": "assets/screen-game-over.png"
 		},
 		{
+			"id": "pointer",
+			"url": "assets/pointer.png"
+		},
+		{
 			"id": "wolfWalk",
 			"url": "assets/wolf-walk.png"
 		},

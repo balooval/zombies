@@ -54,6 +54,7 @@ export class Player {
 		const baseWeapon = new BasicEggLauncher();
 		baseWeapon.setOwner(this);
 		this.weapon = new ActiveWeapon(baseWeapon);
+		this.weaponPointer = new WeaponPointer();
 
 		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'pouleIdle');
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -72,13 +73,14 @@ export class Player {
 		this.weapon.changeWeapon(bonus);
 	}
 
-	update(step, time) {
-		this.move(time);
+	update() {
+		this.move();
 		this.#updateViewAngle();
 	}
 
 	#updateViewAngle() {
 		this.viewAngle = Math.atan2(Mouse.worldPosition[1] - this.position.y, Mouse.worldPosition[0] - this.position.x);
+		this.weaponPointer.setPosition(Mouse.worldPosition[0], Mouse.worldPosition[1]);
 		
 	}
 
@@ -210,30 +212,13 @@ export class Player {
 	}
 }
 
-class Poussin {
+class WeaponPointer {
     constructor() {
-        this.sprite = SpriteFactory.createAnimatedSprite(12, 12, 'poussinIdle');
-        this.sprite.setPosition(PLAYER_POSITION_X + 12, PLAYER_MAX_POS_Y + 23);
-		this.mustRun = false;
-		this.isRunning = false;
+        this.sprite = SpriteFactory.createAnimatedSprite(4, 4, 'pointer');
+        this.sprite.setPosition(0, 0);
     }
 
-	animate(movementQuantity) {
-		this.mustRun = movementQuantity !== 0;
-
-		if (this.isRunning === false && this.mustRun === true) {
-			this.sprite.changeAnimation('poussinRun');
-			this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.onRunEnd);
-			this.isRunning = true;
-		}
-	}
-
-	onRunEnd() {
-		if (this.mustRun === true) {
-			return;
-		}
-		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.onRunEnd);
-		this.sprite.changeAnimation('poussinIdle');
-		this.isRunning = false;
+	setPosition(x, y) {
+		this.sprite.setPosition(x, y);
 	}
 }

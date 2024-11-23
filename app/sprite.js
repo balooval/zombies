@@ -31,6 +31,7 @@ export class SpriteBase {
 
 	dispose() {}
 }
+
 export class AnimatedSprite extends SpriteBase {
 
 	constructor(render, width, height, animationId) {
