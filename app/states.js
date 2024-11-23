@@ -25,8 +25,10 @@ export class State {
 	}
 
 	start() {}
+	
+	suspend() {}
 
-	update(time) {
+	update(step, time) {
 		this.sprite.setPosition(this.position.x, this.position.y);
 	}
 
@@ -40,7 +42,7 @@ export class State {
 	}
 }
 
-export class StateReachEntitie extends State {
+export class StateFollowEntitie extends State {
 	constructor(position, entitieToReach, moveSpeed) {
 		super(position);
 		this.moveSpeed = moveSpeed;
@@ -67,9 +69,9 @@ export class StateReachEntitie extends State {
 		Stepper.listenStep(Stepper.curStep + this.updateDirectionRate, this, this.#updateDirection);
 	}
 
-	update(time) {
+	update(step, time) {
 		this.#move();
-		super.update(time);
+		super.update(step, time);
 	}
 	
 	#move() {
@@ -86,7 +88,52 @@ export class StateReachEntitie extends State {
 	}
 
 	onReachDestination() {
-		this.dispose();
+		
+	}
+
+	dispose() {
+		super.dispose();
+	}
+}
+
+
+export class StateSlide extends State {
+	constructor(position, velocityX, velocityY, friction) {
+		super(position);
+		this.velocityX = 0;
+		this.velocityY = 0;
+		this.friction = 0;
+		this.sprite = SpriteFactory.createDummySprite();
+	}
+
+	start(params) {
+		this.velocityX = params.velocityX;
+		this.velocityY = params.velocityY;
+		this.friction = params.friction;
+		super.start();
+	}
+
+	update(step, time) {
+		this.#move();
+		super.update(time);
+	}
+	
+	#move() {
+		this.position.x += this.velocityX; 
+		this.position.y += this.velocityY; 
+
+		this.velocityX *= this.friction;
+		this.velocityY *= this.friction;
+
+		const translation = Math.abs(this.velocityX) + Math.abs(this.velocityY);
+
+		if (translation < 0.001) {
+			this.onStop();
+		}
+	}
+
+	onStop() {
+		
 	}
 
 	dispose() {

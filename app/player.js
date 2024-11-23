@@ -5,11 +5,7 @@ import * as AnimationControl from './animationControl.js';
 import Hitbox from './collisionHitbox.js';
 import CollisionResolver from './collisionResolver.js';
 import {
-	ANIMATION_END_EVENT,
-} from './textureAnimation.js';
-import {
 	PLAYER_START_POSITION,
-	PLAYER_POSITION_X,
 	PLAYER_MAX_POS_X,
 	PLAYER_MIN_POS_X,
 	PLAYER_MAX_POS_Y,
@@ -17,7 +13,7 @@ import {
 } from './map/map.js';
 import * as SpriteFactory from './spriteFactory.js';
 import * as Stepper from './utils/stepper.js';
-import { ActiveWeapon, BasicEggLauncher } from './weapons.js';
+import { ActiveWeapon, BasicBulletLauncher } from './weapons.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
@@ -51,7 +47,7 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new BasicEggLauncher();
+		const baseWeapon = new BasicBulletLauncher();
 		baseWeapon.setOwner(this);
 		this.weapon = new ActiveWeapon(baseWeapon);
 		this.weaponPointer = new WeaponPointer();

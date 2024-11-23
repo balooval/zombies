@@ -12,6 +12,7 @@ import {
 } from './utils/misc.js';
 import Interval from './utils/interval.js';
 
+export const BLOOD_WALK = 'BLOOD_WALK';
 export const ENNEMI_HIT = 'ENNEMI_HIT';
 export const BONUS_TAKE = 'BONUS_TAKE';
 export const EGG_EXPLOSION = 'EGG_EXPLOSION';
@@ -86,6 +87,10 @@ export function create(type, position, direction) {
 		break;
 		case ENNEMI_HIT:
 			createEnnemiHit(position, direction);
+		break;
+
+		case BLOOD_WALK:
+			createBloodWalk(position);
 		break;
 	}
 }
@@ -208,6 +213,26 @@ function createEggExplosion(position, direction) {
 			0.04,
 			0.96,
 			color,
+		);
+	}
+}
+
+function createBloodWalk(position) {
+	const count = 4;
+
+	for (let i = 0; i < count; i ++) {
+		const color = randomElement([0x9e1908, 0x880000]);
+		const particule = new Particule(
+			position.x + randomDirection(0.3),
+			position.y + randomDirection(0.3),
+			0, // velocityX
+			0, // velocityY
+			randomValue(300, 400), // stepDuration
+			randomValue(0.98, 1.2), // scaleDecrease
+			0, // gravity
+			1, // airResistance
+			color,
+			0.5, // scale
 		);
 	}
 }

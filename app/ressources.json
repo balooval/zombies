@@ -76,6 +76,10 @@
 			"url": "assets/wolf-bite.png"
 		},
 		{
+			"id": "wolfStillDeath",
+			"url": "assets/loup-still-death.png"
+		},
+		{
 			"id": "backgroundNight",
 			"url": "assets/map.png"
 		},

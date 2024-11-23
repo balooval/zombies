@@ -14,9 +14,12 @@ class EntityWithStates {
 		AnimationControl.registerToUpdate(this);
 	}
 
-	setState(stateKey) {
+	setState(stateKey, params) {
+		if (this.currentState !== null) {
+			this.currentState.suspend();
+		}
 		this.currentState = this.states.get(stateKey);
-		this.currentState.start();
+		this.currentState.start(params);
 	}
 
     getState() {
@@ -24,7 +27,7 @@ class EntityWithStates {
 	}
 
 	update(step, time) {
-		this.currentState.update(time);
+		this.currentState.update(step, time);
 	}
 
 	dispose() {

@@ -172,6 +172,10 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'wolfDeath',
 		frames: [],
 	},
+	wolfStillDeath: {
+		textureId: 'wolfStillDeath',
+		frames: [],
+	},
 
 	wolfClimb: {
 		textureId: 'wolfClimb',
@@ -301,6 +305,12 @@ const animations = {
 		spriteSheet: 'wolfDeath',
 		stepsByFrame: 20,
 		framesToDisplay: [0, 1],
+	},
+	
+	wolfStillDeath: {
+		spriteSheet: 'wolfStillDeath',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
 	},
 
 	wolfDeadGround: {

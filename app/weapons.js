@@ -1,4 +1,4 @@
-import Egg from './egg.js';
+import Bullet from './bullet.js';
 import * as SoundLoader from './net/loaderSound.js';
 import Interval from './utils/interval.js';
 import * as Stepper from './utils/stepper.js';
@@ -65,18 +65,18 @@ class Weapon {
 	}
 }
 
-export class BasicEggLauncher extends Weapon {
+export class BasicBulletLauncher extends Weapon {
 	constructor() {
 		super();
 	}
 
 	launchProjectile() {
 		SoundLoader.play('eggLaunch');
-		const arrow = new Egg(this.owner.position.x, this.owner.position.y, this.owner.viewAngle, this.owner);
+		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle, this.owner);
 	}
 }
 
-export class DoubleEggLauncher extends BasicEggLauncher {
+export class DoubleEggLauncher extends BasicBulletLauncher {
 	constructor() {
 		super();
 		this.activesSteps = 600;
