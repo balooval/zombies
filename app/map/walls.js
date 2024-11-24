@@ -31,14 +31,14 @@ export class BottomWall extends Wall {
 }
 
 export class LeftWall extends Wall {
-    constructor(groundPosition) {
+    constructor() {
         super();
         this.hitBox = new Hitbox(-80, -77, -70, 70, true);
     }
 }
 
 export class RightWall extends Wall {
-    constructor(groundPosition) {
+    constructor() {
         super();
         this.hitBox = new Hitbox(77, 80, -70, 70, true);
     }

@@ -47,13 +47,19 @@ export class GameMap {
         this.bonusStep = 0;
         this.addZombiRate = 80;
         this.player = null;
+        this.blocks = this.buildBlocks();
+    }
+
+    buildBlocks() {
+        const blocks = [];
+        blocks.push(new Block(0, 0, 10, 50));
+        return blocks;
     }
     
     start() {
-        this.player = new Player();
+        this.player = new Player(this);
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
 
-        // Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
         this.#addZombi(0);
     }
 
@@ -121,4 +127,27 @@ export class GameMap {
         this.leftWall.dispose();
         this.rightWall.dispose();
     }
+}
+
+class Block {
+    constructor(posX, posY, width, height) {
+        this.posX = posX;
+        this.posY = posY;
+        this.width = width;
+        this.height = height;
+        this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
+        this.sprite = SpriteFactory.createFlatRectangleSprite(
+            this.posX + this.width / 2,
+            this.posY - this.height / 2,
+            this.width,
+            this.height,
+            0x102030
+        );
+
+        CollisionResolver.addToLayer(this, 'WALLS');
+    }
+
+    getWorldCollisionBox() {
+		return this.hitBox;
+	}
 }

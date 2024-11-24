@@ -140,6 +140,30 @@ export class AnimatedSprite extends SpriteBase {
 	}
 }
 
+export class FlatRectangleSprite {
+
+	constructor(render, x, y, width, height, color) {
+		this.mesh = new Mesh(buildFlatMesh(width, height), getColorMaterial(color));
+		this.render = render;
+		this.depthPosition = 1;
+		this.mesh.material = getColorMaterial(color);
+		this.render.scene.add(this.mesh);
+		this.setPosition(x, y);
+	}
+
+	getPosition() {
+		return this.mesh.position;
+	}
+
+	setPosition(x, y) {
+		this.mesh.position.set(x, y, this.depthPosition);
+	}
+	
+	dispose() {
+		this.render.scene.remove(this.mesh);
+	}
+}
+
 export class FlatSprite {
 
 	constructor(render, x, y, color) {

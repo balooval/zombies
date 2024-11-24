@@ -3,6 +3,7 @@ import * as Input from './input.js';
 import * as Mouse from './inputMouse.js';
 import * as AnimationControl from './animationControl.js';
 import Hitbox from './collisionHitbox.js';
+import Translation from './translation.js';
 import CollisionResolver from './collisionResolver.js';
 import {
 	PLAYER_START_POSITION,
@@ -12,15 +13,20 @@ import {
 	PLAYER_MIN_POS_Y,
 } from './map/map.js';
 import * as SpriteFactory from './spriteFactory.js';
+import * as MATH from './utils/math.js';
 import * as Stepper from './utils/stepper.js';
 import { ActiveWeapon, BasicBulletLauncher } from './weapons.js';
+import {
+	getIntersection
+} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
 export class Player {
 
-	constructor() {
+	constructor(map) {
 		this.evt = new Evt();
+		this.map = map;
 		this.lifePoints = 1;
 		this.acceleration = 0.05;
 		this.moveSpeed = 0.2;
@@ -51,6 +57,8 @@ export class Player {
 		baseWeapon.setOwner(this);
 		this.weapon = new ActiveWeapon(baseWeapon);
 		this.weaponPointer = new WeaponPointer();
+		
+		this.translation = new Translation();
 
 		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'pouleIdle');
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -81,50 +89,68 @@ export class Player {
 	}
 
 	move() {
-		const translation = this.#getTranslation();
-		this.#applyAcceleration(translation.total);
-		this.#applyTranslation(translation.x, translation.y);
+		this.#updateTranslation();
+		this.#applyAcceleration();
+		this.#applyTranslation();
 	}
 
-	#applyAcceleration(totalTranslation) {
-		if (totalTranslation > 0) {
+	#applyAcceleration() {
+		if (this.translation.length > 0) {
 			this.moveSpeed = Math.min(this.moveSpeed + this.acceleration, 1.2);			
 			return;
 		}
 		this.moveSpeed = 0;
 	}
 
-	#getTranslation() {
+	#updateTranslation() {
 		const directionX = this.inputMoves.right - this.inputMoves.left;
 		const directionY = this.inputMoves.up - this.inputMoves.down;
-		const angle = Math.atan2(directionY, directionX);
 		if (directionX === 0 && directionY === 0) {
-			return {
-				x: 0,
-				y: 0,
-				total: 0,
-			};
+			this.translation.update(
+				this.position.x,
+				this.position.y,
+				this.position.x,
+				this.position.y,
+			);
+			return;
 		}
 
-		this.sprite.setRotation(angle);
-		const x = Math.cos(angle);
-		const y = Math.sin(angle);
-		return {
-			x: x,
-			y: y,
-			total: Math.abs(x) + Math.abs(y),
-		}
+
+		this.translation.setDirection(
+			this.position.x,
+			this.position.y,
+			directionX,
+			directionY,
+			this.moveSpeed
+		);
+		
+		this.sprite.setRotation(this.translation.angle);
 	}
 
-	#applyTranslation(translationX, translationY) {
-		const previousX = this.position.x;
-		const previousY = this.position.y;
-		this.position.x += translationX * this.moveSpeed;
-		this.position.y += translationY * this.moveSpeed;
+	#applyTranslation() {
+		const wallHit = this.map.blocks.map(block => getIntersection(this.translation, block.hitBox)).filter(res => res).pop();
+		// const wallHit = getIntersection(this.translation, this.map.blocks[0].hitBox);
+
+		let newPosX = this.translation.destX;
+		let newPosY = this.translation.destY;
+
+		if (wallHit) {
+			// const newPos = MATH.lerpPoint([this.translation.startX, this.translation.startY], [wallHit.x, wallHit.y], 0.1);
+			// console.log(this.translation.startX, this.translation.startY);
+			// console.log(wallHit);
+			// console.log(newPos);
+			// console.log('--');
+			newPosX = this.translation.startX;
+			newPosY = this.translation.startY;
+		}
+
+
+		this.position.x = newPosX;
+		this.position.y = newPosY;
 		this.position.x = Math.max(PLAYER_MIN_POS_X, Math.min(this.position.x, PLAYER_MAX_POS_X));
 		this.position.y = Math.max(PLAYER_MIN_POS_Y, Math.min(this.position.y, PLAYER_MAX_POS_Y));
 
-		if (previousX === this.position.x && previousY === this.position.y) {
+		if (this.translation.length === 0) {
 			this.moveSpeed = 0;
 		}
 		this.sprite.setPosition(this.position.x, this.position.y);

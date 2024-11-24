@@ -44,8 +44,6 @@ function loadRessourcesList(ressourcesUrl) {
 }
 
 function onRessourcesLoaded() {
-	console.log(TextureLoader);
-	
 	LoadingScreen.hide();
 	Renderer.init('main');
 	TextureAnimationInit();

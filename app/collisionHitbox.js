@@ -26,6 +26,15 @@ class Hitbox {
 		)
 	}
 
+	getSegments() {
+		return [
+			[[this.left, this.top], [this.right, this.top]],
+			[[this.right, this.top], [this.right, this.bottom]],
+			[[this.right, this.bottom], [this.left, this.bottom]],
+			[[this.left, this.bottom], [this.left, this.top]],
+		];
+	}
+
 	dispose() {
 		if (this.hitBoxDebug) {
 			this.hitBoxDebug.dispose();
