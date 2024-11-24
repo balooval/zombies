@@ -45,7 +45,7 @@ export class Zombi extends EntityWithStates{
 
 export class ZombiStateFollow extends StateFollowEntitie {
 	constructor(position, player) {
-		super(position, player, 0.2);
+		super(position, player, 0.2, 60);
 		this.id = 'ENTER';
 		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
 		this.bloodModulo = 2;
@@ -53,7 +53,7 @@ export class ZombiStateFollow extends StateFollowEntitie {
 	
 	start() {
 		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
-		this.setSprite(8, 8, 'wolfWalk');
+		this.setSprite(8, 8, 'zombiWalk');
 		super.start();
 	}
 
@@ -66,6 +66,10 @@ export class ZombiStateFollow extends StateFollowEntitie {
 		this.#dropBlood(step);
 	}
 
+	getNextUpdateDirectionStepDelay() {
+		return Math.round(randomValue(10, 120));
+	}
+
 	#dropBlood(time) {
 		if (this.entity.life !== 1) {
 			return;
@@ -74,7 +78,7 @@ export class ZombiStateFollow extends StateFollowEntitie {
 			return;
 		}
 
-		Particules.create(Particules.BLOOD_WALK, {x: this.position.x, y: this.position.y - 2});
+		Particules.create(Particules.BLOOD_WALK, this.position);
 
 		this.bloodModulo = Math.round(randomValue(2, 60));
 	}
@@ -102,9 +106,8 @@ export class ZombiStateFollow extends StateFollowEntitie {
 }
 
 export class ZombiStateSlide extends StateSlide {
-	constructor(position, velocityX, velocityY) {
-		const friction = 0.9;
-		super(position, velocityX, velocityY, friction);
+	constructor(position) {
+		super(position);
 		this.id = 'SLIDE';
 	}
 
@@ -112,9 +115,9 @@ export class ZombiStateSlide extends StateSlide {
 		const params = {
 			velocityX: vector.x,
 			velocityY: vector.y,
-			friction: 0.9,
+			friction: 0.85,
 		}
-		this.setSprite(8, 8, 'wolfStillDeath');
+		this.setSprite(8, 8, 'zombiHit');
 		super.start(params);
 	}
 

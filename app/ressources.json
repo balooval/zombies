@@ -80,6 +80,14 @@
 			"url": "assets/loup-still-death.png"
 		},
 		{
+			"id": "zombiWalk",
+			"url": "assets/zombi.png"
+		},
+		{
+			"id": "zombiHit",
+			"url": "assets/zombi-hit.png"
+		},
+		{
 			"id": "backgroundNight",
 			"url": "assets/map.png"
 		},

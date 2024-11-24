@@ -2,7 +2,8 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Mesh,
-	MeshBasicMaterial
+	MeshBasicMaterial,
+	Vector3
 } from '../vendor/three.module.js';
 import * as TextureLoader from './net/loaderTexture.js';
 import {TextureAnimation} from './textureAnimation.js';
@@ -24,6 +25,8 @@ export class SpriteBase {
 	setOpacity(opacity) {}
 	
 	setDepth(depthPosition) {}
+
+	setRotation(angle) {}
 
 	flipHorizontal() {}
 
@@ -52,6 +55,11 @@ export class AnimatedSprite extends SpriteBase {
 
 	setPosition(x, y) {
 		this.mesh.position.set(x, y - this.animationOffsetV, this.depthPosition);
+	}
+
+	setRotation(angle) {
+		const vector = new Vector3(0, 0, 1);
+		this.mesh.setRotationFromAxisAngle(vector, angle);
 	}
 
 	setOpacity(opacity) {

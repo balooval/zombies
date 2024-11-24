@@ -176,6 +176,14 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'wolfStillDeath',
 		frames: [],
 	},
+	zombiWalk: {
+		textureId: 'zombiWalk',
+		frames: [],
+	},
+	zombiHit: {
+		textureId: 'zombiHit',
+		frames: [],
+	},
 
 	wolfClimb: {
 		textureId: 'wolfClimb',
@@ -309,6 +317,16 @@ const animations = {
 	
 	wolfStillDeath: {
 		spriteSheet: 'wolfStillDeath',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiWalk: {
+		spriteSheet: 'zombiWalk',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiHit: {
+		spriteSheet: 'zombiHit',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
 	},

@@ -218,21 +218,22 @@ function createEggExplosion(position, direction) {
 }
 
 function createBloodWalk(position) {
-	const count = 4;
+	const count = 10;
 
 	for (let i = 0; i < count; i ++) {
-		const color = randomElement([0x9e1908, 0x880000]);
+		// const color = randomElement([0x9e1908, 0x880000, 0x5e1616]);
+		const color = randomElement([0x880000, 0x5e1616]);
 		const particule = new Particule(
-			position.x + randomDirection(0.3),
-			position.y + randomDirection(0.3),
+			randomDiff(position.x, 2),
+			randomDiff(position.y, 2),
 			0, // velocityX
 			0, // velocityY
 			randomValue(300, 400), // stepDuration
-			randomValue(0.98, 1.2), // scaleDecrease
+			1, // scaleDecrease
 			0, // gravity
 			1, // airResistance
 			color,
-			0.5, // scale
+			randomValue(0.4, 0.6), // scale
 		);
 	}
 }

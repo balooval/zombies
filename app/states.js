@@ -51,7 +51,6 @@ export class StateFollowEntitie extends State {
 		this.distanceFromTargetY = 99999;
 		this.distanceFromTargetTotal = 99999;
 		this.angle = 0;
-		this.updateDirectionRate = 30;
 		this.sprite = SpriteFactory.createDummySprite();
 	}
 
@@ -65,8 +64,15 @@ export class StateFollowEntitie extends State {
 		this.distanceFromTargetY = this.entitieToReach.position.y - this.position.y;
 		this.angle = Math.atan2(this.distanceFromTargetY, this.distanceFromTargetX);
 
+		this.sprite.setRotation(this.angle);
+
+		const nextUpdateDirectionStepDelay = this.getNextUpdateDirectionStepDelay();
 		Stepper.stopListenStep(step, this, this.#updateDirection);
-		Stepper.listenStep(Stepper.curStep + this.updateDirectionRate, this, this.#updateDirection);
+		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.#updateDirection);
+	}
+
+	getNextUpdateDirectionStepDelay() {
+		return 1;	
 	}
 
 	update(step, time) {
@@ -98,7 +104,7 @@ export class StateFollowEntitie extends State {
 
 
 export class StateSlide extends State {
-	constructor(position, velocityX, velocityY, friction) {
+	constructor(position) {
 		super(position);
 		this.velocityX = 0;
 		this.velocityY = 0;
@@ -110,6 +116,9 @@ export class StateSlide extends State {
 		this.velocityX = params.velocityX;
 		this.velocityY = params.velocityY;
 		this.friction = params.friction;
+
+		const angle = Math.atan2(this.velocityY, this.velocityX)
+		this.sprite.setRotation(angle);
 		super.start();
 	}
 

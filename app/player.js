@@ -106,6 +106,7 @@ export class Player {
 			};
 		}
 
+		this.sprite.setRotation(angle);
 		const x = Math.cos(angle);
 		const y = Math.sin(angle);
 		return {

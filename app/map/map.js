@@ -44,7 +44,7 @@ class MapObject {
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
         this.bonusStep = 0;
-        this.addZombiRate = 60;
+        this.addZombiRate = 100;
         this.player = null;
     }
     
@@ -94,11 +94,11 @@ class MapObject {
         const startPosition = {x: startX, y: startY};
         const zombiStates = new Map();
 		zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
-		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this.player));
+		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition));
 		const zombi = new Zombi.Zombi(zombiStates);
 
         Stepper.stopListenStep(step, this, this.#addZombi);
-		Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
+		// Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
     }
 
     onPlayerDead() {
