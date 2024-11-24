@@ -6,7 +6,7 @@ import {
 
 let textureLoader = new TextureLoader();
 let imagesList;
-const textLoaded = {};
+export const textLoaded = {};
 
 export function get(_id) {
 	if (!textLoaded[_id]) {

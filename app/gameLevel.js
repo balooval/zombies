@@ -4,7 +4,7 @@ import * as Renderer from './renderer.js';
 import * as Stepper from './utils/stepper.js';
 import * as Clock from './utils/clock.js';
 import {
-	MapNight,
+	GameMap,
 	GAME_OVER_EVENT,
 }  from './map/map.js';
 import GameOverScreen from './ui/gameOverScreen.js';
@@ -30,7 +30,7 @@ class GameLevel {
 		AnimationControl.registerToUpdate(Stepper);
 		Renderer.start();
 		AnimationControl.start();
-		this.map = new MapNight();
+		this.map = new GameMap();
 		this.map.start();
 		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
 		Clock.start();

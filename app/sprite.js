@@ -3,11 +3,42 @@ import {
 	BufferGeometry,
 	Mesh,
 	MeshBasicMaterial,
+	ShaderMaterial,
+	Vector2,
 	Vector3
 } from '../vendor/three.module.js';
 import * as TextureLoader from './net/loaderTexture.js';
 import {TextureAnimation} from './textureAnimation.js';
+import * as LightingShader from './shaders/lighting.js';
 
+const materials = new Map();
+
+function getSpriteMaterial(animationId) {
+	if (materials.has(animationId)) {
+		return materials.get(animationId);
+	}
+	
+	const material = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(animationId), transparent: true});
+
+	// const texture = TextureLoader.get(animationId);
+	// console.log(animationId, texture);
+	
+
+	// const uniforms = {
+	// 	lightPosition: {value: new Vector2(0, 0)},
+	// 	map: { type: "t", value: texture}
+	// }
+
+	// const material = new ShaderMaterial({
+	// 	uniforms: uniforms,
+	// 	fragmentShader: LightingShader.fragment,
+	// 	vertexShader: LightingShader.vertex,
+	// })
+
+
+	materials.set(animationId, material);
+	return material;
+}
 
 export class SpriteBase {
 
@@ -98,7 +129,8 @@ export class AnimatedSprite extends SpriteBase {
 		this.geometry.setIndex(indices);
 		this.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
 
-		const material = new MeshBasicMaterial({opacity: 1,map: TextureLoader.get(animationId), transparent: true});
+		const material = getSpriteMaterial(animationId);
+		
 		this.mesh = new Mesh(this.geometry, material);
 	}
 

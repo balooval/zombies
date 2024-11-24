@@ -31,8 +31,9 @@ export const PLAYER_MIN_POS_Y = -55;
 export const PLAYER_MAX_POS_Y = 55;
 
 
-class MapObject {
-    constructor(spriteType) {
+export class GameMap {
+    constructor() {
+        const spriteType = 'Night';
         this.evt = new Evt();
         this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
         this.skySprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapSky' + spriteType);
@@ -44,7 +45,7 @@ class MapObject {
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
         this.bonusStep = 0;
-        this.addZombiRate = 100;
+        this.addZombiRate = 80;
         this.player = null;
     }
     
@@ -98,7 +99,7 @@ class MapObject {
 		const zombi = new Zombi.Zombi(zombiStates);
 
         Stepper.stopListenStep(step, this, this.#addZombi);
-		// Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
+		Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
     }
 
     onPlayerDead() {
@@ -119,15 +120,5 @@ class MapObject {
         this.bottomWall.dispose();
         this.leftWall.dispose();
         this.rightWall.dispose();
-    }
-}
-
-export class MapNight extends MapObject {
-    constructor() {
-        super('Night');
-    }
-
-    dispose() {
-        super.dispose();
     }
 }
