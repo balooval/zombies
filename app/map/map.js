@@ -17,6 +17,10 @@ export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
 
 export const WIDTH = 160;
 export const HEIGHT = 120;
+const MIN_X = -80; 
+const MAX_X = 80; 
+const MIN_Y = -60; 
+const MAX_Y = 60; 
 export const GROUND_POSITION = -50;
 export const GROUND_LIMITE_X_MIN = -65;
 export const GROUND_LIMITE_X_MAX = 65;
@@ -47,20 +51,16 @@ export class GameMap {
         this.bonusStep = 0;
         this.addZombiRate = 80;
         this.player = null;
-        this.blocks = this.buildBlocks();
-    }
-
-    buildBlocks() {
-        const blocks = [];
-        blocks.push(new Block(0, 0, 10, 50));
-        return blocks;
+        
+        this.blocks = this.#buildBlocks();
+        this.grid = this.#buildGrid();
     }
     
     start() {
         this.player = new Player(this);
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
 
-        this.#addZombi(0);
+        // this.#addZombi(0);
     }
 
     #addZombi(step) {
@@ -126,6 +126,159 @@ export class GameMap {
         this.bottomWall.dispose();
         this.leftWall.dispose();
         this.rightWall.dispose();
+    }
+
+    #buildBlocks() {
+        const blocks = [];
+        blocks.push(new Block(-30, 40, 30, 10));
+        blocks.push(new Block(-10, -10, 50, 10));
+        blocks.push(new Block(-30, -25, 30, 10));
+        return blocks;
+    }
+
+    #buildGrid() {
+        let currentCell = new Cell(
+            MIN_X,
+            MAX_X,
+            MIN_Y,
+            MAX_Y,
+            this.blocks,
+        );
+        currentCell.buildHorizontalChilds();
+        console.log(currentCell);
+        const flatCells = currentCell.flat([]);
+        flatCells.forEach(cell => cell.buildConnections(flatCells));
+        console.log('FLAT', flatCells);
+    }
+}
+
+let debugId = 0;
+
+class Cell {
+    constructor(left, right, bottom, top, blocks) {
+        this.id = debugId;
+        debugId ++;
+        this.left = left;
+        this.right = right;
+        this.bottom = bottom;
+        this.top = top;
+        this.blocks = this.#cleanBlocks(blocks);
+        // console.log(this.blocks);
+        // debugger;
+        
+        // this.childs = this.buildChilds();
+        this.childs = [];
+        this.connections = [];
+    }
+
+    flat(res) {
+        if (this.childs.length === 0) {
+            res.push(this);
+            return res;
+        }
+        
+        for (const child of this.childs) {
+            const childRes = child.flat(res);
+            res = childRes;
+        }
+
+        return res;
+    }
+
+    buildConnections(flatCells) {
+        for (const cell of flatCells) {
+
+
+            
+            const touchLeft = this.left === cell.right;
+            const touchRight = this.right === cell.left;
+            const touchBottom = this.bottom === cell.top;
+            const touchTop = this.top === cell.bottom;
+            const contacts = [
+                touchLeft,
+                touchRight,
+                touchBottom,
+                touchTop,
+            ];
+            
+            if (contacts.some(value => value === true) === false) {
+                continue;
+            }
+            
+
+            const bottomMatch = this.bottom < cell.top;
+            const topMatch = this.top > cell.bottom;
+
+            if (bottomMatch && topMatch) {
+                this.connections.push(cell);
+                continue;
+            }
+            
+            if (this.left !== cell.left) {
+                continue;
+            }
+            
+            if (touchBottom || touchTop) {
+                this.connections.push(cell);
+                continue;
+            }
+        }
+    }
+
+    buildHorizontalChilds() {
+
+        let horPositions = this.blocks.map(block => [block.posX, block.posX + block.width]).flat();
+        horPositions.push(this.right);
+        horPositions = [...new Set(horPositions)];
+        horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));
+        console.log('horPositions', horPositions);
+
+        let prevLeft = this.left;
+        
+        for (const posX of horPositions) {
+            const child = new Cell(
+                prevLeft,
+                posX,
+                this.bottom,
+                this.top,
+                this.blocks,
+            );
+            child.buildVerticalChilds();
+            this.childs.push(child);
+            prevLeft = posX;
+        }
+    }
+
+    buildVerticalChilds() {
+
+        let vertPositions = this.blocks.map(block => [block.posY, block.posY - block.height]).flat();
+        vertPositions.push(this.top);
+        vertPositions = [...new Set(vertPositions)];
+        vertPositions = vertPositions.toSorted((xA, xB) => Math.sign(xA - xB));
+        console.log('vertPositions', this.id, vertPositions);
+
+        let prevBottom = this.bottom;
+        
+        for (const posY of vertPositions) {
+            this.childs.push(new Cell(
+                this.left,
+                this.right,
+                prevBottom,
+                posY,
+                this.blocks,
+            ));
+            prevBottom = posY;
+        }
+    }
+
+    #cleanBlocks(blocks) {
+        return blocks.filter(block => {
+            if (block.posX >= this.right) return false;
+            if (block.posX + block.width <= this.left) return false;
+            if (block.posY <= this.bottom) return false;
+            if (block.posY - block.height >= this.top) return false;
+            return true;
+        });
     }
 }
 
