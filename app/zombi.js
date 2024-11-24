@@ -11,6 +11,7 @@ import * as SoundLoader from './net/loaderSound.js';
 import {
 	StateFollowEntitie,
 	StateSlide,
+	StateTravelCells,
 } from './states.js';
 import {
 	randomValue,
@@ -43,9 +44,60 @@ export class Zombi extends EntityWithStates{
 }
 
 
+export class ZombiStateTravelCells extends StateTravelCells {
+	constructor(position, cellRoot) {
+		super(position, cellRoot, 0.2);
+		this.id = 'ENTER';
+		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
+		this.bloodModulo = 2;
+	}
+
+	start() {
+		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
+		this.setSprite(8, 8, 'zombiWalk');
+		super.start();
+	}
+
+	suspend() {
+		this.sprite.dispose();
+	}
+
+	update(step, time) {
+		super.update(step, time);
+		this.#dropBlood(step);
+	}
+
+	#dropBlood(time) {
+		if (this.entity.life !== 1) {
+			return;
+		}
+		if (time % this.bloodModulo !== 0) {
+			return;
+		}
+
+		Particules.create(Particules.BLOOD_WALK, this.position);
+
+		this.bloodModulo = Math.round(randomValue(2, 60));
+	}
+
+	takeDamage(vector) {
+		this.entity.life --;
+		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
+		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
+
+		this.entity.setState('SLIDE', vector);
+	}
+
+	dispose() {
+		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
+		this.hitBox.dispose();
+		super.dispose();
+	}
+}
+
 export class ZombiStateFollow extends StateFollowEntitie {
 	constructor(position, player) {
-		super(position, player, 0.2, 60);
+		super(position, player, 0.2);
 		this.id = 'ENTER';
 		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
 		this.bloodModulo = 2;

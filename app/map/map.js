@@ -11,6 +11,7 @@ import * as Zombi from '../zombi.js';
 import * as Stepper from '../utils/stepper.js';
 import * as Walls from './walls.js';
 import * as Utils from '../utils/misc.js';
+import * as MATH from '../utils/math.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
@@ -54,13 +55,15 @@ export class GameMap {
         
         this.blocks = this.#buildBlocks();
         this.grid = this.#buildGrid();
+
+        console.log(this.grid);
     }
     
     start() {
         this.player = new Player(this);
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
 
-        // this.#addZombi(0);
+        this.#addZombi(0);
     }
 
     #addZombi(step) {
@@ -100,7 +103,8 @@ export class GameMap {
         const startY = Utils.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
         const zombiStates = new Map();
-		zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
+		zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
+		// zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
 		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition));
 		const zombi = new Zombi.Zombi(zombiStates);
 
@@ -149,6 +153,8 @@ export class GameMap {
         const flatCells = currentCell.flat([]);
         flatCells.forEach(cell => cell.buildConnections(flatCells));
         console.log('FLAT', flatCells);
+
+        return currentCell;
     }
 }
 
@@ -162,11 +168,14 @@ class Cell {
         this.right = right;
         this.bottom = bottom;
         this.top = top;
+        this.width = Math.abs(this.right - this.left);
+        this.height = Math.abs(this.top - this.bottom);
+
+        this.center = {
+            x: this.left + (this.right - this.left) / 2,
+            y: this.bottom + (this.top - this.bottom) / 2,
+        };
         this.blocks = this.#cleanBlocks(blocks);
-        // console.log(this.blocks);
-        // debugger;
-        
-        // this.childs = this.buildChilds();
         this.childs = [];
         this.connections = [];
     }
@@ -183,6 +192,30 @@ class Cell {
         }
 
         return res;
+    }
+
+    getCellByPosition(posX, posY) {
+        if (this.left > posX) {
+            return null;
+        }
+        if (this.right < posX) {
+            return null;
+        }
+        if (this.bottom > posY) {
+            return null;
+        }
+        if (this.top < posY) {
+            return null;
+        }
+
+        if (this.childs.length === 0) {
+            return this;
+        }
+
+        return this.childs
+        .map(child => child.getCellByPosition(posX, posY))
+        .filter(cell => cell !== null)
+        .pop();
     }
 
     buildConnections(flatCells) {
@@ -204,13 +237,12 @@ class Cell {
             if (contacts.some(value => value === true) === false) {
                 continue;
             }
-            
 
             const bottomMatch = this.bottom < cell.top;
             const topMatch = this.top > cell.bottom;
 
             if (bottomMatch && topMatch) {
-                this.connections.push(cell);
+                this.#createHorConnection(cell);
                 continue;
             }
             
@@ -219,10 +251,51 @@ class Cell {
             }
             
             if (touchBottom || touchTop) {
-                this.connections.push(cell);
+                this.#createVertConnection(cell);
                 continue;
             }
         }
+    }
+
+    #createVertConnection(connectedCell) {
+        const point = [
+            MATH.lerpFloat(this.left, this.right, 0.5),
+            0
+        ];
+        
+        if (this.top < connectedCell.top) {
+            point[1] = this.top;
+        }
+
+        if (this.bottom > connectedCell.bottom) {
+            point[1] = this.bottom;
+        }
+
+        this.#createConnection(connectedCell, point);
+    }
+
+    #createHorConnection(connectedCell) {
+        const point = [
+            this.left,
+            MATH.lerpFloat(connectedCell.bottom, connectedCell.top, 0.5)
+        ];
+        
+        if (this.right < connectedCell.right) {
+            point[0] = this.right;
+        }
+
+        if (this.height < connectedCell.height) {
+            point[1] = MATH.lerpFloat(this.bottom, this.top, 0.5);
+        }
+
+        this.#createConnection(connectedCell, point);
+    }
+
+    #createConnection(connectedCell, point) {
+        this.connections.push({
+            cell: connectedCell,
+            point: point,
+        });
     }
 
     buildHorizontalChilds() {

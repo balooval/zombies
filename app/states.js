@@ -5,6 +5,13 @@ import {
 	TweenValue,
 	TWEEN_END_EVENT,
 } from './utils/tween.js';
+import * as Utils from './utils/misc.js';
+import {
+	PLAYER_MAX_POS_X,
+	PLAYER_MIN_POS_X,
+	PLAYER_MAX_POS_Y,
+	PLAYER_MIN_POS_Y,
+} from './map/map.js';
 
 export class State {
 	constructor(position) {
@@ -103,6 +110,92 @@ export class StateFollowEntitie extends State {
 }
 
 
+
+
+export class StateTravelCells extends State {
+	constructor(position, cellRoot, moveSpeed) {
+		super(position);
+		this.moveSpeed = moveSpeed;
+		this.cellRoot = cellRoot;
+		this.distanceFromTargetX = 99999;
+		this.distanceFromTargetY = 99999;
+		this.distanceFromTargetTotal = 99999;
+		this.destX = 0;
+		this.destY = 0;
+		this.angle = 0;
+		this.sprite = SpriteFactory.createDummySprite();
+		this.travelPoints = [];
+	}
+
+	start() {
+		this.travelPoints = [];
+		this.#updateDirection();
+		super.start();
+	}
+
+	#updateDirection() {
+
+		if (this.travelPoints.length === 0) {
+			const nextConnection = this.#getNextConnectionToReach();
+			// console.log('nextConnection', nextConnection);
+			
+			this.travelPoints.push([
+				nextConnection.point[0],
+				nextConnection.point[1],
+			]);
+			this.travelPoints.push([
+				nextConnection.cell.center.x,
+				nextConnection.cell.center.y,
+			]);
+		}
+
+		const pos = this.travelPoints.shift();
+		this.destX = pos[0];
+		this.destY = pos[1];
+
+		this.distanceFromTargetX = this.destX - this.position.x;
+		this.distanceFromTargetY = this.destY - this.position.y;
+		this.angle = Math.atan2(this.distanceFromTargetY, this.distanceFromTargetX);
+		this.sprite.setRotation(this.angle);
+	}
+
+	#getNextConnectionToReach() {
+		const currentCell = this.cellRoot.getCellByPosition(this.position.x, this.position.y);
+		const potentialConnections = currentCell.connections.filter(connection => connection.cell.blocks.length === 0);
+		return Utils.randomElement(potentialConnections);
+	}
+	
+	update(step, time) {
+		this.#move();
+		super.update(step, time);
+	}
+	
+	#move() {
+		const transationX = Math.cos(this.angle);
+		const transationY = Math.sin(this.angle);
+		this.position.x += transationX * this.moveSpeed; 
+		this.position.y += transationY * this.moveSpeed; 
+		
+		this.distanceFromTargetX = this.destX - this.position.x;
+		this.distanceFromTargetY = this.destY - this.position.y;
+		this.distanceFromTargetTotal = Math.abs(this.distanceFromTargetX) + Math.abs(this.distanceFromTargetY);
+
+		if (this.distanceFromTargetTotal < 10) {
+			this.onReachDestination();
+		}
+	}
+
+	onReachDestination() {
+		// console.log('onReachDestination');
+		this.#updateDirection();
+	}
+
+	dispose() {
+		super.dispose();
+	}
+}
+
+
 export class StateSlide extends State {
 	constructor(position) {
 		super(position);
@@ -128,8 +221,11 @@ export class StateSlide extends State {
 	}
 	
 	#move() {
-		this.position.x += this.velocityX; 
-		this.position.y += this.velocityY; 
+		this.position.x += this.velocityX;
+		this.position.y += this.velocityY;
+
+		this.position.x = Math.max(PLAYER_MIN_POS_X, Math.min(this.position.x, PLAYER_MAX_POS_X));
+		this.position.y = Math.max(PLAYER_MIN_POS_Y, Math.min(this.position.y, PLAYER_MAX_POS_Y));
 
 		this.velocityX *= this.friction;
 		this.velocityY *= this.friction;

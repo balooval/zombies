@@ -85,7 +85,7 @@ export class Player {
 	#updateViewAngle() {
 		this.viewAngle = Math.atan2(Mouse.worldPosition[1] - this.position.y, Mouse.worldPosition[0] - this.position.x);
 		this.weaponPointer.setPosition(Mouse.worldPosition[0], Mouse.worldPosition[1]);
-		
+		this.sprite.setRotation(this.viewAngle);
 	}
 
 	move() {
@@ -96,7 +96,7 @@ export class Player {
 
 	#applyAcceleration() {
 		if (this.translation.length > 0) {
-			this.moveSpeed = Math.min(this.moveSpeed + this.acceleration, 1.2);			
+			this.moveSpeed = Math.min(this.moveSpeed + this.acceleration, 0.6);			
 			return;
 		}
 		this.moveSpeed = 0;
@@ -124,22 +124,17 @@ export class Player {
 			this.moveSpeed
 		);
 		
-		this.sprite.setRotation(this.translation.angle);
+		// this.sprite.setRotation(this.translation.angle);
+		// this.sprite.setRotation(this.viewAngle);
 	}
 
 	#applyTranslation() {
 		const wallHit = this.map.blocks.map(block => getIntersection(this.translation, block.hitBox)).filter(res => res).pop();
-		// const wallHit = getIntersection(this.translation, this.map.blocks[0].hitBox);
 
 		let newPosX = this.translation.destX;
 		let newPosY = this.translation.destY;
 
 		if (wallHit) {
-			// const newPos = MATH.lerpPoint([this.translation.startX, this.translation.startY], [wallHit.x, wallHit.y], 0.1);
-			// console.log(this.translation.startX, this.translation.startY);
-			// console.log(wallHit);
-			// console.log(newPos);
-			// console.log('--');
 			newPosX = this.translation.startX;
 			newPosY = this.translation.startY;
 		}
