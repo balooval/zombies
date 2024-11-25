@@ -12,6 +12,7 @@ import * as Stepper from '../utils/stepper.js';
 import * as Walls from './walls.js';
 import * as Utils from '../utils/misc.js';
 import * as MATH from '../utils/math.js';
+import AstarBuilder from '../astar/AStarBuilder.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
@@ -54,9 +55,42 @@ export class GameMap {
         this.player = null;
         
         this.blocks = this.#buildBlocks();
-        this.grid = this.#buildGrid();
+        this.rootCell = this.#buildGraph();
+        this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
 
-        console.log(this.grid);
+        // console.log(this.navigationGrid);
+
+        const astarBuilder = new AstarBuilder();
+        this.astar = astarBuilder.build();
+
+        // const test = this.getTravel({x: -55, y: 0}, {x: 55, y: 0});
+        // console.log(test);
+
+        // const toto = this.getRandomCell();
+        // console.log(toto);
+    }
+
+    getTravel(startPos, endPos) {
+        const positions = [];
+        const startCell = this.rootCell.getCellByPosition(startPos.x, startPos.y);
+        const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
+
+        const nav = this.astar.launch(this.navigationGrid.get('cell_' + startCell.id), this.navigationGrid.get('cell_' + endCell.id));
+
+        for (const waypoint of nav) {
+            // console.log(waypoint.node);
+            positions.push(waypoint.node)
+        }
+
+        return positions;
+    }
+
+    getRandomCell() {
+        const flat = this.rootCell
+        .flat([])
+        .filter(cell => cell.blocks.length === 0);
+
+        return Utils.randomElement(flat);
     }
     
     start() {
@@ -67,34 +101,45 @@ export class GameMap {
     }
 
     #addZombi(step) {
+
+        Stepper.stopListenStep(step, this, this.#addZombi);
+        Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
+
+        if (Zombi.pool.size >= 10) {
+            return;
+        }
+
+        console.log('ZOMBIES', Zombi.pool.size);
+
+
         const zones = [
             // TOP
             {
-                minX: -80,
-                maxX: 80,
-                minY: 60,
-                maxY: 60,
+                minX: -78,
+                maxX: 78,
+                minY: 58,
+                maxY: 58,
             },
             // BOTTOM
             {
-                minX: -80,
-                maxX: 80,
-                minY: -60,
-                maxY: -60,
+                minX: -78,
+                maxX: 78,
+                minY: -58,
+                maxY: -58,
             },
             // LEFT
             {
-                minX: -80,
-                maxX: -80,
-                minY: -60,
-                maxY: 60,
+                minX: -78,
+                maxX: -78,
+                minY: -58,
+                maxY: 58,
             },
             // RIGHT
             {
-                minX: 80,
-                maxX: 80,
-                minY: -60,
-                maxY: 60,
+                minX: 78,
+                maxX: 78,
+                minY: -58,
+                maxY: 58,
             },
         ];
 
@@ -103,13 +148,11 @@ export class GameMap {
         const startY = Utils.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
         const zombiStates = new Map();
-		zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
+		zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this));
+		// zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
 		// zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
-		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition));
+		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this));
 		const zombi = new Zombi.Zombi(zombiStates);
-
-        Stepper.stopListenStep(step, this, this.#addZombi);
-		Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
     }
 
     onPlayerDead() {
@@ -134,13 +177,22 @@ export class GameMap {
 
     #buildBlocks() {
         const blocks = [];
-        blocks.push(new Block(-30, 40, 30, 10));
-        blocks.push(new Block(-10, -10, 50, 10));
-        blocks.push(new Block(-30, -25, 30, 10));
+        // Pour DEBUG, correspond au schéma papier
+        // blocks.push(new Block(-30, 40, 30, 10));
+        // blocks.push(new Block(-10, -10, 50, 10));
+        // blocks.push(new Block(-30, -25, 30, 10));
+
+        // blocks.push(new Block(-65, 40, 100, 5));
+        blocks.push(new Block(30, 40, 5, 50));
+        blocks.push(new Block(-70, 40, 5, 50));
+        blocks.push(new Block(-70, 40, 45, 5));
+        blocks.push(new Block(-10, 40, 45, 5));
+        blocks.push(new Block(-70, -10, 45, 5));
+        blocks.push(new Block(-10, -10, 45, 5));
         return blocks;
     }
 
-    #buildGrid() {
+    #buildGraph() {
         let currentCell = new Cell(
             MIN_X,
             MAX_X,
@@ -149,16 +201,78 @@ export class GameMap {
             this.blocks,
         );
         currentCell.buildHorizontalChilds();
-        console.log(currentCell);
-        const flatCells = currentCell.flat([]);
-        flatCells.forEach(cell => cell.buildConnections(flatCells));
-        console.log('FLAT', flatCells);
-
         return currentCell;
+    }
+
+    #buildNavigationGrid(mainCell) {
+        const flatCells = mainCell.flat([]);
+        const emptyCells = flatCells.filter(cell => cell.blocks.length === 0);
+        emptyCells.forEach(cell => cell.buildConnections(emptyCells));
+
+
+        const navigationGrid = new Map();
+
+        for (const cell of emptyCells) {
+            const x = cell.center.x;
+            const y = cell.center.y;
+            const index = x + '_' + y;
+            const node = new NavigationNode(x, y, 'cell_' + cell.id);
+            navigationGrid.set(index, node);
+
+            for (const connection of cell.connections) {
+                const x = connection.point[0];
+                const y = connection.point[1];
+                const index = x + '_' + y;
+                const node = new NavigationNode(x, y, cell.id + '_' + connection.cell.id);
+                navigationGrid.set(index, node);
+            }
+        }
+
+        for (const cell of emptyCells) {
+            const x = cell.center.x;
+            const y = cell.center.y;
+            const index = x + '_' + y;
+            const cellNode = navigationGrid.get(index);
+            
+            for (const connection of cell.connections) {
+                const x = connection.point[0];
+                const y = connection.point[1];
+                const index = x + '_' + y;
+                const subNode = navigationGrid.get(index);
+
+                cellNode.addConnection(subNode);
+                subNode.addConnection(cellNode);
+            }
+        }
+
+        const gridArray = [...navigationGrid.values()];
+        const res = new Map();
+        for (const node of gridArray) {
+            res.set(node.id, node);
+        }
+
+        return res;
     }
 }
 
 let debugId = 0;
+
+class NavigationNode {
+    constructor(posX, posY, id) {
+        this.x = posX;
+        this.y = posY;
+        this.id = id;
+        this.connections = [];
+    }
+
+    addConnection(navigationNode) {
+        this.connections.push(navigationNode);
+    }
+
+    getSiblings() {
+        return this.connections;
+    }
+}
 
 class Cell {
     constructor(left, right, bottom, top, blocks) {
@@ -220,9 +334,6 @@ class Cell {
 
     buildConnections(flatCells) {
         for (const cell of flatCells) {
-
-
-            
             const touchLeft = this.left === cell.right;
             const touchRight = this.right === cell.left;
             const touchBottom = this.bottom === cell.top;
@@ -304,7 +415,6 @@ class Cell {
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
         horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));
-        console.log('horPositions', horPositions);
 
         let prevLeft = this.left;
         
@@ -328,7 +438,6 @@ class Cell {
         vertPositions.push(this.top);
         vertPositions = [...new Set(vertPositions)];
         vertPositions = vertPositions.toSorted((xA, xB) => Math.sign(xA - xB));
-        console.log('vertPositions', this.id, vertPositions);
 
         let prevBottom = this.bottom;
         

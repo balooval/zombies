@@ -12,6 +12,12 @@ import {
 	PLAYER_MAX_POS_Y,
 	PLAYER_MIN_POS_Y,
 } from './map/map.js';
+import Translation from './translation.js';
+import * as MATH from './utils/math.js';
+import {
+	getIntersection
+} from './intersectionResolver.js';
+
 
 export class State {
 	constructor(position) {
@@ -197,11 +203,13 @@ export class StateTravelCells extends State {
 
 
 export class StateSlide extends State {
-	constructor(position) {
+	constructor(position, map) {
 		super(position);
+		this.map = map;
 		this.velocityX = 0;
 		this.velocityY = 0;
 		this.friction = 0;
+		this.translation = new Translation();
 		this.sprite = SpriteFactory.createDummySprite();
 	}
 
@@ -209,20 +217,56 @@ export class StateSlide extends State {
 		this.velocityX = params.velocityX;
 		this.velocityY = params.velocityY;
 		this.friction = params.friction;
+		this.moveSpeed = MATH.distance({x: 0, y: 0}, {x: this.velocityX, y: this.velocityY});
 
+		
 		const angle = Math.atan2(this.velocityY, this.velocityX)
+		this.directionX = Math.cos(angle);
+		this.directionY = Math.sin(angle);
+
 		this.sprite.setRotation(angle);
 		super.start();
 	}
 
 	update(step, time) {
+		this.#updateTranslation();
 		this.#move();
 		super.update(time);
 	}
+
+	#updateTranslation() {
+		if (this.velocityX === 0 && this.velocityY === 0) {
+			this.translation.update(
+				this.position.x,
+				this.position.y,
+				this.position.x,
+				this.position.y,
+			);
+			return;
+		}
+
+		this.translation.setDirection(
+			this.position.x,
+			this.position.y,
+			this.directionX,
+			this.directionY,
+			this.moveSpeed
+		);
+	}
 	
 	#move() {
-		this.position.x += this.velocityX;
-		this.position.y += this.velocityY;
+		const wallHit = this.map.blocks.map(block => getIntersection(this.translation, block.hitBox)).filter(res => res).pop();
+
+		let newPosX = this.position.x + this.velocityX;
+		let newPosY = this.position.y + this.velocityY;
+
+		if (wallHit) {
+			newPosX = this.position.x;
+			newPosY = this.position.y;
+		}
+
+		this.position.x = newPosX;
+		this.position.y = newPosY;
 
 		this.position.x = Math.max(PLAYER_MIN_POS_X, Math.min(this.position.x, PLAYER_MAX_POS_X));
 		this.position.y = Math.max(PLAYER_MIN_POS_Y, Math.min(this.position.y, PLAYER_MAX_POS_Y));
@@ -230,9 +274,9 @@ export class StateSlide extends State {
 		this.velocityX *= this.friction;
 		this.velocityY *= this.friction;
 
-		const translation = Math.abs(this.velocityX) + Math.abs(this.velocityY);
+		const velocity = MATH.distance({x: 0, y: 0}, {x: this.velocityX, y: this.velocityY});
 
-		if (translation < 0.001) {
+		if (velocity < 0.001) {
 			this.onStop();
 		}
 	}
