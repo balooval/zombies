@@ -8,6 +8,7 @@ import * as Particules from './particules.js';
 import CollisionResolver from './collisionResolver.js';
 import EntityWithStates from './entityWithStates.js'
 import * as SoundLoader from './net/loaderSound.js';
+import * as Debug from './debugCanvas.js';
 import {
 	State,
 	StateFollowEntitie,
@@ -52,7 +53,7 @@ export class Zombi extends EntityWithStates{
 export class ZombiStateTravelGraph extends State {
 	constructor(position, map) {
 		super(position);
-		this.moveSpeed = 0.2;
+		this.moveSpeed = 0.1;
 		this.map = map;
 
 		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
@@ -63,6 +64,7 @@ export class ZombiStateTravelGraph extends State {
 		this.destX = 0;
 		this.destY = 0;
 		this.angle = 0;
+		this.bloodModulo = 2;
 		this.travelPoints = [];
 	}
 	
@@ -74,9 +76,28 @@ export class ZombiStateTravelGraph extends State {
 		this.#updateDirection();
 		super.start();
 	}
+
+	update(step, time) {
+		this.#move();
+		this.#dropBlood(step);
+		super.update(step, time);
+	}
 	
 	suspend() {
 		this.sprite.dispose();
+	}
+
+	#dropBlood(step) {
+		if (this.entity.life !== 1) {
+			return;
+		}
+		if (step % this.bloodModulo !== 0) {
+			return;
+		}
+
+		Particules.create(Particules.BLOOD_WALK, this.position);
+
+		this.bloodModulo = Math.round(randomValue(2, 60));
 	}
 
 	takeDamage(vector) {
@@ -91,6 +112,9 @@ export class ZombiStateTravelGraph extends State {
 		const destCell = this.map.getRandomCell();
 		const destPos = destCell.center;
 		this.travelPoints = this.map.getTravel(this.position, destPos);
+		// this.travelPoints.pop(); // Retire le premier point, qui est le centre de là où on se trouve déjà
+
+		Debug.drawJourney([...this.travelPoints]);
 	}
 
 	#updateDirection() {
@@ -103,11 +127,6 @@ export class ZombiStateTravelGraph extends State {
 		this.destY = nextPoint.y;
 		this.angle = Math.atan2(nextPoint.y - this.position.y, nextPoint.x - this.position.x);
 		this.sprite.setRotation(this.angle);
-	}
-
-	update(step, time) {
-		this.#move();
-		super.update(step, time);
 	}
 	
 	#move() {
@@ -122,7 +141,7 @@ export class ZombiStateTravelGraph extends State {
 
 		// console.log('this.distanceFromTargetTotal', this.distanceFromTargetTotal);
 
-		if (this.distanceFromTargetTotal < 10) {
+		if (this.distanceFromTargetTotal < 1) {
 			this.onReachDestination();
 		}
 	}

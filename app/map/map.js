@@ -13,6 +13,7 @@ import * as Walls from './walls.js';
 import * as Utils from '../utils/misc.js';
 import * as MATH from '../utils/math.js';
 import AstarBuilder from '../astar/AStarBuilder.js';
+import * as Debug from '../debugCanvas.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
@@ -58,16 +59,10 @@ export class GameMap {
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
 
-        // console.log(this.navigationGrid);
+        Debug.drawNavigationGrid(this.navigationGrid);
 
         const astarBuilder = new AstarBuilder();
         this.astar = astarBuilder.build();
-
-        // const test = this.getTravel({x: -55, y: 0}, {x: 55, y: 0});
-        // console.log(test);
-
-        // const toto = this.getRandomCell();
-        // console.log(toto);
     }
 
     getTravel(startPos, endPos) {
@@ -78,7 +73,6 @@ export class GameMap {
         const nav = this.astar.launch(this.navigationGrid.get('cell_' + startCell.id), this.navigationGrid.get('cell_' + endCell.id));
 
         for (const waypoint of nav) {
-            // console.log(waypoint.node);
             positions.push(waypoint.node)
         }
 
@@ -189,6 +183,8 @@ export class GameMap {
         blocks.push(new Block(-10, 40, 45, 5));
         blocks.push(new Block(-70, -10, 45, 5));
         blocks.push(new Block(-10, -10, 45, 5));
+        blocks.push(new Block(-55, 15, 75, 5));
+        blocks.push(new Block(45, 15, 25, 5));
         return blocks;
     }
 
@@ -480,6 +476,8 @@ class Block {
         );
 
         CollisionResolver.addToLayer(this, 'WALLS');
+
+        Debug.drawBlock(this);
     }
 
     getWorldCollisionBox() {
