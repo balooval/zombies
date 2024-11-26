@@ -5,6 +5,14 @@
 			"url": "assets/sounds/clap.wav"
 		},
 		{
+			"id": "gunA",
+			"url": "assets/sounds/gun-a.mp3"
+		},
+		{
+			"id": "gunB",
+			"url": "assets/sounds/gun-b.mp3"
+		},
+		{
 			"id": "wolfHitGroundA",
 			"url": "assets/sounds/fall-a.wav"
 		},
@@ -48,6 +56,10 @@
 			"url": "assets/screen-game-over.png"
 		},
 		{
+			"id": "bullet",
+			"url": "assets/bullet.png"
+		},
+		{
 			"id": "pointer",
 			"url": "assets/pointer.png"
 		},
@@ -82,6 +94,10 @@
 		{
 			"id": "zombiWalk",
 			"url": "assets/zombi.png"
+		},
+		{
+			"id": "playerWalk",
+			"url": "assets/playerWalk.png"
 		},
 		{
 			"id": "zombiHit",

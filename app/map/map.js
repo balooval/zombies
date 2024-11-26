@@ -14,6 +14,7 @@ import * as Utils from '../utils/misc.js';
 import * as MATH from '../utils/math.js';
 import AstarBuilder from '../astar/AStarBuilder.js';
 import * as Debug from '../debugCanvas.js';
+import {getIntersection} from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
@@ -54,6 +55,8 @@ export class GameMap {
         this.bonusStep = 0;
         this.addZombiRate = 80;
         this.player = null;
+
+        this.maxZombiesCount = 10;
         
         this.blocks = this.#buildBlocks();
         this.rootCell = this.#buildGraph();
@@ -99,7 +102,7 @@ export class GameMap {
         Stepper.stopListenStep(step, this, this.#addZombi);
         Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
 
-        if (Zombi.pool.size >= 1) {
+        if (Zombi.pool.size >= this.maxZombiesCount) {
             return;
         }
 
@@ -139,12 +142,14 @@ export class GameMap {
         const startX = Utils.randomValue(zone.minX, zone.maxX);
         const startY = Utils.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
-        const zombiStates = new Map();
-		zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this));
-		// zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
-		// zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
-		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this));
-		const zombi = new Zombi.Zombi(zombiStates);
+        // const zombiStates = new Map();
+		// zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this, this.player));
+		// // zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
+		// zombiStates.set('FOLLOW', new Zombi.ZombiStateFollow(startPosition, this.player, this));
+		// zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this));
+		// const zombi = new Zombi.Zombi(zombiStates);
+
+        Zombi.createZombi(this.player, this, startPosition);
     }
 
     onPlayerDead() {
@@ -154,6 +159,20 @@ export class GameMap {
     getWorldCollisionBox() {
 		return this.hitBox;
 	}
+
+    getWallsIntersections(segment) {
+        const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox)).filter(res => res);
+
+        const wallHitsWithDistance = wallHits.map(position => {
+            return {
+                x: position.x,
+                y: position.y,
+                distance: MATH.distance({x: segment.startX, y: segment.startY}, position),
+            };
+        }).sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));
+
+        return wallHitsWithDistance;
+    }
 
     dispose() {
         CollisionResolver.removeFromLayer(this, 'MAP');

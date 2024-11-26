@@ -11,9 +11,7 @@ import {
 } from './map/map.js';
 import Translation from './translation.js';
 import * as MATH from './utils/math.js';
-import {
-	getIntersection
-} from './intersectionResolver.js';
+import { getIntersection } from './intersectionResolver.js';
 
 
 export class State {

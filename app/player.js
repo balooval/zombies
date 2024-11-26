@@ -15,10 +15,12 @@ import {
 import * as SpriteFactory from './spriteFactory.js';
 import * as MATH from './utils/math.js';
 import * as Stepper from './utils/stepper.js';
-import { ActiveWeapon, BasicBulletLauncher } from './weapons.js';
-import {
-	getIntersection
-} from './intersectionResolver.js';
+import { 
+	ActiveWeapon,
+	RayLauncher,
+	BasicBulletLauncher
+} from './weapons.js';
+import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
@@ -41,8 +43,6 @@ export class Player {
 
 		Mouse.evt.addEventListener(Mouse.MOUSE_DOWN, this, this.onMouseDown);
 		Mouse.evt.addEventListener(Mouse.MOUSE_UP, this, this.onMouseUp);
-		Input.evt.addEventListener('LEFT', this, this.onKeyDown);
-		Input.evt.addEventListener('RIGHT', this, this.onKeyDown);
 		Input.evt.addEventListener('DOWN', this, this.onKeyDown);
 		Input.evt.addEventListener('UP', this, this.onKeyUp);
 		Input.evt.addEventListener('SPACE', this, this.onKeyUp);
@@ -53,15 +53,26 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new BasicBulletLauncher();
+		const baseWeapon = new RayLauncher(this.map);
+		// const baseWeapon = new BasicBulletLauncher(this.map);
 		baseWeapon.setOwner(this);
 		this.weapon = new ActiveWeapon(baseWeapon);
 		this.weaponPointer = new WeaponPointer();
 		
 		this.translation = new Translation();
 
-		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'pouleIdle');
+		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'playerWalk');
 		this.sprite.setPosition(this.position.x, this.position.y);
+
+		this.currentAnimation = '';
+	}
+
+	changeAnimation(animationId) {
+		if (animationId === this.currentAnimation) {
+			return;
+		}
+		this.currentAnimation = animationId;
+		this.sprite.changeAnimation(this.currentAnimation);
 	}
 
 	hit() {
@@ -123,9 +134,6 @@ export class Player {
 			directionY,
 			this.moveSpeed
 		);
-		
-		// this.sprite.setRotation(this.translation.angle);
-		// this.sprite.setRotation(this.viewAngle);
 	}
 
 	#applyTranslation() {
@@ -145,7 +153,10 @@ export class Player {
 		this.position.x = Math.max(PLAYER_MIN_POS_X, Math.min(this.position.x, PLAYER_MAX_POS_X));
 		this.position.y = Math.max(PLAYER_MIN_POS_Y, Math.min(this.position.y, PLAYER_MAX_POS_Y));
 
+		this.changeAnimation('playerWalk');
+		
 		if (this.translation.length === 0) {
+			this.changeAnimation('playerIdle');
 			this.moveSpeed = 0;
 		}
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -157,7 +168,7 @@ export class Player {
 
 	onShot() {
 		this.isShoting = true;
-		this.sprite.changeAnimation('pouleShot');
+		// this.sprite.changeAnimation('playerIdle');
 		Stepper.stopListenStep(this.endShotAnimatonStep, this, this.setToIdle);
 		this.weapon.startShot();
 	}
@@ -174,7 +185,7 @@ export class Player {
 		if (this.isShoting === true) {
 			return;
 		}
-		this.sprite.changeAnimation('pouleIdle');
+		// this.changeAnimation('playerWalk');
 	}
 
 	onMouseDown() {
@@ -188,15 +199,19 @@ export class Player {
 	onKeyDown(code) {
 		switch (code) {
 			case 'LEFT':
+			case 'Q':
 				this.inputMoves.left = 1;
 			break;
 			case 'RIGHT':
+			case 'D':
 				this.inputMoves.right = 1;
 			break;
 			case 'DOWN':
+			case 'S':
 				this.inputMoves.down = 1;
 			break;
 			case 'UP':
+			case 'Z':
 				this.inputMoves.up = 1;
 			break;
 			case 'SPACE':
@@ -208,15 +223,19 @@ export class Player {
 	onKeyUp(code) {
 		switch (code) {
 			case 'LEFT':
+			case 'Q':
 				this.inputMoves.left = 0;
 			break;
 			case 'RIGHT':
+			case 'D':
 				this.inputMoves.right = 0;
 			break;
 			case 'DOWN':
+			case 'S':
 				this.inputMoves.down = 0;
 			break;
 			case 'UP':
+			case 'Z':
 				this.inputMoves.up = 0;
 			break;
 			case 'SPACE':

@@ -63,6 +63,8 @@ export function onKeyDown(event) {
 		}
 		evt.fireEvent('DOWN_' + key, key);
 		evt.fireEvent('DOWN', key);
+
+
 		if( key == 87 ){ // w
 			
 		}else if( key == 16 ){ // MAJ
@@ -92,22 +94,28 @@ export function onKeyDown(event) {
 		}else if( key == 67 ){ // c
 			
 		}else if( key == 68 ){ // d
+			evt.fireEvent('DOWN', 'D');
 			
 		}else if( key == 69 ){ // e
-
+			
 		}else if( key == 71 ){ // g
-		
+			
 		}else if( key == 76 ){ // l
-
+			
 		}else if( key == 79 ){ // o
 			
 		}else if( key == 80 ){ // p
+
+		}else if( key == 81 ){ // q
+			evt.fireEvent('DOWN', 'Q');
 			
 		}else if( key == 82 ){ // r
 			
 		}else if( key == 83 ){ // s
+			evt.fireEvent('DOWN', 'S');
 			
 		}else if( key == 90 ){ // z
+			evt.fireEvent('DOWN', 'Z');
 			
 		}else if( key == 107 ){ // +
 			
@@ -140,5 +148,17 @@ export function onKeyUp(_event) {
 			evt.fireEvent('UP', 'UP');
 	}else if( key == 40 ){ // BOTTOM
 		evt.fireEvent('UP', 'DOWN');
+
+	}else if( key == 68 ){ // d
+		evt.fireEvent('UP', 'D');
+
+	}else if( key == 81 ){ // q
+		evt.fireEvent('UP', 'Q');
+		
+	}else if( key == 83 ){ // s
+		evt.fireEvent('UP', 'S');
+		
+	}else if( key == 90 ){ // z
+		evt.fireEvent('UP', 'Z');
 	}
 }

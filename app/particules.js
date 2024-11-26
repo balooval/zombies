@@ -11,6 +11,7 @@ import {
 	randomDiff,
 } from './utils/misc.js';
 import Interval from './utils/interval.js';
+import * as MATH from './utils/math.js';
 
 export const BLOOD_WALK = 'BLOOD_WALK';
 export const ENNEMI_HIT = 'ENNEMI_HIT';
@@ -18,6 +19,7 @@ export const BONUS_TAKE = 'BONUS_TAKE';
 export const EGG_EXPLOSION = 'EGG_EXPLOSION';
 export const WOLF_FALLING = 'WOLF_FALLING';
 export const WOLF_FALLING_CLOUD = 'WOLF_FALLING_CLOUD';
+export const RAY = 'RAY';
 
 export class WolfFallingParticules {
 	constructor(entitie) {
@@ -88,10 +90,64 @@ export function create(type, position, direction) {
 		case ENNEMI_HIT:
 			createEnnemiHit(position, direction);
 		break;
-
 		case BLOOD_WALK:
 			createBloodWalk(position);
 		break;
+	}
+}
+
+export function createBloodSplat(position) {
+	const count = 20;
+
+	for (let i = 0; i < count; i ++) {
+		const color = randomElement([0x9e1908, 0x880000, 0x5e1616]);
+		// const color = randomElement([0x880000, 0x5e1616]);
+		const velocityX = randomDirection(1.2);
+		const velocityY = randomDirection(1.2);
+		const particule = new Particule(
+			position.x,
+			position.y,
+			velocityX,
+			velocityY,
+			30, // stepDuration
+			0.95, // scaleDecrease
+			0, // gravity
+			0.96, // airResistance
+			color,
+			1, // scale
+		);
+	}
+}
+
+export function createRay(start, end) {
+	const distance = MATH.distance(start, end);
+	const countByUnite = 2;
+	const count = distance * countByUnite;
+	const stepX = (end.x - start.x) / count;
+	const stepY = (end.y - start.y) / count;
+
+	let stepDuration = 2;
+	const velocity = 0.05;
+
+	for (let i = 3; i < count; i ++) {
+		stepDuration += 0.1;
+		// const color = randomElement([0x9e1908, 0x880000, 0x5e1616]);
+		const color = randomElement([0x606060, 0x808080]);
+		const particule = new Particule(
+			randomDiff(start.x + (stepX * i), 0.2),
+			randomDiff(start.y + (stepY * i), 0.2),
+			randomFloat(-velocity, velocity), // velocityX
+			randomFloat(-velocity, velocity), // velocityY
+			// randomDiff(stepDuration, 0.05), // stepDuration
+			stepDuration, // stepDuration
+			// 3, // stepDuration
+			0.95, // scaleDecrease
+			0, // gravity
+			1, // airResistance
+			color,
+			0.5, // scale
+			// randomValue(0.2, 0.4), // scale
+		);
 	}
 }
 
@@ -250,6 +306,7 @@ class Particule {
 		AnimationControl.registerToUpdate(this);
 		
 		this.sprite = SpriteFactory.createFlatSprite(this.position.x, this.position.y, color);
+		this.sprite.setScale(this.scale);
 
 		this.shootInterval = new Interval(stepDuration, () => this.dispose(), false);
 		this.shootInterval.start();

@@ -5,8 +5,6 @@ import {
 
 export function getIntersection(translation, hitbox) {
     const hitboxSegments = hitbox.getSegments();
-    // console.log(hitboxSegments);
-    // console.log(translation.startX, translation.startY, translation.destX, translation.destY);
 
     return hitboxSegments.map(segment => {
         
