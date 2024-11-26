@@ -1,10 +1,7 @@
 import * as SpriteFactory from './spriteFactory.js';
+import * as Renderer from './renderer.js';
 import Hitbox from './collisionHitbox.js';
 import * as Stepper from './utils/stepper.js';
-import {
-	TweenValue,
-	TWEEN_END_EVENT,
-} from './utils/tween.js';
 import * as Utils from './utils/misc.js';
 import {
 	PLAYER_MAX_POS_X,
@@ -26,20 +23,32 @@ export class State {
 		this.position = position;
 		this.hitBox = new Hitbox(-1, 1, -1, 1, true);
 		this.sprite = SpriteFactory.createDummySprite();
+		this.sprite.hide();
 	}
 	
 	setEntity(entity) {
 		this.entity = entity
 	}
-
+	
 	setSprite(width, height, animationId) {
 		this.sprite = SpriteFactory.createAnimatedSprite(width, height, animationId);
 		this.sprite.setPosition(this.position.x, this.position.y);
+		this.sprite.hide();
 	}
 
-	start() {}
+	setHitBox(hitbox) {
+		this.hitBox.dispose();
+		this.hitBox = hitbox;
+	}
+
+	start() {
+		this.sprite.setPosition(this.position.x, this.position.y);
+		this.sprite.display();
+	}
 	
-	suspend() {}
+	suspend() {
+		this.sprite.hide();
+	}
 
 	update(step, time) {
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -64,7 +73,6 @@ export class StateFollowEntitie extends State {
 		this.distanceFromTargetY = 99999;
 		this.distanceFromTargetTotal = 99999;
 		this.angle = 0;
-		this.sprite = SpriteFactory.createDummySprite();
 	}
 
 	start() {
@@ -116,8 +124,6 @@ export class StateFollowEntitie extends State {
 }
 
 
-
-
 export class StateTravelCells extends State {
 	constructor(position, cellRoot, moveSpeed) {
 		super(position);
@@ -129,7 +135,6 @@ export class StateTravelCells extends State {
 		this.destX = 0;
 		this.destY = 0;
 		this.angle = 0;
-		this.sprite = SpriteFactory.createDummySprite();
 		this.travelPoints = [];
 	}
 
@@ -210,7 +215,6 @@ export class StateSlide extends State {
 		this.velocityY = 0;
 		this.friction = 0;
 		this.translation = new Translation();
-		this.sprite = SpriteFactory.createDummySprite();
 	}
 
 	start(params) {
@@ -219,7 +223,6 @@ export class StateSlide extends State {
 		this.friction = params.friction;
 		this.moveSpeed = MATH.distance({x: 0, y: 0}, {x: this.velocityX, y: this.velocityY});
 
-		
 		const angle = Math.atan2(this.velocityY, this.velocityX)
 		this.directionX = Math.cos(angle);
 		this.directionY = Math.sin(angle);
@@ -283,9 +286,5 @@ export class StateSlide extends State {
 
 	onStop() {
 		
-	}
-
-	dispose() {
-		super.dispose();
 	}
 }

@@ -51,6 +51,12 @@ export class SpriteBase {
 		return null;
 	}
 
+	display() {
+	}
+
+	hide() {
+	}
+
 	setPosition(x, y) {}
 
 	setOpacity(opacity) {}
@@ -74,10 +80,20 @@ export class AnimatedSprite extends SpriteBase {
 		this.height = height;
 		this.buildMesh(width, height, animationId);
 		this.render = render;
-		this.render.scene.add(this.mesh);
 		this.textureAnimation = new TextureAnimation(this.mesh, animationId);
 		this.depthPosition = 5;
 		this.animationOffsetV = this.textureAnimation.getOffsetV() * this.height;
+		this.display();
+	}
+
+	display() {
+		this.render.scene.add(this.mesh);
+		super.display();
+	}
+	
+	hide() {
+		this.render.scene.remove(this.mesh);
+		super.hide();
 	}
 
 	getPosition() {
@@ -135,7 +151,7 @@ export class AnimatedSprite extends SpriteBase {
 	}
 
 	dispose() {
-		this.render.scene.remove(this.mesh);
+		this.hide();
 		this.textureAnimation.dispose();
 	}
 }
@@ -147,7 +163,7 @@ export class FlatRectangleSprite {
 		this.render = render;
 		this.depthPosition = 1;
 		this.mesh.material = getColorMaterial(color);
-		this.render.scene.add(this.mesh);
+		this.display();
 		this.setPosition(x, y);
 	}
 
@@ -158,9 +174,17 @@ export class FlatRectangleSprite {
 	setPosition(x, y) {
 		this.mesh.position.set(x, y, this.depthPosition);
 	}
+
+	display() {
+		this.render.scene.add(this.mesh);
+	}
+
+	hide() {
+		this.render.scene.remove(this.mesh);
+	}
 	
 	dispose() {
-		this.render.scene.remove(this.mesh);
+		this.hide();
 	}
 }
 
@@ -176,7 +200,7 @@ export class FlatSprite {
 	reset(x, y, color) {
 		this.isAlive = true;
 		this.mesh.material = getColorMaterial(color);
-		this.render.scene.add(this.mesh);
+		this.display();
 		this.setPosition(x, y);
 		this.setScale(1);
 	}
@@ -194,9 +218,17 @@ export class FlatSprite {
 		this.mesh.scale.y = scale;
 		this.mesh.scale.z = scale;
 	}
+
+	display() {
+		this.render.scene.add(this.mesh);
+	}
+
+	hide() {
+		this.render.scene.remove(this.mesh);
+	}
 	
 	dispose() {
-		this.render.scene.remove(this.mesh);
+		this.hide();
 		this.isAlive = false;
 	}
 }

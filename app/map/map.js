@@ -99,11 +99,9 @@ export class GameMap {
         Stepper.stopListenStep(step, this, this.#addZombi);
         Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
 
-        if (Zombi.pool.size >= 10) {
+        if (Zombi.pool.size >= 1) {
             return;
         }
-
-        console.log('ZOMBIES', Zombi.pool.size);
 
 
         const zones = [

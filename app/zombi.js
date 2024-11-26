@@ -39,8 +39,8 @@ export class Zombi extends EntityWithStates{
 		return this.currentState.getWorldCollisionBox();
 	}
 
-	takeDamage(vector) {
-		this.currentState.takeDamage(vector);
+	takeDamage(vector, damageCount) {
+		this.currentState.takeDamage(vector, damageCount);
 	}
 
 	dispose() {
@@ -50,13 +50,71 @@ export class Zombi extends EntityWithStates{
 	}
 }
 
+class BloodDropping {
+
+	constructor(entity) {
+		this.entity = entity;
+		this.bloodModulo = 2;
+	}
+
+	setEntity(entity) {
+		this.entity = entity;
+	}
+
+	update(step, position) {
+		this.#dropBlood(step, position);
+	}
+
+	#dropBlood(step, position) {
+		if (this.entity.life !== 1) {
+			return;
+		}
+
+		if (step % this.bloodModulo !== 0) {
+			return;
+		}
+
+		Particules.create(Particules.BLOOD_WALK, position);
+
+		this.bloodModulo = Math.round(randomValue(2, 60));
+	}
+}
+
+class ZombiHitable {
+
+	constructor(entity) {
+		this.entity = entity;
+	}
+
+	setEntity(entity) {
+		this.entity = entity;
+	}
+
+	enable() {
+		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
+	}
+
+	disable() {
+		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
+	}
+	
+	hit(damageCount) {
+		this.entity.life -= damageCount;
+		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
+	}
+
+	dispose() {
+		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
+	}
+}
+
 export class ZombiStateTravelGraph extends State {
 	constructor(position, map) {
 		super(position);
 		this.moveSpeed = 0.1;
 		this.map = map;
 
-		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
+		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
 		
 		this.distanceFromTargetX = 99999;
 		this.distanceFromTargetY = 99999;
@@ -64,47 +122,41 @@ export class ZombiStateTravelGraph extends State {
 		this.destX = 0;
 		this.destY = 0;
 		this.angle = 0;
-		this.bloodModulo = 2;
+		// this.bloodModulo = 2;
 		this.travelPoints = [];
+		this.setSprite(8, 8, 'zombiWalk');
+
+		this.bloodDropping = new BloodDropping(this.entity);
+		this.zombiHitable = new ZombiHitable();
+	}
+
+	setEntity(entity) {
+		super.setEntity(entity);
+		this.bloodDropping.setEntity(this.entity);
+		this.zombiHitable.setEntity(this.entity);
 	}
 	
 	start() {
-		this.setSprite(8, 8, 'zombiWalk');
-		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
+		this.zombiHitable.enable();
 		this.travelPoints = [];
 		this.#getJourney();
 		this.#updateDirection();
 		super.start();
 	}
 
+	suspend() {
+		this.zombiHitable.disable();
+		super.suspend();
+	}
+
 	update(step, time) {
 		this.#move();
-		this.#dropBlood(step);
+		this.bloodDropping.update(step, this.position);
 		super.update(step, time);
 	}
-	
-	suspend() {
-		this.sprite.dispose();
-	}
 
-	#dropBlood(step) {
-		if (this.entity.life !== 1) {
-			return;
-		}
-		if (step % this.bloodModulo !== 0) {
-			return;
-		}
-
-		Particules.create(Particules.BLOOD_WALK, this.position);
-
-		this.bloodModulo = Math.round(randomValue(2, 60));
-	}
-
-	takeDamage(vector) {
-		this.entity.life --;
-		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-
+	takeDamage(vector, damageCount) {
+		this.zombiHitable.hit(damageCount);
 		this.entity.setState('SLIDE', vector);
 	}
 
@@ -112,8 +164,6 @@ export class ZombiStateTravelGraph extends State {
 		const destCell = this.map.getRandomCell();
 		const destPos = destCell.center;
 		this.travelPoints = this.map.getTravel(this.position, destPos);
-		// this.travelPoints.pop(); // Retire le premier point, qui est le centre de là où on se trouve déjà
-
 		Debug.drawJourney([...this.travelPoints]);
 	}
 
@@ -139,21 +189,17 @@ export class ZombiStateTravelGraph extends State {
 		this.distanceFromTargetY = this.destY - this.position.y;
 		this.distanceFromTargetTotal = Math.abs(this.distanceFromTargetX) + Math.abs(this.distanceFromTargetY);
 
-		// console.log('this.distanceFromTargetTotal', this.distanceFromTargetTotal);
-
 		if (this.distanceFromTargetTotal < 1) {
 			this.onReachDestination();
 		}
 	}
 
 	onReachDestination() {
-		// console.log('onReachDestination');
 		this.#updateDirection();
 	}
 
 	dispose() {
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-		this.hitBox.dispose();
+		this.zombiHitable.dispose();
 		super.dispose();
 	}
 }
@@ -162,49 +208,37 @@ export class ZombiStateTravelCells extends StateTravelCells {
 	constructor(position, cellRoot) {
 		super(position, cellRoot, 0.2);
 		this.id = 'ENTER';
-		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
-		this.bloodModulo = 2;
+		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
+		this.setSprite(8, 8, 'zombiWalk');
+		this.zombiHitable = new ZombiHitable();
+	}
+
+	setEntity(entity) {
+		super.setEntity(entity);
+		this.zombiHitable.setEntity(this.entity);
 	}
 
 	start() {
-		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
-		this.setSprite(8, 8, 'zombiWalk');
+		this.zombiHitable.enable();
 		super.start();
 	}
 
 	suspend() {
-		this.sprite.dispose();
+		this.zombiHitable.disable();
+		super.suspend();
 	}
 
 	update(step, time) {
 		super.update(step, time);
-		this.#dropBlood(step);
 	}
 
-	#dropBlood(time) {
-		if (this.entity.life !== 1) {
-			return;
-		}
-		if (time % this.bloodModulo !== 0) {
-			return;
-		}
-
-		Particules.create(Particules.BLOOD_WALK, this.position);
-
-		this.bloodModulo = Math.round(randomValue(2, 60));
-	}
-
-	takeDamage(vector) {
-		this.entity.life --;
-		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-
+	takeDamage(vector, damageCount) {
+		this.zombiHitable.hit(damageCount);
 		this.entity.setState('SLIDE', vector);
 	}
 
 	dispose() {
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-		this.hitBox.dispose();
+		this.zombiHitable.dispose();
 		super.dispose();
 	}
 }
@@ -213,40 +247,32 @@ export class ZombiStateFollow extends StateFollowEntitie {
 	constructor(position, player) {
 		super(position, player, 0.2);
 		this.id = 'ENTER';
-		this.hitBox = new Hitbox(-2, 2, -2, 4, true);
-		this.bloodModulo = 2;
+		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
+		this.setSprite(8, 8, 'zombiWalk');
+		this.zombiHitable = new ZombiHitable();
+	}
+
+	setEntity(entity) {
+		super.setEntity(entity);
+		this.zombiHitable.setEntity(this.entity);
 	}
 	
 	start() {
-		CollisionResolver.addToLayer(this.entity, 'ENNEMIES');
-		this.setSprite(8, 8, 'zombiWalk');
+		this.zombiHitable.enable();
 		super.start();
 	}
 
 	suspend() {
-		this.sprite.dispose();
+		this.zombiHitable.disable();
+		super.suspend();
 	}
 
 	update(step, time) {
 		super.update(step, time);
-		this.#dropBlood(step);
 	}
 
 	getNextUpdateDirectionStepDelay() {
 		return Math.round(randomValue(10, 120));
-	}
-
-	#dropBlood(time) {
-		if (this.entity.life !== 1) {
-			return;
-		}
-		if (time % this.bloodModulo !== 0) {
-			return;
-		}
-
-		Particules.create(Particules.BLOOD_WALK, this.position);
-
-		this.bloodModulo = Math.round(randomValue(2, 60));
 	}
 
 	onReachDestination() {
@@ -254,19 +280,13 @@ export class ZombiStateFollow extends StateFollowEntitie {
 		this.entity.dispose();
 	}
 
-	takeDamage(vector) {
-		this.entity.life --;
-		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
-		// this.entity.dispose();
-		// this.dispose();
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-
+	takeDamage(vector, damageCount) {
+		this.zombiHitable.hit(damageCount);
 		this.entity.setState('SLIDE', vector);
 	}
 
 	dispose() {
-		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
-		this.hitBox.dispose();
+		this.zombiHitable.dispose();
 		super.dispose();
 	}
 }
@@ -275,6 +295,7 @@ export class ZombiStateSlide extends StateSlide {
 	constructor(position, map) {
 		super(position, map);
 		this.id = 'SLIDE';
+		this.setSprite(8, 8, 'zombiHit');
 	}
 
 	start(vector) {
@@ -283,19 +304,12 @@ export class ZombiStateSlide extends StateSlide {
 			velocityY: vector.y,
 			friction: 0.85,
 		}
-		this.setSprite(8, 8, 'zombiHit');
 		super.start(params);
 	}
 
-	suspend() {
-		this.sprite.dispose();
-	}
-	
 	onStop() {
-		// this.entity.setState('ENTER');
 		if (this.entity.life === 0) {
 			this.entity.dispose();
-			this.dispose();
 			return;
 		}
 
