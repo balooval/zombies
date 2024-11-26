@@ -9,7 +9,23 @@ class Translation {
         this.moveY = 0;
         this.length = 0;
         this.angle = 0;
+        this.lastPosX = 0;
+        this.lastPosY = 0;
 	}
+
+    reset(posX, posY) {
+        this.lastPosX = posX;
+        this.lastPosY = posY;
+        this.startX = posX;
+        this.startY = posY;
+        this.updatePosition(posX, posY);    
+    }
+
+    updatePosition(posX, posY) {
+        this.lastPosX = this.destX;
+        this.lastPosY = this.destY;
+        this.update(this.lastPosX, this.lastPosY, posX, posY);
+    }
 
     setDirection(startX, startY, normalizedMoveX, normalizedMoveY, moveLength) {
         this.angle = Math.atan2(normalizedMoveY, normalizedMoveX);
@@ -23,6 +39,8 @@ class Translation {
 	}
 
     update(startX, startY, destX, destY) {
+        this.lastPosX = this.startX;
+        this.lastPosY = this.startY;
 		this.startX = startX;
 		this.startY = startY;
 		this.destX = destX;

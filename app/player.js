@@ -41,8 +41,6 @@ export class Player {
 
 		Mouse.evt.addEventListener(Mouse.MOUSE_DOWN, this, this.onMouseDown);
 		Mouse.evt.addEventListener(Mouse.MOUSE_UP, this, this.onMouseUp);
-		Input.evt.addEventListener('LEFT', this, this.onKeyDown);
-		Input.evt.addEventListener('RIGHT', this, this.onKeyDown);
 		Input.evt.addEventListener('DOWN', this, this.onKeyDown);
 		Input.evt.addEventListener('UP', this, this.onKeyUp);
 		Input.evt.addEventListener('SPACE', this, this.onKeyUp);
@@ -60,7 +58,7 @@ export class Player {
 		
 		this.translation = new Translation();
 
-		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'pouleIdle');
+		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'playerWalk');
 		this.sprite.setPosition(this.position.x, this.position.y);
 	}
 
@@ -123,9 +121,6 @@ export class Player {
 			directionY,
 			this.moveSpeed
 		);
-		
-		// this.sprite.setRotation(this.translation.angle);
-		// this.sprite.setRotation(this.viewAngle);
 	}
 
 	#applyTranslation() {
@@ -157,7 +152,7 @@ export class Player {
 
 	onShot() {
 		this.isShoting = true;
-		this.sprite.changeAnimation('pouleShot');
+		this.sprite.changeAnimation('playerIdle');
 		Stepper.stopListenStep(this.endShotAnimatonStep, this, this.setToIdle);
 		this.weapon.startShot();
 	}
@@ -174,7 +169,7 @@ export class Player {
 		if (this.isShoting === true) {
 			return;
 		}
-		this.sprite.changeAnimation('pouleIdle');
+		this.sprite.changeAnimation('playerWalk');
 	}
 
 	onMouseDown() {
@@ -188,15 +183,19 @@ export class Player {
 	onKeyDown(code) {
 		switch (code) {
 			case 'LEFT':
+			case 'Q':
 				this.inputMoves.left = 1;
 			break;
 			case 'RIGHT':
+			case 'D':
 				this.inputMoves.right = 1;
 			break;
 			case 'DOWN':
+			case 'S':
 				this.inputMoves.down = 1;
 			break;
 			case 'UP':
+			case 'Z':
 				this.inputMoves.up = 1;
 			break;
 			case 'SPACE':
@@ -208,15 +207,19 @@ export class Player {
 	onKeyUp(code) {
 		switch (code) {
 			case 'LEFT':
+			case 'Q':
 				this.inputMoves.left = 0;
 			break;
 			case 'RIGHT':
+			case 'D':
 				this.inputMoves.right = 0;
 			break;
 			case 'DOWN':
+			case 'S':
 				this.inputMoves.down = 0;
 			break;
 			case 'UP':
+			case 'Z':
 				this.inputMoves.up = 0;
 			break;
 			case 'SPACE':

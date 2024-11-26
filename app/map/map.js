@@ -99,7 +99,7 @@ export class GameMap {
         Stepper.stopListenStep(step, this, this.#addZombi);
         Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
 
-        if (Zombi.pool.size >= 1) {
+        if (Zombi.pool.size >= 10) {
             return;
         }
 
@@ -140,9 +140,9 @@ export class GameMap {
         const startY = Utils.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
         const zombiStates = new Map();
-		zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this));
+		zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this, this.player));
 		// zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
-		// zombiStates.set('ENTER', new Zombi.ZombiStateFollow(startPosition, this.player));
+		zombiStates.set('FOLLOW', new Zombi.ZombiStateFollow(startPosition, this.player, this));
 		zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this));
 		const zombi = new Zombi.Zombi(zombiStates);
     }

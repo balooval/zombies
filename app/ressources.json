@@ -84,6 +84,10 @@
 			"url": "assets/zombi.png"
 		},
 		{
+			"id": "playerWalk",
+			"url": "assets/playerWalk.png"
+		},
+		{
 			"id": "zombiHit",
 			"url": "assets/zombi-hit.png"
 		},

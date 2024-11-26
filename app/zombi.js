@@ -4,11 +4,14 @@ import {
 	PLAYER_POSITION_X,
 } from './map/map.js';
 import Hitbox from './collisionHitbox.js';
+import Translation from './translation.js';
 import * as Particules from './particules.js';
 import CollisionResolver from './collisionResolver.js';
 import EntityWithStates from './entityWithStates.js'
 import * as SoundLoader from './net/loaderSound.js';
 import * as Debug from './debugCanvas.js';
+import * as MATH from './utils/math.js';
+import { getIntersection } from './intersectionResolver.js';
 import {
 	State,
 	StateFollowEntitie,
@@ -108,8 +111,53 @@ class ZombiHitable {
 	}
 }
 
+class PlayerFinder {
+	constructor(player, map) {
+		this.player = player;
+		this.map = map;
+		this.evt = new Evt();
+		this.entity = null;
+		this.viewAngle = 1.5;
+		this.translation = new Translation();
+		this.viewTranslation = new Translation();
+	}
+	
+	init(entity, position, onViewFunction) {
+		this.entity = entity;
+		this.onViewFunction = onViewFunction;
+		this.translation.reset(position.x, position.y)
+	}
+
+	update(position) {
+		this.translation.updatePosition(position.x, position.y);
+		
+		const angleToPlayer = MATH.pointsAngle(
+			[position.x, position.y],
+			[this.player.position.x, this.player.position.y]
+		);
+		
+		const viewAngle = Math.abs(MATH.angleDiff(angleToPlayer, this.translation.angle));
+		
+		if (viewAngle > this.viewAngle) {
+			this.evt.fireEvent('LOST');
+			return;
+		}
+		
+		this.viewTranslation.reset(position.x, position.y);
+		this.viewTranslation.updatePosition(this.player.position.x, this.player.position.y);
+		const wallHit = this.map.blocks.map(block => getIntersection(this.viewTranslation, block.hitBox)).filter(res => res).pop();
+		
+		if (wallHit) {
+			this.evt.fireEvent('LOST');
+			return;
+		}
+
+		this.evt.fireEvent('VIEW');
+	}
+}
+
 export class ZombiStateTravelGraph extends State {
-	constructor(position, map) {
+	constructor(position, map, player) {
 		super(position);
 		this.moveSpeed = 0.1;
 		this.map = map;
@@ -126,14 +174,17 @@ export class ZombiStateTravelGraph extends State {
 		this.travelPoints = [];
 		this.setSprite(8, 8, 'zombiWalk');
 
-		this.bloodDropping = new BloodDropping(this.entity);
+		this.bloodDropping = new BloodDropping();
 		this.zombiHitable = new ZombiHitable();
+		this.playerFinder = new PlayerFinder(player, this.map);
+		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 	}
 
 	setEntity(entity) {
 		super.setEntity(entity);
 		this.bloodDropping.setEntity(this.entity);
 		this.zombiHitable.setEntity(this.entity);
+		this.playerFinder.init(this.entity, this.position);
 	}
 	
 	start() {
@@ -152,7 +203,12 @@ export class ZombiStateTravelGraph extends State {
 	update(step, time) {
 		this.#move();
 		this.bloodDropping.update(step, this.position);
+		this.playerFinder.update(this.position);
 		super.update(step, time);
+	}
+
+	onViewPlayer() {
+		this.entity.setState('FOLLOW');
 	}
 
 	takeDamage(vector, damageCount) {
@@ -244,17 +300,26 @@ export class ZombiStateTravelCells extends StateTravelCells {
 }
 
 export class ZombiStateFollow extends StateFollowEntitie {
-	constructor(position, player) {
+	constructor(position, player, map) {
 		super(position, player, 0.2);
 		this.id = 'ENTER';
 		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
 		this.setSprite(8, 8, 'zombiWalk');
+		this.bloodDropping = new BloodDropping();
 		this.zombiHitable = new ZombiHitable();
+		this.playerFinder = new PlayerFinder(player, map);
+		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
+	}
+
+	onLostPlayer() {
+		this.entity.setState('ENTER');
 	}
 
 	setEntity(entity) {
 		super.setEntity(entity);
+		this.bloodDropping.setEntity(this.entity);
 		this.zombiHitable.setEntity(this.entity);
+		this.playerFinder.init(this.entity, this.position);
 	}
 	
 	start() {
@@ -269,6 +334,8 @@ export class ZombiStateFollow extends StateFollowEntitie {
 
 	update(step, time) {
 		super.update(step, time);
+		this.bloodDropping.update(step, this.position);
+		this.playerFinder.update(this.position);
 	}
 
 	getNextUpdateDirectionStepDelay() {
