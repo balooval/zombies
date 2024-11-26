@@ -78,6 +78,11 @@ body {
     transition-property: font-size;
     transition-duration: 0.1s;
 }
+#debugCanvas {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
 
 #container_points.changed {
     font-size: 24px;

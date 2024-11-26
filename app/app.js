@@ -9,6 +9,7 @@ import * as Sound from './sound.js';
 import HomeScreen from './ui/homeScreen.js';
 import * as GameLevel from './gameLevel.js';
 import {init as TextureAnimationInit} from './textureAnimation.js';
+import * as Debug from './debugCanvas.js';
 
 Input.init();
 Mouse.init('main', Renderer.worldWidth, Renderer.worldHeight);
@@ -28,6 +29,7 @@ function onKeyDown(code) {
 
 function init() {
 	homeScreen.evt.removeEventListener('LAUNCH_GAME', null, init);
+	Debug.init('debugCanvas');
 	Sound.init();
 	LoadingScreen.display('main');
 	loadRessourcesList('./app/ressources.json')
