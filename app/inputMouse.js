@@ -19,6 +19,7 @@ export function init(elementId, inputWorldWidth, inputWorldHeight) {
     worldHeight = inputWorldHeight;
     ratioWidth = worldWidth / domRect.width;
     ratioHeight = worldHeight / domRect.height;
+
     targetElement.addEventListener('mousemove', onMouseMove);
     targetElement.addEventListener('mousedown', onMouseDown);
     targetElement.addEventListener('mouseup', onMouseUp);

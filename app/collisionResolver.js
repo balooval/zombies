@@ -1,4 +1,5 @@
 import * as AnimationControl from './animationControl.js';
+import * as MATH from './utils/math.js';
 
 
 class CollisionResolver {
@@ -29,6 +30,28 @@ class CollisionResolver {
         } else {
             this.entitiesToCheck.delete(entitie);
         }
+    }
+
+    checkIntersectionWithLayer(segment, layerName) {
+        const layer = this.layers[layerName];
+        if (layer === undefined) {
+            return [];
+        }
+
+        const collisions = [];
+        for (const layerEntitie of layer) {
+            const intersection = this.#entitiesIntersect(segment, layerEntitie);
+            if (intersection !== undefined) {
+                const distance = MATH.distance({x: segment.startX, y: segment.startY}, intersection);
+                collisions.push({
+                    target: layerEntitie,
+                    distance: distance,
+                    point: intersection,
+                });
+            }
+        }
+
+        return collisions.sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));;
     }
 
     checkCollisionWithLayer(entitie, layerName) {
@@ -63,6 +86,12 @@ class CollisionResolver {
         }
 
         return collisions;
+    }
+
+    #entitiesIntersect(segment, layerEntitie) {
+        const box = layerEntitie.getWorldCollisionBox();
+        const polygon = box.getSegments();
+        return MATH.segmentWithPolygonIntersection(segment, polygon);
     }
 
     entitiesCollide(entitieA, entitieB) {

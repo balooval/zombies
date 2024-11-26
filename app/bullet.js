@@ -26,7 +26,7 @@ class Bullet {
 		CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
 		CollisionResolver.checkCollisionWithLayer(this, 'WALLS');
 
-		this.sprite = SpriteFactory.createAnimatedSprite(3, 3, 'eggLaunch');
+		this.sprite = SpriteFactory.createAnimatedSprite(3, 3, 'bullet');
 		this.sprite.setPosition(this.position.x, this.position.y);
 	}
 

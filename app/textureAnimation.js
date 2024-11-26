@@ -189,6 +189,10 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'playerWalk',
 		frames: [],
 	},
+	bullet: {
+		textureId: 'bullet',
+		frames: [],
+	},
 	playerIdle: {
 		textureId: 'playerWalk',
 		frames: [],
@@ -340,6 +344,11 @@ const animations = {
 		framesToDisplay: [0],
 	},
 
+	bullet: {
+		spriteSheet: 'bullet',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	playerWalk: {
 		spriteSheet: 'playerWalk',
 		stepsByFrame: 15,

@@ -15,10 +15,12 @@ import {
 import * as SpriteFactory from './spriteFactory.js';
 import * as MATH from './utils/math.js';
 import * as Stepper from './utils/stepper.js';
-import { ActiveWeapon, BasicBulletLauncher } from './weapons.js';
-import {
-	getIntersection
-} from './intersectionResolver.js';
+import { 
+	ActiveWeapon,
+	RayLauncher,
+	BasicBulletLauncher
+} from './weapons.js';
+import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
@@ -51,7 +53,8 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new BasicBulletLauncher();
+		const baseWeapon = new RayLauncher(this.map);
+		// const baseWeapon = new BasicBulletLauncher(this.map);
 		baseWeapon.setOwner(this);
 		this.weapon = new ActiveWeapon(baseWeapon);
 		this.weaponPointer = new WeaponPointer();
@@ -60,6 +63,16 @@ export class Player {
 
 		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'playerWalk');
 		this.sprite.setPosition(this.position.x, this.position.y);
+
+		this.currentAnimation = '';
+	}
+
+	changeAnimation(animationId) {
+		if (animationId === this.currentAnimation) {
+			return;
+		}
+		this.currentAnimation = animationId;
+		this.sprite.changeAnimation(this.currentAnimation);
 	}
 
 	hit() {
@@ -140,7 +153,10 @@ export class Player {
 		this.position.x = Math.max(PLAYER_MIN_POS_X, Math.min(this.position.x, PLAYER_MAX_POS_X));
 		this.position.y = Math.max(PLAYER_MIN_POS_Y, Math.min(this.position.y, PLAYER_MAX_POS_Y));
 
+		this.changeAnimation('playerWalk');
+		
 		if (this.translation.length === 0) {
+			this.changeAnimation('playerIdle');
 			this.moveSpeed = 0;
 		}
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -152,7 +168,7 @@ export class Player {
 
 	onShot() {
 		this.isShoting = true;
-		this.sprite.changeAnimation('playerIdle');
+		// this.sprite.changeAnimation('playerIdle');
 		Stepper.stopListenStep(this.endShotAnimatonStep, this, this.setToIdle);
 		this.weapon.startShot();
 	}
@@ -169,7 +185,7 @@ export class Player {
 		if (this.isShoting === true) {
 			return;
 		}
-		this.sprite.changeAnimation('playerWalk');
+		// this.changeAnimation('playerWalk');
 	}
 
 	onMouseDown() {

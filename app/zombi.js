@@ -3,6 +3,7 @@ import * as AnimationControl from './animationControl.js';
 import {
 	PLAYER_POSITION_X,
 } from './map/map.js';
+import Interval from './utils/interval.js';
 import Hitbox from './collisionHitbox.js';
 import Translation from './translation.js';
 import * as Particules from './particules.js';
@@ -26,6 +27,15 @@ export const DISPOSE_EVENT = 'DISPOSE_EVENT';
 export const ON_GROUND_EVENT = 'ON_GROUND_EVENT';
 
 export const pool = new Map();
+
+export function createZombi(player, map, startPosition) {
+	const zombiStates = new Map();
+	zombiStates.set('ENTER', new ZombiStateTravelGraph(startPosition, map, player));
+	// zombiStates.set('ENTER', new ZombiStateTravelCells(startPosition, this.grid));
+	zombiStates.set('FOLLOW', new ZombiStateFollow(startPosition, player, map));
+	zombiStates.set('SLIDE', new ZombiStateSlide(startPosition, map));
+	const zombi = new Zombi(zombiStates);
+}
 
 export class Zombi extends EntityWithStates{
 
@@ -103,7 +113,11 @@ class ZombiHitable {
 	
 	hit(damageCount) {
 		this.entity.life -= damageCount;
-		SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']);
+		// SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB'], 0.5);
+
+		Particules.createBloodSplat(this.entity.currentState.position)
+
+		setTimeout(() => SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']), 100);
 	}
 
 	dispose() {
@@ -162,7 +176,7 @@ export class ZombiStateTravelGraph extends State {
 		this.moveSpeed = 0.1;
 		this.map = map;
 
-		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
+		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		
 		this.distanceFromTargetX = 99999;
 		this.distanceFromTargetY = 99999;
@@ -264,7 +278,7 @@ export class ZombiStateTravelCells extends StateTravelCells {
 	constructor(position, cellRoot) {
 		super(position, cellRoot, 0.2);
 		this.id = 'ENTER';
-		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
+		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		this.setSprite(8, 8, 'zombiWalk');
 		this.zombiHitable = new ZombiHitable();
 	}
@@ -303,7 +317,7 @@ export class ZombiStateFollow extends StateFollowEntitie {
 	constructor(position, player, map) {
 		super(position, player, 0.2);
 		this.id = 'ENTER';
-		this.setHitBox(new Hitbox(-2, 2, -2, 4, true));
+		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		this.setSprite(8, 8, 'zombiWalk');
 		this.bloodDropping = new BloodDropping();
 		this.zombiHitable = new ZombiHitable();

@@ -5,6 +5,14 @@
 			"url": "assets/sounds/clap.wav"
 		},
 		{
+			"id": "gunA",
+			"url": "assets/sounds/gun-a.mp3"
+		},
+		{
+			"id": "gunB",
+			"url": "assets/sounds/gun-b.mp3"
+		},
+		{
 			"id": "wolfHitGroundA",
 			"url": "assets/sounds/fall-a.wav"
 		},
@@ -46,6 +54,10 @@
 		{
 			"id": "screenGameOver",
 			"url": "assets/screen-game-over.png"
+		},
+		{
+			"id": "bullet",
+			"url": "assets/bullet.png"
 		},
 		{
 			"id": "pointer",
