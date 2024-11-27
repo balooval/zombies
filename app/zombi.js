@@ -11,6 +11,7 @@ import CollisionResolver from './collisionResolver.js';
 import EntityWithStates from './entityWithStates.js'
 import * as SoundLoader from './net/loaderSound.js';
 import * as Debug from './debugCanvas.js';
+import * as Stepper from './utils/stepper.js';
 import * as MATH from './utils/math.js';
 import { getIntersection } from './intersectionResolver.js';
 import {
@@ -31,9 +32,9 @@ export const pool = new Map();
 export function createZombi(player, map, startPosition) {
 	const zombiStates = new Map();
 	zombiStates.set('ENTER', new ZombiStateTravelGraph(startPosition, map, player));
-	// zombiStates.set('ENTER', new ZombiStateTravelCells(startPosition, this.grid));
 	zombiStates.set('FOLLOW', new ZombiStateFollow(startPosition, player, map));
 	zombiStates.set('SLIDE', new ZombiStateSlide(startPosition, map));
+	zombiStates.set('PAUSE_AND_SEARCH', new ZombiPauseAndSearch(startPosition, map, player));
 	const zombi = new Zombi(zombiStates);
 }
 
@@ -132,26 +133,26 @@ class PlayerFinder {
 		this.evt = new Evt();
 		this.entity = null;
 		this.viewAngle = 1.5;
-		this.translation = new Translation();
+		// this.translation = new Translation();
 		this.viewTranslation = new Translation();
 	}
 	
 	init(entity, position, onViewFunction) {
 		this.entity = entity;
 		this.onViewFunction = onViewFunction;
-		this.translation.reset(position.x, position.y)
+		// this.translation.reset(position.x, position.y)
 	}
 
-	update(position) {
-		this.translation.updatePosition(position.x, position.y);
+	update(position, translation) {
+		// this.translation.updatePosition(position.x, position.y);
 		
 		const angleToPlayer = MATH.pointsAngle(
 			[position.x, position.y],
 			[this.player.position.x, this.player.position.y]
 		);
 		
-		const viewAngle = Math.abs(MATH.angleDiff(angleToPlayer, this.translation.angle));
-		
+		const viewAngle = Math.abs(MATH.angleDiff(angleToPlayer, translation.angle));
+
 		if (viewAngle > this.viewAngle) {
 			this.evt.fireEvent('LOST');
 			return;
@@ -170,28 +171,65 @@ class PlayerFinder {
 	}
 }
 
+class ZombieMove {
+	constructor(moveSpeed, position) {
+		this.moveSpeed = moveSpeed;
+		this.position = position;
+		this.moveTranslation = new Translation();
+		this.destX = 0;
+		this.destY = 0;
+		this.evt = new Evt();
+	}
+
+	setDestination(x, y) {
+		this.destX = x;
+		this.destY = y;
+		this.moveTranslation.angle = MATH.pointsAngle([this.position.x, this.position.y], [this.destX, this.destY]);
+	}
+
+	update() {
+		const translationX = Math.cos(this.moveTranslation.angle);
+		const translationY = Math.sin(this.moveTranslation.angle);
+
+		const newX = this.position.x + translationX * this.moveSpeed;
+		const newY = this.position.y + translationY * this.moveSpeed;
+		
+		this.moveTranslation.update(this.position.x, this.position.y, newX, newY);
+
+		this.position.x = newX; 
+		this.position.y = newY; 
+
+		const distanceFromTargetX = this.destX - this.position.x;
+		const distanceFromTargetY = this.destY - this.position.y;
+		const distanceFromTargetTotal = Math.abs(distanceFromTargetX) + Math.abs(distanceFromTargetY);
+
+		if (distanceFromTargetTotal < 1) {
+			this.evt.fireEvent('REACH');
+		}
+	}
+}
+
 export class ZombiStateTravelGraph extends State {
 	constructor(position, map, player) {
 		super(position);
-		this.moveSpeed = 0.1;
 		this.map = map;
 
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		
-		this.distanceFromTargetX = 99999;
-		this.distanceFromTargetY = 99999;
-		this.distanceFromTargetTotal = 99999;
-		this.destX = 0;
-		this.destY = 0;
-		this.angle = 0;
-		// this.bloodModulo = 2;
 		this.travelPoints = [];
 		this.setSprite(8, 8, 'zombiWalk');
+
+		this.translation = new Translation();
+
+		this.zombieMove = new ZombieMove(0.1, this.position);
+		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
 
 		this.bloodDropping = new BloodDropping();
 		this.zombiHitable = new ZombiHitable();
 		this.playerFinder = new PlayerFinder(player, this.map);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
+
+		this.test = 0;
 	}
 
 	setEntity(entity) {
@@ -202,10 +240,11 @@ export class ZombiStateTravelGraph extends State {
 	}
 	
 	start() {
+		this.test = 0;
 		this.zombiHitable.enable();
 		this.travelPoints = [];
 		this.#getJourney();
-		this.#updateDirection();
+		this.updateDirection();
 		super.start();
 	}
 
@@ -215,9 +254,10 @@ export class ZombiStateTravelGraph extends State {
 	}
 
 	update(step, time) {
-		this.#move();
 		this.bloodDropping.update(step, this.position);
-		this.playerFinder.update(this.position);
+		this.zombieMove.update();
+		this.playerFinder.update(this.position, this.zombieMove.moveTranslation);
+		this.sprite.setRotation(this.zombieMove.moveTranslation.angle);
 		super.update(step, time);
 	}
 
@@ -231,41 +271,28 @@ export class ZombiStateTravelGraph extends State {
 	}
 
 	#getJourney() {
+		this.test ++;
 		const destCell = this.map.getRandomCell();
+		// const destCell = this.map.getCellByPosition(-20, 0);
 		const destPos = destCell.center;
 		this.travelPoints = this.map.getTravel(this.position, destPos);
 		Debug.drawJourney([...this.travelPoints]);
-	}
 
-	#updateDirection() {
+	}
+	
+	updateDirection() {
+		if (this.test > 1) {
+			console.log('PAUSE');
+			this.entity.setState('PAUSE_AND_SEARCH');
+			return;
+		}
+
 		if (this.travelPoints.length === 0) {
 			this.#getJourney();
 		}
 
 		const nextPoint = this.travelPoints.pop();
-		this.destX = nextPoint.x;
-		this.destY = nextPoint.y;
-		this.angle = Math.atan2(nextPoint.y - this.position.y, nextPoint.x - this.position.x);
-		this.sprite.setRotation(this.angle);
-	}
-	
-	#move() {
-		const transationX = Math.cos(this.angle);
-		const transationY = Math.sin(this.angle);
-		this.position.x += transationX * this.moveSpeed; 
-		this.position.y += transationY * this.moveSpeed; 
-		
-		this.distanceFromTargetX = this.destX - this.position.x;
-		this.distanceFromTargetY = this.destY - this.position.y;
-		this.distanceFromTargetTotal = Math.abs(this.distanceFromTargetX) + Math.abs(this.distanceFromTargetY);
-
-		if (this.distanceFromTargetTotal < 1) {
-			this.onReachDestination();
-		}
-	}
-
-	onReachDestination() {
-		this.#updateDirection();
+		this.zombieMove.setDestination(nextPoint.x, nextPoint.y);
 	}
 
 	dispose() {
@@ -274,55 +301,21 @@ export class ZombiStateTravelGraph extends State {
 	}
 }
 
-export class ZombiStateTravelCells extends StateTravelCells {
-	constructor(position, cellRoot) {
-		super(position, cellRoot, 0.2);
-		this.id = 'ENTER';
-		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
-		this.setSprite(8, 8, 'zombiWalk');
-		this.zombiHitable = new ZombiHitable();
-	}
-
-	setEntity(entity) {
-		super.setEntity(entity);
-		this.zombiHitable.setEntity(this.entity);
-	}
-
-	start() {
-		this.zombiHitable.enable();
-		super.start();
-	}
-
-	suspend() {
-		this.zombiHitable.disable();
-		super.suspend();
-	}
-
-	update(step, time) {
-		super.update(step, time);
-	}
-
-	takeDamage(vector, damageCount) {
-		this.zombiHitable.hit(damageCount);
-		this.entity.setState('SLIDE', vector);
-	}
-
-	dispose() {
-		this.zombiHitable.dispose();
-		super.dispose();
-	}
-}
-
-export class ZombiStateFollow extends StateFollowEntitie {
+export class ZombiStateFollow extends State {
 	constructor(position, player, map) {
-		super(position, player, 0.2);
-		this.id = 'ENTER';
+		super(position);
+		this.entitieToReach = player;
+
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		this.setSprite(8, 8, 'zombiWalk');
+		this.translation = new Translation();
 		this.bloodDropping = new BloodDropping();
 		this.zombiHitable = new ZombiHitable();
 		this.playerFinder = new PlayerFinder(player, map);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
+
+		this.zombieMove = new ZombieMove(0.2, this.position);
+		this.zombieMove.evt.addEventListener('REACH', this, this.onReachDestination);
 	}
 
 	onLostPlayer() {
@@ -337,8 +330,17 @@ export class ZombiStateFollow extends StateFollowEntitie {
 	}
 	
 	start() {
-		this.zombiHitable.enable();
 		super.start();
+		this.zombiHitable.enable();
+		this.updateDirection(0);
+	}
+
+	updateDirection(step) {
+		this.zombieMove.setDestination(this.entitieToReach.position.x, this.entitieToReach.position.y)
+
+		const nextUpdateDirectionStepDelay = Math.round(randomValue(10, 120));
+		Stepper.stopListenStep(step, this, this.updateDirection);
+		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.updateDirection);
 	}
 
 	suspend() {
@@ -349,15 +351,12 @@ export class ZombiStateFollow extends StateFollowEntitie {
 	update(step, time) {
 		super.update(step, time);
 		this.bloodDropping.update(step, this.position);
-		this.playerFinder.update(this.position);
-	}
-
-	getNextUpdateDirectionStepDelay() {
-		return Math.round(randomValue(10, 120));
+		this.playerFinder.update(this.position, this.zombieMove.moveTranslation);
+		this.zombieMove.update();
+		this.sprite.setRotation(this.zombieMove.moveTranslation.angle);
 	}
 
 	onReachDestination() {
-		super.onReachDestination();
 		this.entity.dispose();
 	}
 
@@ -395,6 +394,75 @@ export class ZombiStateSlide extends StateSlide {
 		}
 
 		this.entity.setState('ENTER');
+	}
+}
+
+
+export class ZombiPauseAndSearch extends State {
+	constructor(position, map, player) {
+		super(position);
+		this.setSprite(8, 8, 'zombiWalk');
+
+		this.playerFinder = new PlayerFinder(player, map);
+		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
+
+		this.zombiHitable = new ZombiHitable();
+
+		this.translation = new Translation();
+		this.rotationDirection = MATH.randomDirection(0.02);
+		this.stopSearchStep = 0
+	}
+
+	setEntity(entity) {
+		super.setEntity(entity);
+		this.playerFinder.init(this.entity, this.position);
+		this.zombiHitable.setEntity(this.entity);
+	}
+
+	start() {
+		super.start();
+		this.translation.angle = this.sprite.getRotation();
+		
+		this.stopSearchStep = Stepper.curStep + Math.round(MATH.random(120, 600));
+		
+		this.zombiHitable.enable();
+		Stepper.listenStep(this.stopSearchStep, this, this.onStopSearch);
+	}
+	
+	onStopSearch() {
+		Stepper.stopListenStep(this.stopSearchStep, this, this.onStopSearch);
+		this.entity.setState('FOLLOW');
+	}
+
+	update(step, time) {
+		super.update(step, time);
+		this.#turn();
+		this.playerFinder.update(this.position, this.translation);
+	}
+
+	suspend() {
+		this.zombiHitable.disable();
+		super.suspend();
+	}
+
+	#turn() {
+		this.translation.angle += this.rotationDirection;
+		this.sprite.setRotation(this.translation.angle);
+	}
+
+	onViewPlayer() {
+		this.entity.setState('FOLLOW');
+	}
+
+	takeDamage(vector, damageCount) {
+		this.zombiHitable.hit(damageCount);
+		this.entity.setState('SLIDE', vector);
+	}
+
+	dispose() {
+		this.zombiHitable.dispose();
+		Stepper.stopListenStep(this.stopSearchStep, this, this.onStopSearch);
+		super.dispose();
 	}
 }
 

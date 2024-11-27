@@ -82,6 +82,10 @@ export class GameMap {
         return positions;
     }
 
+    getCellByPosition(x, y) {
+        return this.rootCell.getCellByPosition(x, y);
+    }
+
     getRandomCell() {
         const flat = this.rootCell
         .flat([])
@@ -142,12 +146,7 @@ export class GameMap {
         const startX = Utils.randomValue(zone.minX, zone.maxX);
         const startY = Utils.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
-        // const zombiStates = new Map();
-		// zombiStates.set('ENTER', new Zombi.ZombiStateTravelGraph(startPosition, this, this.player));
-		// // zombiStates.set('ENTER', new Zombi.ZombiStateTravelCells(startPosition, this.grid));
-		// zombiStates.set('FOLLOW', new Zombi.ZombiStateFollow(startPosition, this.player, this));
-		// zombiStates.set('SLIDE', new Zombi.ZombiStateSlide(startPosition, this));
-		// const zombi = new Zombi.Zombi(zombiStates);
+        // const startPosition = {x: 5, y: 0};
 
         Zombi.createZombi(this.player, this, startPosition);
     }

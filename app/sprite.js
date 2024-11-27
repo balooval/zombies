@@ -45,6 +45,7 @@ export class SpriteBase {
 	constructor() {
 		this.width = 1;
 		this.height = 1;
+		this.angle = 0;
 	}
 
 	getPosition() {
@@ -63,7 +64,13 @@ export class SpriteBase {
 	
 	setDepth(depthPosition) {}
 
-	setRotation(angle) {}
+	setRotation(angle) {
+		this.angle = angle;
+	}
+
+	getRotation() {
+		return this.angle;
+	}
 
 	flipHorizontal() {}
 
@@ -105,8 +112,9 @@ export class AnimatedSprite extends SpriteBase {
 	}
 
 	setRotation(angle) {
+		super.setRotation(angle);
 		const vector = new Vector3(0, 0, 1);
-		this.mesh.setRotationFromAxisAngle(vector, angle);
+		this.mesh.setRotationFromAxisAngle(vector, this.angle);
 	}
 
 	setOpacity(opacity) {
