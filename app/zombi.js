@@ -80,7 +80,7 @@ class BloodDropping {
 	}
 
 	#dropBlood(step, position) {
-		if (this.entity.life !== 1) {
+		if (this.entity.life > 1) {
 			return;
 		}
 
@@ -388,7 +388,7 @@ export class ZombiStateSlide extends StateSlide {
 	}
 
 	onStop() {
-		if (this.entity.life === 0) {
+		if (this.entity.life <= 0) {
 			this.entity.dispose();
 			return;
 		}

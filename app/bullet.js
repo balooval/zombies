@@ -15,7 +15,7 @@ class Bullet {
 		this.owner = owner;
 		this.gravity = 0.04;
 		this.airResistance = 1;
-		const speed = 3;
+		const speed = 2;
 		
 		this.velX = Math.cos(angle) * speed;
 		this.velY = Math.sin(angle) * speed;
@@ -45,7 +45,7 @@ class Bullet {
 	#onCollideEnnemies(enemies) {
 		for (const zombi of enemies) {
 			UiScore.addPoints(zombi.pointValue);
-			zombi.takeDamage(this.vector, 1);
+			zombi.takeDamage(this.vector, 0.4);
 			CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
 			Particules.create(Particules.ENNEMI_HIT, this.position, this.vector);
 			SoundLoader.play('eggCrack', 0.2);

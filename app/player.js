@@ -2,6 +2,7 @@ import Evt from './utils/event.js';
 import * as Input from './input.js';
 import * as Mouse from './inputMouse.js';
 import * as AnimationControl from './animationControl.js';
+import * as WeaponList from './ui/weaponList.js';
 import Hitbox from './collisionHitbox.js';
 import Translation from './translation.js';
 import CollisionResolver from './collisionResolver.js';
@@ -41,6 +42,8 @@ export class Player {
 			down: 0,
 		};
 
+		Mouse.evt.addEventListener(Mouse.WHEEL_DOWN, this, this.onWheelDown);
+		Mouse.evt.addEventListener(Mouse.WHEEL_UP, this, this.onWheelUp);
 		Mouse.evt.addEventListener(Mouse.MOUSE_DOWN, this, this.onMouseDown);
 		Mouse.evt.addEventListener(Mouse.MOUSE_UP, this, this.onMouseUp);
 		Input.evt.addEventListener('DOWN', this, this.onKeyDown);
@@ -48,23 +51,62 @@ export class Player {
 		Input.evt.addEventListener('SPACE', this, this.onKeyUp);
 
 		AnimationControl.registerToUpdate(this);
-		this.hitBox = new Hitbox(-3, 3, -3, 2, true);
+		this.hitBox = new Hitbox(-3, 3, -3, 3, true);
 		CollisionResolver.addToLayer(this, 'PLAYER');
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new RayLauncher(this.map);
+		const baseWeapon = new BasicBulletLauncher();
 		// const baseWeapon = new BasicBulletLauncher(this.map);
 		baseWeapon.setOwner(this);
-		this.weapon = new ActiveWeapon(baseWeapon);
+
 		this.weaponPointer = new WeaponPointer();
+		
+		this.weapon = new ActiveWeapon();
+		this.currentWeaponIndex = 0;
+		this.weaponsList = [];
+		this.#addWeapon(baseWeapon);
 		
 		this.translation = new Translation();
 
 		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'playerWalk');
 		this.sprite.setPosition(this.position.x, this.position.y);
 
+		CollisionResolver.checkCollisionWithLayer(this, 'BONUS');
+
 		this.currentAnimation = '';
+	}
+
+	onCollide(collisions, layersName) {
+		switch (layersName) {
+			case 'BONUS':
+				this.#onCollideBonus(collisions);
+			break;
+		}
+	}
+
+	#onCollideBonus(collisions) {
+		collisions.forEach(bonus => {
+			const weapon = bonus.take();
+			this.#addWeapon(weapon);
+		});
+	}
+
+	#addWeapon(weapon) {
+		const sameWeapon = this.weaponsList.filter(w => w.constructor.name === weapon.constructor.name).pop();
+		if (sameWeapon) {
+			console.log('ALREADY', weapon.constructor.name);
+			sameWeapon.addAmmo(weapon.ammo);
+			return;
+		}
+		weapon.setOwner(this);
+		this.weaponsList.push(weapon);
+		this.weapon.changeWeapon(weapon);
+
+		WeaponList.addWeapon(weapon);
+		WeaponList.setActive(weapon);
+
+		this.currentWeaponIndex = this.weaponsList.length - 1;
 	}
 
 	changeAnimation(animationId) {
@@ -163,7 +205,7 @@ export class Player {
 	}
 	
 	getWorldCollisionBox() {
-		return this.hitBox.addPosition(this.position.x + 4, this.position.y + 2);
+		return this.hitBox.addPosition(this.position.x, this.position.y);
 	}
 
 	onShot() {
@@ -186,6 +228,28 @@ export class Player {
 			return;
 		}
 		// this.changeAnimation('playerWalk');
+	}
+
+	onWheelDown() {
+		this.currentWeaponIndex --;
+		if (this.currentWeaponIndex < 0) {
+			this.currentWeaponIndex = this.weaponsList.length - 1;
+		}
+		const prevWeapon = this.weaponsList[this.currentWeaponIndex];
+		console.log('prevWeapon', prevWeapon.constructor.name);
+		this.weapon.changeWeapon(prevWeapon);
+		WeaponList.setActive(prevWeapon);
+	}
+	
+	onWheelUp() {
+		this.currentWeaponIndex ++;
+		if (this.currentWeaponIndex >= this.weaponsList.length) {
+			this.currentWeaponIndex = 0;
+		}
+		const nextWeapon = this.weaponsList[this.currentWeaponIndex];
+		console.log('nextWeapon', nextWeapon.constructor.name);
+		this.weapon.changeWeapon(nextWeapon);
+		WeaponList.setActive(nextWeapon);
 	}
 
 	onMouseDown() {

@@ -3,34 +3,29 @@ import * as SoundLoader from './net/loaderSound.js';
 import Interval from './utils/interval.js';
 import * as Stepper from './utils/stepper.js';
 import CollisionResolver from './collisionResolver.js';
-import * as Mouse from './inputMouse.js';
 import * as Particules from './particules.js';
-import * as Zombi from './zombi.js';
+import * as WeaponList from './ui/weaponList.js';
+import {HitSprite} from './fxSprites.js';
 
 export class ActiveWeapon {
-	constructor(baseWeapon) {
-		this.baseWeapon = baseWeapon;
-		this.currentWeapon = this.baseWeapon;
-		this.switchToBaseWeaponStep = -1;
+	constructor() {
+		this.currentWeapon = null;
 	}
 	
 	changeWeapon(weapon) {
-		Stepper.stopListenStep(this.switchToBaseWeaponStep, this, this.switchToBaseWeapon);
-		const weaponIsActive = this.currentWeapon.isActive;
-		this.currentWeapon.stopShot();
+		let weaponIsActive = false;
+
+		if (this.currentWeapon) {
+			weaponIsActive = this.currentWeapon.isActive;
+			this.currentWeapon.stopShot();
+		}
 		this.currentWeapon = weapon;
 
 		if (weaponIsActive === true) {
 			this.currentWeapon.startShot();
 		}
-		this.switchToBaseWeaponStep = Stepper.curStep + this.currentWeapon.activesSteps;
-		Stepper.listenStep(this.switchToBaseWeaponStep, this, this.switchToBaseWeapon);
 	}
 	
-	switchToBaseWeapon(step) {
-		this.changeWeapon(this.baseWeapon);
-	}
-
 	startShot() {
 		this.currentWeapon.startShot();
 	}
@@ -45,7 +40,9 @@ class Weapon {
 		this.owner = null;
 		this.isActive = false;
 		this.endShotAnimatonStep = 0;
+		this.ammo = -1;
 		this.activesSteps = -1;
+		this.icon = 'pistolIcon';
 		this.shootInterval = new Interval(shotIntervalSteps, () => this.launchProjectile(), true);
 	}
 
@@ -63,8 +60,13 @@ class Weapon {
 		this.shootInterval.stop();
 	}
 
+	addAmmo(count) {
+		this.ammo += count;
+		WeaponList.updateWeaponAmmo(this);
+	}
+
 	launchProjectile() {
-		// To be overrided
+		WeaponList.updateWeaponAmmo(this);
 	}
 }
 
@@ -72,19 +74,28 @@ export class RayLauncher extends Weapon {
 	constructor(map) {
 		super(30);
 		this.map = map;
+		this.icon = 'pistolIcon';
+		this.ammo = 5;
 	}
 
 	launchProjectile() {
-		// SoundLoader.play('eggLaunch');
-		SoundLoader.playRandom(['gunA', 'gunB'], 1);
+		
+		if (this.ammo === 0) {
+			return;
+		}
 
-		// Zombi.createZombi(this.owner, this.map, {x: Mouse.worldPosition[0], y: Mouse.worldPosition[1]});
+		this.ammo = Math.max(this.ammo - 1, 0);
+		super.launchProjectile();
+
+		SoundLoader.playRandom(['gunA', 'gunB'], 1);
 
 		const hit = this.#getZombiTouched();
 
 		Particules.createRay(hit.start, hit.point);
 
 		
+		const hitSprite = new HitSprite(hit.point.x, hit.point.y, 6);
+
 		if (hit.target === null) {
 			Particules.create(Particules.EGG_EXPLOSION, hit.point, {x: 1, y: 0.7});
 			return;
@@ -96,8 +107,6 @@ export class RayLauncher extends Weapon {
 			y: Math.sin(this.owner.viewAngle) * vectorPower,
 		}
 		hit.target.takeDamage(vector, 1);
-
-		// hit.target
 	}
 
 	#getZombiTouched() {
@@ -115,12 +124,14 @@ export class RayLauncher extends Weapon {
 		const res = {
 			start: this.owner.position,
 			target: null,
+			wall: false,
 			point: {x: destX, y: destY},
 		};
 
 		const wallHit = this.map.getWallsIntersections(segment).shift();
 
 		if (wallHit !== undefined) {
+			res.wall = true;
 			res.point = wallHit;
 		}
 
@@ -144,6 +155,7 @@ export class RayLauncher extends Weapon {
 		
 		res.target = zombiHit.target;
 		res.point = zombiHit.point;
+		res.wall = false;
 		return res;
 	}
 }
@@ -151,11 +163,13 @@ export class RayLauncher extends Weapon {
 export class BasicBulletLauncher extends Weapon {
 	constructor() {
 		super(10);
+		this.icon = 'bullet';
 	}
 
 	launchProjectile() {
 		SoundLoader.play('eggLaunch');
 		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle, this.owner);
+		super.launchProjectile();
 	}
 }
 

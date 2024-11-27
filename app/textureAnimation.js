@@ -273,8 +273,8 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'bonusFlying',
 		frames: [],
 	},
-	poussinBonusWalk: {
-		textureId: 'poussinBonusWalk',
+	bonusBullet: {
+		textureId: 'bonusBullet',
 		frames: [],
 	},
 	pointer: {
@@ -284,10 +284,10 @@ const spriteSheets = new Map(Object.entries({
 }));
 
 const animations = {
-	poussinBonusWalk: {
-		spriteSheet: 'poussinBonusWalk',
-		stepsByFrame: 20,
-		framesToDisplay: [0, 1, 2],
+	bonusBullet: {
+		spriteSheet: 'bonusBullet',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
 	},
 	bonusFlying: {
 		spriteSheet: 'bonusFlying',

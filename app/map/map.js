@@ -14,6 +14,7 @@ import * as Utils from '../utils/misc.js';
 import * as MATH from '../utils/math.js';
 import AstarBuilder from '../astar/AStarBuilder.js';
 import * as Debug from '../debugCanvas.js';
+import { Bonus } from '../bonus.js';
 import {getIntersection} from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
@@ -52,11 +53,10 @@ export class GameMap {
         this.rightWall = new Walls.RightWall(GROUND_POSITION);
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
-        this.bonusStep = 0;
         this.addZombiRate = 80;
         this.player = null;
 
-        this.maxZombiesCount = 10;
+        this.maxZombiesCount = 2;
         
         this.blocks = this.#buildBlocks();
         this.rootCell = this.#buildGraph();
@@ -149,6 +149,11 @@ export class GameMap {
         // const startPosition = {x: 5, y: 0};
 
         Zombi.createZombi(this.player, this, startPosition);
+
+
+        const destCell = this.getRandomCell();
+		const destPos = destCell.center;
+        new Bonus(destPos.x, destPos.y, this)
     }
 
     onPlayerDead() {
@@ -175,7 +180,6 @@ export class GameMap {
 
     dispose() {
         CollisionResolver.removeFromLayer(this, 'MAP');
-        Stepper.stopListenStep(this.bonusStep, this, this.addBonus);
         this.player.dispose();
         this.sprite.dispose();
         this.skySprite.dispose();

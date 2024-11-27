@@ -164,9 +164,12 @@
 			"url": "assets/bonus-flying.png"
 		},
 		{
-			"id": "poussinBonusWalk",
-			"url": "assets/poussin-bonus-walk.png"
+			"id": "bonusBullet",
+			"url": "assets/bonus-bullet.png"
+		},
+		{
+			"id": "pistolIcon",
+			"url": "assets/pistol-icon.png"
 		}
-		
 	]
 }

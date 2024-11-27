@@ -78,10 +78,36 @@ body {
     transition-property: font-size;
     transition-duration: 0.1s;
 }
+
+#weapon-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: 100px;
+    width: 50vw;
+    display: flex;
+}
+
+.weaponIcon {
+    background-color: rgba(200, 200, 200, 0.2);
+    padding: 8px;
+    border-radius: 5px;
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    margin: 0 4px;
+    text-align: center;
+}
+.weaponIcon.selected {
+    border: 2px solid red;
+}
+
+
 #debugCanvas {
     position: absolute;
     bottom: 10px;
     left: 10px;
+    display: none;
 }
 
 #container_points.changed {
