@@ -19,6 +19,7 @@ import * as Stepper from './utils/stepper.js';
 import { ActiveWeapon } from './weapons/activeWeapon.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import BombLauncher from './weapons/bombLauncher.js';
+import Batte from './weapons/batte.js';
 import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
@@ -57,6 +58,7 @@ export class Player {
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		const baseWeapon = new BombLauncher();
+		// const baseWeapon = new Batte();
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};
@@ -133,6 +135,7 @@ export class Player {
 	update() {
 		this.move();
 		this.#updateViewAngle();
+		this.weapon.update();
 	}
 
 	#updateViewAngle() {

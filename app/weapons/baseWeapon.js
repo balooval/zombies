@@ -12,6 +12,18 @@ class Weapon {
 		this.shootInterval = new Interval(shotIntervalSteps, () => this.launchProjectile(), true);
 	}
 
+	update() {
+		
+	}
+
+	enable() {
+
+	}
+
+	disable() {
+		
+	}
+
 	setOwner(owner) {
 		this.owner = owner;
 	}
@@ -32,6 +44,10 @@ class Weapon {
 	}
 
 	launchProjectile() {
+		if (this.ammo === 0) {
+			return;
+		}
+		this.ammo = Math.max(this.ammo - 1, 0);
 		WeaponList.updateWeaponAmmo(this);
 	}
 }

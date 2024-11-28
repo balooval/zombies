@@ -13,12 +13,6 @@ export class RayLauncher extends Weapon {
 	}
 
 	launchProjectile() {
-		
-		if (this.ammo === 0) {
-			return;
-		}
-
-		this.ammo = Math.max(this.ammo - 1, 0);
 		super.launchProjectile();
 
 		SoundLoader.playRandom(['gunA', 'gunB'], 1);

@@ -64,6 +64,14 @@
 			"url": "assets/screen-game-over.png"
 		},
 		{
+			"id": "batte",
+			"url": "assets/batte.png"
+		},
+		{
+			"id": "grenade",
+			"url": "assets/grenade.png"
+		},
+		{
 			"id": "bullet",
 			"url": "assets/bullet.png"
 		},

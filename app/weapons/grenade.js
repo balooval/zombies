@@ -1,15 +1,14 @@
-import {Vector2} from './../../vendor/three.module.js';
-import * as AnimationControl from './../animationControl.js';
-import CollisionResolver from './../collisionResolver.js';
-import Hitbox from './../collisionHitbox.js';
-import * as Particules from './../particules.js';
-import * as SoundLoader from './../net/loaderSound.js';
-import * as SpriteFactory from './../spriteFactory.js';
-import * as Stepper from './../utils/stepper.js';
-import * as MATH from './../utils/math.js';
+import {Vector2} from '../../vendor/three.module.js';
+import * as AnimationControl from '../animationControl.js';
+import CollisionResolver from '../collisionResolver.js';
+import Hitbox from '../collisionHitbox.js';
+import * as Particules from '../particules.js';
+import * as SoundLoader from '../net/loaderSound.js';
+import * as SpriteFactory from '../spriteFactory.js';
+import * as Stepper from '../utils/stepper.js';
+import * as MATH from '../utils/math.js';
 
-class Bomb {
-
+class Grenade {
 	constructor(position, targetPosition, owner) {
 		this.targetX = targetPosition.x;
 		this.targetY = targetPosition.y;
@@ -29,7 +28,7 @@ class Bomb {
 		// CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
 		CollisionResolver.checkCollisionWithLayer(this, 'WALLS');
 
-		this.sprite = SpriteFactory.createAnimatedSprite(5, 5, 'bullet');
+		this.sprite = SpriteFactory.createAnimatedSprite(5, 5, 'grenade');
 		this.sprite.setPosition(this.position.x, this.position.y);
 
 		this.updateFunction = this.move;
@@ -82,12 +81,13 @@ class Bomb {
 	move() {
 		this.velX *= this.airResistance;
 		this.velY *= this.airResistance;
+		const movementQuantity = Math.abs(this.velX) + Math.abs(this.velY);
 
 		this.position.x += this.velX;
 		this.position.y += this.velY;
 		this.sprite.setPosition(this.position.x, this.position.y);
+		this.sprite.setRotation(this.sprite.getRotation() + movementQuantity * 0.2);
 
-		const movementQuantity = Math.abs(this.velX) + Math.abs(this.velY);
 		
 		if (movementQuantity < 0.1) {
 			this.stopMove();
@@ -139,4 +139,4 @@ class Bomb {
 	}
 }
 
-export {Bomb as default};
+export {Grenade as default};

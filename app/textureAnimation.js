@@ -277,6 +277,14 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'bonusBullet',
 		frames: [],
 	},
+	batte: {
+		textureId: 'batte',
+		frames: [],
+	},
+	grenade: {
+		textureId: 'grenade',
+		frames: [],
+	},
 	pointer: {
 		textureId: 'pointer',
 		frames: [],
@@ -284,6 +292,21 @@ const spriteSheets = new Map(Object.entries({
 }));
 
 const animations = {
+	grenade: {
+		spriteSheet: 'grenade',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	batteIdle: {
+		spriteSheet: 'batte',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	batteHit: {
+		spriteSheet: 'batte',
+		stepsByFrame: 3,
+		framesToDisplay: [0, 1, 2, 3, 4],
+	},
 	bonusBullet: {
 		spriteSheet: 'bonusBullet',
 		stepsByFrame: -1,
