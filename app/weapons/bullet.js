@@ -1,12 +1,12 @@
-import {Vector2} from '../vendor/three.module.js';
-import * as AnimationControl from './animationControl.js';
-import CollisionResolver from './collisionResolver.js';
-import Hitbox from './collisionHitbox.js';
-import {HitSprite} from './fxSprites.js';
-import * as Particules from './particules.js';
-import * as SoundLoader from './net/loaderSound.js';
-import * as SpriteFactory from './spriteFactory.js';
-import * as UiScore from './ui/score.js';
+import {Vector2} from './../../vendor/three.module.js';
+import * as AnimationControl from './../animationControl.js';
+import CollisionResolver from './../collisionResolver.js';
+import Hitbox from './../collisionHitbox.js';
+import {HitSprite} from './../fxSprites.js';
+import * as Particules from './../particules.js';
+import * as SoundLoader from './../net/loaderSound.js';
+import * as SpriteFactory from './../spriteFactory.js';
+import * as UiScore from './../ui/score.js';
 
 class Bullet {
 

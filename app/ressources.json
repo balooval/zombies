@@ -1,6 +1,14 @@
 {
 	"sounds": [
 		{
+			"id": "bombA",
+			"url": "assets/sounds/bomb-a.mp3"
+		},
+		{
+			"id": "bombB",
+			"url": "assets/sounds/bomb-b.mp3"
+		},
+		{
 			"id": "clap",
 			"url": "assets/sounds/clap.wav"
 		},

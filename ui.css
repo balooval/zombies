@@ -86,6 +86,7 @@ body {
     height: 100px;
     width: 50vw;
     display: flex;
+    pointer-events: none;
 }
 
 .weaponIcon {

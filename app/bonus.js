@@ -4,8 +4,7 @@ import {
 import CollisionResolver from './collisionResolver.js';
 import Hitbox from './collisionHitbox.js';
 import * as SpriteFactory from './spriteFactory.js';
-import { BasicBulletLauncher, RayLauncher } from './weapons.js';
-
+import RayLauncher from './weapons/rayLauncher.js';
 
 
 export class Bonus {

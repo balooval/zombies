@@ -49,6 +49,10 @@ export class Zombi extends EntityWithStates{
 		pool.set(this, this);
 	}
 
+	getPosition() {
+		return this.currentState.position;
+	}
+
 	getWorldCollisionBox() {
 		return this.currentState.getWorldCollisionBox();
 	}

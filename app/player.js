@@ -16,11 +16,9 @@ import {
 import * as SpriteFactory from './spriteFactory.js';
 import * as MATH from './utils/math.js';
 import * as Stepper from './utils/stepper.js';
-import { 
-	ActiveWeapon,
-	RayLauncher,
-	BasicBulletLauncher
-} from './weapons.js';
+import { ActiveWeapon } from './weapons/activeWeapon.js';
+import BulletLauncher from './weapons/bulletLauncher.js';
+import BombLauncher from './weapons/bombLauncher.js';
 import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
@@ -56,13 +54,15 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new BasicBulletLauncher();
-		// const baseWeapon = new BasicBulletLauncher(this.map);
+		// const baseWeapon = new BulletLauncher();
+		// const baseWeapon = new BulletLauncher(this.map);
+		const baseWeapon = new BombLauncher();
 		baseWeapon.setOwner(this);
 
+		this.weaponTargetPosition = {x: 0, y: 0};
 		this.weaponPointer = new WeaponPointer();
 		
-		this.weapon = new ActiveWeapon();
+		this.weapon = new ActiveWeapon(this);
 		this.currentWeaponIndex = 0;
 		this.weaponsList = [];
 		this.#addWeapon(baseWeapon);
@@ -137,7 +137,9 @@ export class Player {
 
 	#updateViewAngle() {
 		this.viewAngle = Math.atan2(Mouse.worldPosition[1] - this.position.y, Mouse.worldPosition[0] - this.position.x);
-		this.weaponPointer.setPosition(Mouse.worldPosition[0], Mouse.worldPosition[1]);
+		this.weaponTargetPosition.x = Mouse.worldPosition[0];
+		this.weaponTargetPosition.y = Mouse.worldPosition[1];
+		this.weaponPointer.setPosition(this.weaponTargetPosition.x, this.weaponTargetPosition.y);
 		this.sprite.setRotation(this.viewAngle);
 	}
 

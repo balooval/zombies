@@ -56,7 +56,7 @@ export class GameMap {
         this.addZombiRate = 80;
         this.player = null;
 
-        this.maxZombiesCount = 2;
+        this.maxZombiesCount = 10;
         
         this.blocks = this.#buildBlocks();
         this.rootCell = this.#buildGraph();
