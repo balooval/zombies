@@ -10,7 +10,7 @@ import Weapon from './baseWeapon.js';
 export class Batte extends Weapon {
 	constructor() {
 		super(25);
-		this.icon = 'bullet';
+		this.icon = 'bonusBatte';
 		this.ammo = -1;
         this.hitBox = new Hitbox(-4, 4, -4, 4, true);
         this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'batteIdle');
@@ -59,9 +59,9 @@ export class Batte extends Weapon {
 	}
     
 	launchProjectile() {
+		super.launchProjectile();
 		// SoundLoader.play('eggLaunch');
         this.sprite.changeAnimation('batteHit');
-		super.launchProjectile();
 	}
     
     onAnimationHit() {

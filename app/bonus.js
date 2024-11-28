@@ -5,19 +5,43 @@ import CollisionResolver from './collisionResolver.js';
 import Hitbox from './collisionHitbox.js';
 import * as SpriteFactory from './spriteFactory.js';
 import RayLauncher from './weapons/rayLauncher.js';
+import BombLauncher from './weapons/bombLauncher.js';
+import BulletLauncher from './weapons/bulletLauncher.js';
+import Minigun from './weapons/minigun.js';
+import * as MATH from './utils/math.js';
 
+export const pool = new Map();
+
+export function createRandomBonus(destPos, map) {
+	const rndValue = MATH.random(0, 4);
+
+	if (rndValue < 1) {
+		return new BonusGun(destPos.x, destPos.y, map);
+	}
+	if (rndValue < 2) {
+		return new BonusGrenade(destPos.x, destPos.y, map);
+	}
+	if (rndValue < 3) {
+		return new BonusEgg(destPos.x, destPos.y, map);
+	}
+	if (rndValue < 4) {
+		return new BonusMinigun(destPos.x, destPos.y, map);
+	}
+}
 
 export class Bonus {
 
-	constructor(posX, posY, map) {
-		this.weapon = new RayLauncher(map);
+	constructor(posX, posY, spriteId) {
+		this.weapon = null;
 		this.position = new Vector2(posX, posY);
 		this.hitBox = new Hitbox(-2, 2, -2, 2, true);
 		CollisionResolver.addToLayer(this, 'BONUS');
 
-		this.sprite = SpriteFactory.createAnimatedSprite(4, 4, 'bonusBullet');
+		this.sprite = SpriteFactory.createAnimatedSprite(6, 6, spriteId);
 		this.sprite.setPosition(this.position.x, this.position.y);
 		this.sprite.setDepth(4);
+
+		pool.set(this, this);
 	}
 
 	take() {
@@ -33,5 +57,38 @@ export class Bonus {
 		CollisionResolver.removeFromLayer(this, 'BONUS');
 		this.sprite.dispose();
 		this.hitBox.dispose();
+		pool.delete(this);
+	}
+}
+
+export class BonusEgg extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(posX, posY, 'bullet');
+		this.weapon = new BulletLauncher();
+	}
+}
+
+export class BonusMinigun extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(posX, posY, 'bonusMinigun');
+		this.weapon = new Minigun(map);
+	}
+}
+
+export class BonusGun extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(posX, posY, 'bonusBullet');
+		this.weapon = new RayLauncher(map);
+	}
+}
+
+export class BonusGrenade extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(posX, posY, 'bonusGrenade');
+		this.weapon = new BombLauncher();
 	}
 }

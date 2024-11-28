@@ -72,6 +72,10 @@
 			"url": "assets/grenade.png"
 		},
 		{
+			"id": "bonusGrenade",
+			"url": "assets/bonus-grenade.png"
+		},
+		{
 			"id": "bullet",
 			"url": "assets/bullet.png"
 		},
@@ -182,6 +186,14 @@
 		{
 			"id": "bonusBullet",
 			"url": "assets/bonus-bullet.png"
+		},
+		{
+			"id": "bonusBatte",
+			"url": "assets/bonus-batte.png"
+		},
+		{
+			"id": "bonusMinigun",
+			"url": "assets/bonus-minigun.png"
 		},
 		{
 			"id": "pistolIcon",

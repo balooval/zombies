@@ -285,6 +285,18 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'grenade',
 		frames: [],
 	},
+	bonusGrenade: {
+		textureId: 'bonusGrenade',
+		frames: [],
+	},
+	bonusBatte: {
+		textureId: 'bonusBatte',
+		frames: [],
+	},
+	bonusMinigun: {
+		textureId: 'bonusMinigun',
+		frames: [],
+	},
 	pointer: {
 		textureId: 'pointer',
 		frames: [],
@@ -294,6 +306,21 @@ const spriteSheets = new Map(Object.entries({
 const animations = {
 	grenade: {
 		spriteSheet: 'grenade',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	bonusGrenade: {
+		spriteSheet: 'bonusGrenade',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	bonusBatte: {
+		spriteSheet: 'bonusBatte',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	bonusMinigun: {
+		spriteSheet: 'bonusMinigun',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
 	},

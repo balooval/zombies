@@ -216,6 +216,11 @@ export class StateSlide extends State {
 	}
 
 	start(params) {
+		this.slide(params);
+		super.start(params);
+	}
+
+	slide(params) {
 		this.velocityX = params.velocityX;
 		this.velocityY = params.velocityY;
 		this.friction = params.friction;
@@ -226,7 +231,6 @@ export class StateSlide extends State {
 		this.directionY = Math.sin(angle);
 
 		this.sprite.setRotation(angle);
-		super.start();
 	}
 
 	update(step, time) {

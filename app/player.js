@@ -19,6 +19,7 @@ import * as Stepper from './utils/stepper.js';
 import { ActiveWeapon } from './weapons/activeWeapon.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import BombLauncher from './weapons/bombLauncher.js';
+import Minigun from './weapons/minigun.js';
 import Batte from './weapons/batte.js';
 import {getIntersection} from './intersectionResolver.js';
 
@@ -55,10 +56,11 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
+		const baseWeapon = new Batte();
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
-		const baseWeapon = new BombLauncher();
-		// const baseWeapon = new Batte();
+		// const baseWeapon = new BombLauncher();
+		// const baseWeapon = new Minigun(this.map);
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};
@@ -103,10 +105,10 @@ export class Player {
 		}
 		weapon.setOwner(this);
 		this.weaponsList.push(weapon);
-		this.weapon.changeWeapon(weapon);
-
 		WeaponList.addWeapon(weapon);
 		WeaponList.setActive(weapon);
+		this.weapon.changeWeapon(weapon);
+
 
 		this.currentWeaponIndex = this.weaponsList.length - 1;
 	}
@@ -241,7 +243,6 @@ export class Player {
 			this.currentWeaponIndex = this.weaponsList.length - 1;
 		}
 		const prevWeapon = this.weaponsList[this.currentWeaponIndex];
-		console.log('prevWeapon', prevWeapon.constructor.name);
 		this.weapon.changeWeapon(prevWeapon);
 		WeaponList.setActive(prevWeapon);
 	}
@@ -252,7 +253,6 @@ export class Player {
 			this.currentWeaponIndex = 0;
 		}
 		const nextWeapon = this.weaponsList[this.currentWeaponIndex];
-		console.log('nextWeapon', nextWeapon.constructor.name);
 		this.weapon.changeWeapon(nextWeapon);
 		WeaponList.setActive(nextWeapon);
 	}

@@ -29,7 +29,7 @@ export function init(elementId, inputWorldWidth, inputWorldHeight) {
 }
 
 function onWheel(event) {
-    if (event.delta > 0) {
+    if (event.deltaY > 0) {
         evt.fireEvent(WHEEL_DOWN, worldPosition);
     } else {
         evt.fireEvent(WHEEL_UP, worldPosition);

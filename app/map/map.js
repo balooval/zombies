@@ -14,7 +14,7 @@ import * as Utils from '../utils/misc.js';
 import * as MATH from '../utils/math.js';
 import AstarBuilder from '../astar/AStarBuilder.js';
 import * as Debug from '../debugCanvas.js';
-import { Bonus } from '../bonus.js';
+import * as Bonus from '../bonus.js';
 import {getIntersection} from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
@@ -54,8 +54,10 @@ export class GameMap {
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
         this.addZombiRate = 80;
+        this.addBonusRate = 300;
         this.player = null;
 
+        this.maxBonusCount = 2;
         this.maxZombiesCount = 10;
         
         this.blocks = this.#buildBlocks();
@@ -99,6 +101,21 @@ export class GameMap {
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
 
         this.#addZombi(0);
+        this.#addBonus(0);
+    }
+
+    #addBonus(step) {
+        Stepper.stopListenStep(step, this, this.#addBonus);
+        Stepper.listenStep(Stepper.curStep + this.addBonusRate, this, this.#addBonus);
+
+        if (Bonus.pool.size >= this.maxBonusCount) {
+            return;
+        }
+
+        const destCell = this.getRandomCell();
+		const destPos = destCell.center;
+
+        Bonus.createRandomBonus(destPos, this);
     }
 
     #addZombi(step) {
@@ -149,11 +166,6 @@ export class GameMap {
         // const startPosition = {x: 5, y: 0};
 
         Zombi.createZombi(this.player, this, startPosition);
-
-
-        const destCell = this.getRandomCell();
-		const destPos = destCell.center;
-        new Bonus(destPos.x, destPos.y, this)
     }
 
     onPlayerDead() {

@@ -3,19 +3,21 @@ import CollisionResolver from './../collisionResolver.js';
 import * as Particules from './../particules.js';
 import {HitSprite} from './../fxSprites.js';
 import Weapon from './baseWeapon.js';
+import * as MATH from '../utils/math.js';
 
-export class RayLauncher extends Weapon {
+
+export class Minigun extends Weapon {
 	constructor(map) {
-		super(30);
+		super(5);
 		this.map = map;
 		this.icon = 'pistolIcon';
-		this.ammo = 10;
+		this.ammo = 100;
 	}
 
 	launchProjectile() {
 		super.launchProjectile();
-		
-		if (this.ammo === 0) {
+
+        if (this.ammo === 0) {
 			return;
 		}
 
@@ -24,7 +26,6 @@ export class RayLauncher extends Weapon {
 		const hit = this.#getZombiTouched();
 
 		Particules.createRay(hit.start, hit.point);
-
 		
 		new HitSprite(hit.point.x, hit.point.y, 6);
 
@@ -43,8 +44,9 @@ export class RayLauncher extends Weapon {
 
 	#getZombiTouched() {
 		const distance = 200;
-		const destX = this.owner.position.x + Math.cos(this.owner.viewAngle) * distance;
-		const destY = this.owner.position.y + Math.sin(this.owner.viewAngle) * distance;
+        const shotAngle = MATH.randomize(this.owner.viewAngle, 0.1);
+		const destX = this.owner.position.x + Math.cos(shotAngle) * distance;
+		const destY = this.owner.position.y + Math.sin(shotAngle) * distance;
 
 		const segment = {
 			startX: this.owner.position.x,
@@ -92,4 +94,4 @@ export class RayLauncher extends Weapon {
 	}
 }
 
-export {RayLauncher as default};
+export {Minigun as default};

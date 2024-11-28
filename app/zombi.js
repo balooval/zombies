@@ -117,6 +117,7 @@ class ZombiHitable {
 	}
 	
 	hit(damageCount) {
+		console.warn('HIT', damageCount, this.entity.life);
 		this.entity.life -= damageCount;
 		// SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB'], 0.5);
 
@@ -379,7 +380,13 @@ export class ZombiStateSlide extends StateSlide {
 	constructor(position, map) {
 		super(position, map);
 		this.id = 'SLIDE';
+		this.zombiHitable = new ZombiHitable();
 		this.setSprite(8, 8, 'zombiHit');
+	}
+
+	setEntity(entity) {
+		super.setEntity(entity);
+		this.zombiHitable.setEntity(this.entity);
 	}
 
 	start(vector) {
@@ -389,15 +396,37 @@ export class ZombiStateSlide extends StateSlide {
 			friction: 0.85,
 		}
 		super.start(params);
+		this.zombiHitable.enable();
 	}
 
 	onStop() {
 		if (this.entity.life <= 0) {
+			console.log('onStop');
 			this.entity.dispose();
 			return;
 		}
 
 		this.entity.setState('ENTER');
+	}
+
+	suspend() {
+		this.zombiHitable.disable();
+		super.suspend();
+	}
+
+	takeDamage(vector, damageCount) {
+		console.log('damageCount', damageCount);
+		this.zombiHitable.hit(damageCount);
+		this.slide({
+			velocityX: vector.x,
+			velocityY: vector.y,
+			friction: 0.85,
+		});
+	}
+
+	dispose() {
+		this.zombiHitable.dispose();
+		super.dispose();
 	}
 }
 
