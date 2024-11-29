@@ -15,7 +15,7 @@ export class Batte extends Weapon {
         this.hitBox = new Hitbox(-4, 4, -4, 4, true);
         this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'batteIdle');
         this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.onAnimationEnd);
-        this.sprite.textureAnimation.evt.addEventListener(`FRAME_${3}`, this, this.onAnimationHit);
+        this.sprite.textureAnimation.evt.addEventListener(`FRAME_${3}`, this, this.onAnimationStartHit);
         this.sprite.textureAnimation.evt.addEventListener(`FRAME_${4}`, this, this.onAnimationStopHit);
         this.position = {x: 0, y: 0};
         this.vector = {x: 0, y: 0};
@@ -50,24 +50,18 @@ export class Batte extends Weapon {
     }
 
     getWorldCollisionBox() {
-        // const offsetX = Math.cos(this.owner.viewAngle) * 5;
-        // const offsetY = Math.sin(this.owner.viewAngle) * 5;
-        // this.position.x = this.owner.position.x + offsetX;
-        // this.position.y = this.owner.position.y + offsetY;
-
 		return this.hitBox.addPosition(this.position.x, this.position.y);
 	}
     
 	launchProjectile() {
 		super.launchProjectile();
-		// SoundLoader.play('eggLaunch');
         this.sprite.changeAnimation('batteHit');
 	}
     
-    onAnimationHit() {
+    onAnimationStartHit() {
         CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
     }
-
+    
     onAnimationStopHit() {
         CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
     }

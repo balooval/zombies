@@ -1,9 +1,11 @@
 import * as AnimationControl from './animationControl.js';
 
 class EntityWithStates {
+
 	constructor(states) {
 		this.currentState = null;
 		this.states = states;
+		this.isDisposed = false;
 
 		for (const state of this.states.values()) {
 			state.setEntity(this);
@@ -15,6 +17,9 @@ class EntityWithStates {
 	}
 
 	setState(stateKey, params) {
+		if (this.isDisposed === true) {
+			return;
+		}
 		if (this.currentState !== null) {
 			this.currentState.suspend();
 		}
@@ -31,10 +36,13 @@ class EntityWithStates {
 	}
 
 	dispose() {
+		this.isDisposed = true;
 		AnimationControl.unregisterToUpdate(this);
+		
 		for (const state of this.states.values()) {
 			state.dispose();
 		}
+
 	}
 }
 

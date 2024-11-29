@@ -1,4 +1,5 @@
 import {Vector2} from '../../vendor/three.module.js';
+import {HitSprite} from './../fxSprites.js';
 import * as AnimationControl from '../animationControl.js';
 import CollisionResolver from '../collisionResolver.js';
 import Hitbox from '../collisionHitbox.js';
@@ -25,7 +26,6 @@ class Grenade {
 		this.position = new Vector2(position.x, position.y);
 		AnimationControl.registerToUpdate(this);
 		this.hitBox = new Hitbox(-2, 2, -2, 2, true);
-		// CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
 		CollisionResolver.checkCollisionWithLayer(this, 'WALLS');
 
 		this.sprite = SpriteFactory.createAnimatedSprite(5, 5, 'grenade');
@@ -65,11 +65,15 @@ class Grenade {
 			vector.x = (zombiPosition.x - this.position.x) * 0.3;
 			vector.y = (zombiPosition.y - this.position.y) * 0.3;
 
-			zombi.takeDamage(vector, 1.5);
+			const distance = MATH.distance(this.position, zombiPosition);
+			const damages = Math.max(0, 12 - distance) * 0.5;
+
+			zombi.takeDamage(vector, damages);
 			Particules.create(Particules.ENNEMI_HIT, this.position, vector);
 			SoundLoader.playRandom(['bombA', 'bombB'], 0.5);
 		}
 
+		const hitSprite = new HitSprite(this.position.x, this.position.y, 15);
 		Particules.create(Particules.EGG_EXPLOSION, this.position, new Vector2(1, 0.7));
 		this.dispose();
 	}

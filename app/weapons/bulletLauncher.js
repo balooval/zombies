@@ -19,7 +19,7 @@ export class BulletLauncher extends Weapon {
 		}
 		console.log('launchProjectile B');
 		SoundLoader.play('eggLaunch');
-		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle, this.owner);
+		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle);
 		super.launchProjectile();
 	}
 }

@@ -1,5 +1,5 @@
 import * as Sound from '../sound.js';
-import * as Utils from '../utils/misc.js';
+import * as MATH from '../utils/math.js';
 
 const soundsLoaded = {};
 let loadingId = null;
@@ -17,7 +17,7 @@ export function play(id, volume = 1) {
 }
 
 export function playRandom(idsList, volume = 1) {
-	const soundToPlay = Utils.randomElement(idsList);
+	const soundToPlay = MATH.randomElement(idsList);
 	this.get(soundToPlay).play(volume);
 }
 

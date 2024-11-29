@@ -6,15 +6,11 @@ import {HitSprite} from './../fxSprites.js';
 import * as Particules from './../particules.js';
 import * as SoundLoader from './../net/loaderSound.js';
 import * as SpriteFactory from './../spriteFactory.js';
-import * as UiScore from './../ui/score.js';
 
 class Bullet {
 
-	constructor(posX, posY, angle, owner) {
+	constructor(posX, posY, angle) {
 		this.angle = angle;
-		this.owner = owner;
-		this.gravity = 0.04;
-		this.airResistance = 1;
 		const speed = 2;
 		
 		this.velX = Math.cos(angle) * speed;
@@ -44,7 +40,6 @@ class Bullet {
 
 	#onCollideEnnemies(enemies) {
 		for (const zombi of enemies) {
-			UiScore.addPoints(zombi.pointValue);
 			zombi.takeDamage(this.vector, 0.4);
 			CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
 			Particules.create(Particules.ENNEMI_HIT, this.position, this.vector);

@@ -7,10 +7,9 @@ import {
 } from '../player.js';
 import Hitbox from '../collisionHitbox.js';
 import * as SpriteFactory from '../spriteFactory.js';
-import * as Zombi from '../zombi.js';
+import * as Zombi from '../zombi/zombi.js';
 import * as Stepper from '../utils/stepper.js';
 import * as Walls from './walls.js';
-import * as Utils from '../utils/misc.js';
 import Block from './block.js';
 import InteractiveBlock from './interactiveBlock.js';
 import * as MATH from '../utils/math.js';
@@ -55,11 +54,12 @@ export class GameMap {
         this.rightWall = new Walls.RightWall(GROUND_POSITION);
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
-        this.addZombiRate = 80;
-        this.addBonusRate = 300;
         this.player = null;
-
+        
+        this.addBonusRate = 300;
         this.maxBonusCount = 2;
+        
+        this.addZombiRate = 80;
         this.maxZombiesCount = 10;
         
         this.blocks = this.#buildBlocks();
@@ -95,7 +95,7 @@ export class GameMap {
         .flat([])
         .filter(cell => cell.blocks.length === 0);
 
-        return Utils.randomElement(flat);
+        return MATH.randomElement(flat);
     }
     
     start() {
@@ -107,7 +107,7 @@ export class GameMap {
     }
 
     #addBonus(step) {
-        Stepper.stopListenStep(step, this, this.#addBonus);
+        Stepper.stopListenStep(Stepper.curStep, this, this.#addBonus);
         Stepper.listenStep(Stepper.curStep + this.addBonusRate, this, this.#addBonus);
 
         if (Bonus.pool.size >= this.maxBonusCount) {
@@ -122,7 +122,7 @@ export class GameMap {
 
     #addZombi(step) {
 
-        Stepper.stopListenStep(step, this, this.#addZombi);
+        Stepper.stopListenStep(Stepper.curStep, this, this.#addZombi);
         Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
 
         if (Zombi.pool.size >= this.maxZombiesCount) {
@@ -161,9 +161,9 @@ export class GameMap {
             },
         ];
 
-        const zone = Utils.randomElement(zones);
-        const startX = Utils.randomValue(zone.minX, zone.maxX);
-        const startY = Utils.randomValue(zone.minY, zone.maxY);
+        const zone = MATH.randomElement(zones);
+        const startX = MATH.randomValue(zone.minX, zone.maxX);
+        const startY = MATH.randomValue(zone.minY, zone.maxY);
         const startPosition = {x: startX, y: startY};
         // const startPosition = {x: 5, y: 0};
 

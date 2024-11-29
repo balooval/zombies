@@ -17,6 +17,10 @@ import * as SpriteFactory from './spriteFactory.js';
 import * as Stepper from './utils/stepper.js';
 import { ActiveWeapon } from './weapons/activeWeapon.js';
 import Batte from './weapons/batte.js';
+import BombLauncher from './weapons/bombLauncher.js';
+import Minigun from './weapons/minigun.js';
+import RayLauncher from './weapons/rayLauncher.js';
+import BulletLauncher from './weapons/bulletLauncher.js';
 import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
@@ -49,10 +53,13 @@ export class Player {
 		AnimationControl.registerToUpdate(this);
 		this.hitBox = new Hitbox(-3, 3, -3, 3, true);
 		CollisionResolver.addToLayer(this, 'PLAYER');
+
+		this.hitCooldown = 0;
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
 		const baseWeapon = new Batte();
+		// const baseWeapon = new RayLauncher(this.map);
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new BombLauncher();
@@ -95,7 +102,6 @@ export class Player {
 	#addWeapon(weapon) {
 		const sameWeapon = this.weaponsList.filter(w => w.constructor.name === weapon.constructor.name).pop();
 		if (sameWeapon) {
-			console.log('ALREADY', weapon.constructor.name);
 			sameWeapon.addAmmo(weapon.ammo);
 			return;
 		}
@@ -117,8 +123,17 @@ export class Player {
 		this.sprite.changeAnimation(this.currentAnimation);
 	}
 
-	hit() {
-		return;
+	hit(zombi) {
+		console.warn('HIT', zombi);
+
+		if (this.hitCooldown > 0) {
+			return;
+		}
+		
+		this.hitCooldown = 30;
+
+		// console.log('hit');
+		// return;
 		this.lifePoints --;
 
 		if (this.lifePoints <= 0) {
@@ -132,6 +147,7 @@ export class Player {
 	}
 
 	update() {
+		this.hitCooldown = Math.max(0, this.hitCooldown - 1);
 		this.move();
 		this.#updateViewAngle();
 		this.weapon.update();

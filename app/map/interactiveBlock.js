@@ -29,12 +29,7 @@ class InteractiveBlock {
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
 
-        // AnimationControl.registerToUpdate(this);
     }
-
-    // update() {
-
-    // }
 
     getWorldCollisionBox() {
 		return this.interactiveHitBox;

@@ -38,8 +38,6 @@ export function init(elmtId) {
 	const domRect = mainElmt.getBoundingClientRect();
     ratioWidth = worldWidth / domRect.width;
     ratioHeight = worldHeight / domRect.height;
-	console.log('ratioWidth', ratioWidth);
-	console.log('ratioHeight', ratioHeight);
 } 
 
 export function start() {

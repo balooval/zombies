@@ -9,7 +9,7 @@ import {
 	randomValue,
 	randomFloat,
 	randomDiff,
-} from './utils/misc.js';
+} from './utils/math.js';
 import Interval from './utils/interval.js';
 import * as MATH from './utils/math.js';
 
