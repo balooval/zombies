@@ -117,7 +117,6 @@ class ZombiHitable {
 	}
 	
 	hit(damageCount) {
-		console.warn('HIT', damageCount, this.entity.life);
 		this.entity.life -= damageCount;
 		// SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB'], 0.5);
 
@@ -287,7 +286,6 @@ export class ZombiStateTravelGraph extends State {
 	
 	updateDirection() {
 		if (this.test > 1) {
-			console.log('PAUSE');
 			this.entity.setState('PAUSE_AND_SEARCH');
 			return;
 		}
@@ -401,7 +399,6 @@ export class ZombiStateSlide extends StateSlide {
 
 	onStop() {
 		if (this.entity.life <= 0) {
-			console.log('onStop');
 			this.entity.dispose();
 			return;
 		}
@@ -415,7 +412,6 @@ export class ZombiStateSlide extends StateSlide {
 	}
 
 	takeDamage(vector, damageCount) {
-		console.log('damageCount', damageCount);
 		this.zombiHitable.hit(damageCount);
 		this.slide({
 			velocityX: vector.x,

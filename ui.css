@@ -98,7 +98,9 @@ body {
     display: inline-block;
     margin: 0 4px;
     text-align: center;
+    user-select: none;
 }
+
 .weaponIcon.selected {
     border: 2px solid red;
 }
