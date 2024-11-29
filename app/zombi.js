@@ -360,7 +360,7 @@ export class ZombiStateFollow extends State {
 	}
 
 	onReachDestination() {
-		this.entity.dispose();
+		this.entitieToReach.hit();
 	}
 
 	takeDamage(vector, damageCount) {

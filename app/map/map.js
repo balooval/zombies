@@ -12,6 +12,7 @@ import * as Stepper from '../utils/stepper.js';
 import * as Walls from './walls.js';
 import * as Utils from '../utils/misc.js';
 import Block from './block.js';
+import InteractiveBlock from './interactiveBlock.js';
 import * as MATH from '../utils/math.js';
 import AstarBuilder from '../astar/AStarBuilder.js';
 import * as Debug from '../debugCanvas.js';
@@ -209,7 +210,7 @@ export class GameMap {
         // blocks.push(new Block(-10, -10, 50, 10));
         // blocks.push(new Block(-30, -25, 30, 10));
 
-        // blocks.push(new Block(-65, 40, 100, 5));
+        
         blocks.push(new Block(30, 40, 5, 50));
         blocks.push(new Block(-70, 40, 5, 50));
         blocks.push(new Block(-70, 40, 45, 5));
@@ -218,6 +219,9 @@ export class GameMap {
         blocks.push(new Block(-10, -10, 45, 5));
         blocks.push(new Block(-55, 15, 75, 5));
         blocks.push(new Block(45, 15, 25, 5));
+        
+        blocks.push(new InteractiveBlock(45, -20, 5, 5));
+
         return blocks;
     }
 

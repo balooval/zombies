@@ -15,6 +15,8 @@ export const worldWidth = 160;
 export const worldHeight = 120;
 
 const ratio = 4 / 3;
+let ratioWidth = 1;
+let ratioHeight = 1;
 
 export function init(elmtId) {
 	const mainElmt = document.getElementById(elmtId);
@@ -31,6 +33,13 @@ export function init(elmtId) {
 	camera.position.set(0, 0, 100);
 	camera.lookAt(new Vector3(0, 0, 0));
 	scene.add(camera);
+
+
+	const domRect = mainElmt.getBoundingClientRect();
+    ratioWidth = worldWidth / domRect.width;
+    ratioHeight = worldHeight / domRect.height;
+	console.log('ratioWidth', ratioWidth);
+	console.log('ratioHeight', ratioHeight);
 } 
 
 export function start() {
@@ -39,4 +48,19 @@ export function start() {
 	renderer.clear();
 	renderer.render(scene, camera);
 	requestAnimationFrame(start);
+}
+
+export function toLocalX(worldX) {
+    return (worldX + 80) / ratioWidth;
+}
+
+export function toLocalY(worldY) {
+    return (worldHeight + ((worldY + 60) * -1)) / ratioHeight;
+}
+
+export function toWorldX(localX) {
+	return (localX * ratioWidth) - (worldWidth / 2);
+}
+export function toWorldY(localX) {
+    return (worldHeight / 2) - (localX * ratioHeight);
 }

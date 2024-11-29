@@ -89,6 +89,24 @@ body {
     pointer-events: none;
 }
 
+#interactiv-popup {
+    position: absolute;
+    top: 200px;
+    left: 300px;
+    background-color: rgba(200, 200, 200, 0.2);
+    padding: 8px;
+    border-radius: 5px;
+    display: inline-block;
+    user-select: none;
+    border: 1px solid red;
+    width: 100px;
+    height: 80px;
+}
+
+#interactiv-popup.hidden {
+    display: none;
+}
+
 .weaponIcon {
     background-color: rgba(200, 200, 200, 0.2);
     padding: 8px;

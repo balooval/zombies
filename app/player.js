@@ -14,12 +14,8 @@ import {
 	PLAYER_MIN_POS_Y,
 } from './map/map.js';
 import * as SpriteFactory from './spriteFactory.js';
-import * as MATH from './utils/math.js';
 import * as Stepper from './utils/stepper.js';
 import { ActiveWeapon } from './weapons/activeWeapon.js';
-import BulletLauncher from './weapons/bulletLauncher.js';
-import BombLauncher from './weapons/bombLauncher.js';
-import Minigun from './weapons/minigun.js';
 import Batte from './weapons/batte.js';
 import {getIntersection} from './intersectionResolver.js';
 
@@ -122,6 +118,7 @@ export class Player {
 	}
 
 	hit() {
+		return;
 		this.lifePoints --;
 
 		if (this.lifePoints <= 0) {
