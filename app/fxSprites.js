@@ -1,5 +1,6 @@
 import * as AnimationControl from './animationControl.js';
 import * as SpriteFactory from './spriteFactory.js';
+import Light from './light.js';
 import {
 	ANIMATION_END_EVENT,
 } from './textureAnimation.js';
@@ -21,7 +22,20 @@ class FxSprite {
 
 export class HitSprite extends FxSprite {
 
-	constructor(x, y, size) {
+	constructor(x, y, size, lightSize) {
 		super(x, y, size, 'hit');
+		this.light = null;
+
+		if (lightSize > 0) {
+			this.light = new Light(lightSize);
+			this.light.setPosition(x, y);
+		}
+	}
+
+	dispose() {
+		if (this.light !== null) {
+			this.light.dispose();
+		}
+		super.dispose();
 	}
 }

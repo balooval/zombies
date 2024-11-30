@@ -235,9 +235,18 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'test',
 		frames: [],
 	},
+	light: {
+		textureId: 'light',
+		frames: [],
+	},
 }));
 
 const animations = {
+	light: {
+		spriteSheet: 'light',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	test: {
 		spriteSheet: 'test',
 		stepsByFrame: -1,

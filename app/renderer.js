@@ -19,6 +19,7 @@ import {
 
 
 import * as PostProcess from './shaders/postProcess.js';
+import * as LightingShader from './shaders/lighting.js';
 
 export let renderer;
 export let camera;
@@ -32,8 +33,10 @@ const ratio = 4 / 3;
 let ratioWidth = 1;
 let ratioHeight = 1;
 
-let bufferScene;
-let bufferTarget;
+let finalScene;
+export let lightScene;
+export let renderTargetGame;
+let renderTargetLight;
 
 export const lights = [new Vector2(0, 0), new Vector2(-30, 20)];
 
@@ -60,10 +63,16 @@ export function init(elmtId) {
     ratioWidth = worldWidth / domRect.width;
     ratioHeight = worldHeight / domRect.height;
 
-	bufferTarget = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
-	const bufferMesh = buildBufferMesh(worldWidth, worldHeight);
-	bufferScene = new Scene();
-	bufferScene.add(bufferMesh);
+	renderTargetLight = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
+	renderTargetGame = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
+	
+	const bufferLightMesh = buildBufferLightMesh(worldWidth, worldHeight);
+	lightScene = new Scene();
+	lightScene.add(bufferLightMesh);
+	
+	const bufferFinalMesh = buildBufferFinalMesh(worldWidth, worldHeight);
+	finalScene = new Scene();
+	finalScene.add(bufferFinalMesh);
 } 
 
 export function start() {
@@ -72,16 +81,20 @@ export function start() {
 	// renderer.clear();
 	// renderer.render(scene, camera);
 	
-	renderer.setRenderTarget(bufferTarget)
+	renderer.setRenderTarget(renderTargetGame)
 	renderer.setClearColor(0x2a2958, 1);
 	renderer.clear();
 	renderer.render(scene, camera);
+
+	renderer.setRenderTarget(renderTargetLight)
+	renderer.setClearColor(0x808080, 1);
+	renderer.clear();
+	renderer.render(lightScene, camera);
 	
 	renderer.setRenderTarget(null);
 	renderer.setClearColor(0xff0000, 1);
 	renderer.clear();
-	renderer.render(bufferScene, camera);
-
+	renderer.render(finalScene, camera);
 
 	requestAnimationFrame(start);
 }
@@ -101,7 +114,7 @@ export function toWorldY(localX) {
     return (worldHeight / 2) - (localX * ratioHeight);
 }
 
-function buildBufferMesh(width, height) {
+function buildBufferLightMesh(width, height) {
 	const geometry = new BufferGeometry();
 		
 	const vertices = new Float32Array([
@@ -119,14 +132,6 @@ function buildBufferMesh(width, height) {
 	geometry.setIndex(indices);
 	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
 
-
-	
-	const lights = new Float32Array([
-		-40, -20,
-		30, 20
-	]);
-	geometry.setAttribute('lights', new BufferAttribute(lights, 2));
-
 	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
 		0, 0,
 		1, 0,
@@ -136,17 +141,58 @@ function buildBufferMesh(width, height) {
 
 
 	const uniforms = {
-		map: { type: "t", value: bufferTarget.texture},
+		map: { type: "t", value: renderTargetGame.texture},
 	}
 
-	const material = new ShaderMaterial({
+	const shaderMaterial = new ShaderMaterial({
 		uniforms: uniforms,
 		fragmentShader: PostProcess.fragment,
 		vertexShader: PostProcess.vertex,
 		transparent: true,
 	})
 
-	console.log('geometry', geometry);
+	const material = new MeshBasicMaterial({opacity: 1, color: 0x000000, transparent: true});
+
+	return new Mesh(geometry, material);
+}
+
+
+function buildBufferFinalMesh(width, height) {
+	const geometry = new BufferGeometry();
+		
+	const vertices = new Float32Array([
+		-0.5 * width, -0.5 * height, 0,
+		0.5 * width, -0.5 * height, 0,
+		0.5 * width, 0.5 * height, 0,
+		-0.5 * width, 0.5 * height, 0,
+	]);
 	
+	const indices = [
+		0, 1, 2,
+		2, 3, 0,
+	];
+
+	geometry.setIndex(indices);
+	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+
+	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
+		0, 0,
+		1, 0,
+		1, 1,
+		0, 1,
+	]), 2));
+
+	const uniforms = {
+		bgMap: { type: "t", value: renderTargetGame.texture},
+		lightMap: { type: "t", value: renderTargetLight.texture},
+	}
+
+	const material = new ShaderMaterial({
+		uniforms: uniforms,
+		fragmentShader: LightingShader.fragment,
+		vertexShader: LightingShader.vertex,
+		transparent: true,
+	})
+
 	return new Mesh(geometry, material);
 }

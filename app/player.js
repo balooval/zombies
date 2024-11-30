@@ -23,6 +23,7 @@ import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import {getIntersection} from './intersectionResolver.js';
+import Light from './light.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
@@ -83,6 +84,8 @@ export class Player {
 		CollisionResolver.checkCollisionWithLayer(this, 'BONUS');
 
 		this.currentAnimation = '';
+
+		this.light = new Light(128);
 	}
 
 	onCollide(collisions, layersName) {
@@ -154,8 +157,7 @@ export class Player {
 		this.move();
 		this.#updateViewAngle();
 		this.weapon.update();
-		Renderer.lights[0].x = this.position.x;
-		Renderer.lights[0].y = this.position.y;
+		this.light.setPosition(this.position.x, this.position.y);
 	}
 
 	#updateViewAngle() {

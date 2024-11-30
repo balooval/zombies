@@ -73,7 +73,7 @@ class Grenade {
 			SoundLoader.playRandom(['bombA', 'bombB'], 0.5);
 		}
 
-		const hitSprite = new HitSprite(this.position.x, this.position.y, 15);
+		const hitSprite = new HitSprite(this.position.x, this.position.y, 15, 60);
 		Particules.create(Particules.EGG_EXPLOSION, this.position, new Vector2(1, 0.7));
 		this.dispose();
 	}

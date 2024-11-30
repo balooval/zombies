@@ -53,7 +53,7 @@ class Bullet {
 	#onCollideWall(walls) {
 		for (const wall of walls) {
 			CollisionResolver.forgotCollisionWithLayer(this, 'WALLS');
-			const hitSprite = new HitSprite(this.position.x, this.position.y, 6);
+			const hitSprite = new HitSprite(this.position.x, this.position.y, 6, 10);
 			SoundLoader.play('eggCrack', 0.2);
 		}
 

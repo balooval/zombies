@@ -1,11 +1,9 @@
 
 export const vertex = `
 varying vec2 vUv;
-varying vec2 vPos;
 
 void main() {
     vUv = uv;
-    vPos = vec4(modelViewMatrix * vec4(position, 1.0)).xy;
     vec4 vertPos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     gl_Position = vertPos;
 }
@@ -14,29 +12,16 @@ void main() {
     
 export const fragment = `
 varying vec2 vUv;
-uniform sampler2D map;
-uniform vec2 lightPosition;
-uniform vec2 lights[ 2 ];
+uniform sampler2D bgMap;
+uniform sampler2D lightMap;
 varying vec2 vPos;
 
 void main() {
-    vec2 ligthPos = vec2(0.0, 0.0);
-    
-    float luminosity = 0.2;
-    
-    for (int v = 0; v < 2; v++) {
-        float dist = distance(lights[v], vPos);
-        float localLight = max(0.0, 1.0 - (dist / 50.0));
-        
-        luminosity += localLight;
-    }
+    vec4 lightColor = texture2D(lightMap, vUv);
+    float lightIntensity = lightColor.r + 0.2;
+    vec4 bgColor = texture2D(bgMap, vUv);
 
-
-    luminosity = 1.0;
-    
-    
-    vec4 color = texture2D(map, vUv);
-    vec4 finalColor = vec4(color.x * luminosity, color.y * luminosity, color.z * luminosity, color.w);
+    vec4 finalColor = vec4(bgColor.r * lightIntensity, bgColor.g * lightIntensity, bgColor.b * lightIntensity, bgColor.a);
     
     gl_FragColor = finalColor;
 }

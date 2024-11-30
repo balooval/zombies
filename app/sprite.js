@@ -19,24 +19,24 @@ function getSpriteMaterial(animationId) {
 		return materials.get(animationId);
 	}
 	
-	// const material = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(animationId), transparent: true});
+	const material = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(animationId), transparent: true});
 
 	const texture = TextureLoader.get(animationId);
 
-	const uniforms = {
-		lightPosition: {value: new Vector2(0, 0)},
-		map: { type: "t", value: texture},
-		lights: {
-			value: Renderer.lights
-		}
-	}
+	// const uniforms = {
+	// 	lightPosition: {value: new Vector2(0, 0)},
+	// 	map: { type: "t", value: texture},
+	// 	lights: {
+	// 		value: Renderer.lights
+	// 	}
+	// }
 
-	const material = new ShaderMaterial({
-		uniforms: uniforms,
-		fragmentShader: LightingShader.fragment,
-		vertexShader: LightingShader.vertex,
-		transparent: true,
-	})
+	// const material = new ShaderMaterial({
+	// 	uniforms: uniforms,
+	// 	fragmentShader: LightingShader.fragment,
+	// 	vertexShader: LightingShader.vertex,
+	// 	transparent: true,
+	// })
 
 
 	materials.set(animationId, material);

@@ -17,6 +17,7 @@ import AstarBuilder from '../astar/AStarBuilder.js';
 import * as Debug from '../debugCanvas.js';
 import * as Bonus from '../bonus.js';
 import {getIntersection} from '../intersectionResolver.js';
+import Light from '../light.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
@@ -45,8 +46,8 @@ export class GameMap {
     constructor() {
         const spriteType = 'Night';
         this.evt = new Evt();
-        // this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
-        this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'test');
+        this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
+        // this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'test');
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
         this.leftWall = new Walls.LeftWall(GROUND_POSITION);
@@ -69,6 +70,42 @@ export class GameMap {
 
         const astarBuilder = new AstarBuilder();
         this.astar = astarBuilder.build();
+
+        this.placeLights();
+    }
+    
+    addLights(lightsData) {
+        console.log('addLights');
+        const positions = [
+            [-60, 0, 35],
+            [-40, 0, 35],
+            [-20, 0, 35],
+            [0, 0, 35],
+            [20, 0, 35],
+
+            [-60, 30, 35],
+            [-40, 30, 35],
+            [-20, 30, 35],
+            [0, 30, 35],
+            [20, 30, 35],
+        ];
+
+        for (const lightData of lightsData) {
+            const light = new Light(lightData.size);
+            light.setPosition(lightData.x, lightData.y);
+        }
+    }
+
+    placeLights() {
+
+        const positions = [
+            [47, -20, 30],
+        ];
+
+        for (const pos of positions) {
+            const light = new Light(pos[2]);
+            light.setPosition(pos[0], pos[1]);
+        }
     }
 
     getTravel(startPos, endPos) {
@@ -219,7 +256,7 @@ export class GameMap {
         blocks.push(new Block(-55, 15, 75, 5));
         blocks.push(new Block(45, 15, 25, 5));
         
-        blocks.push(new InteractiveBlock(45, -20, 5, 5));
+        blocks.push(new InteractiveBlock(this, 45, -20, 5, 5));
 
         return blocks;
     }
