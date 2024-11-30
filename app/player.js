@@ -51,7 +51,7 @@ export class Player {
 		Input.evt.addEventListener('SPACE', this, this.onKeyUp);
 
 		AnimationControl.registerToUpdate(this);
-		this.hitBox = new Hitbox(-3, 3, -3, 3, true);
+		this.hitBox = new Hitbox(-2.5, 2.5, -2.5, 2.5, true);
 		CollisionResolver.addToLayer(this, 'PLAYER');
 
 		this.hitCooldown = 0;

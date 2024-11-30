@@ -28,7 +28,7 @@ class StateFollow extends State {
 	}
 
 	onLostPlayer() {
-		this.entity.setState('ENTER');
+		this.entity.setState('WALK');
 	}
 
 	setEntity(entity) {

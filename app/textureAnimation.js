@@ -301,6 +301,10 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'pointer',
 		frames: [],
 	},
+	hole: {
+		textureId: 'hole',
+		frames: [],
+	},
 }));
 
 const animations = {
@@ -318,6 +322,11 @@ const animations = {
 		spriteSheet: 'bonusBatte',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
+	},
+	hole: {
+		spriteSheet: 'hole',
+		stepsByFrame: 20,
+		framesToDisplay: [0, 1, 2, 3, 4, 5, 6, 7],
 	},
 	bonusMinigun: {
 		spriteSheet: 'bonusMinigun',

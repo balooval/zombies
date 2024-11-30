@@ -198,6 +198,10 @@
 		{
 			"id": "pistolIcon",
 			"url": "assets/pistol-icon.png"
+		},
+		{
+			"id": "hole",
+			"url": "assets/hole.png"
 		}
 	]
 }

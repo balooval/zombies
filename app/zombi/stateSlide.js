@@ -26,7 +26,7 @@ class StateSlide extends Slide {
 
 	onStop() {
 		super.onStop();
-		this.entity.setState('ENTER');
+		this.entity.setState('WALK');
 	}
 
 	suspend() {
