@@ -21,6 +21,10 @@ export class Batte extends Weapon {
         this.vector = {x: 0, y: 0};
 	}
 
+    canShot() {
+		return true;
+	}
+
     enable() {
         this.update();
         this.sprite.display();

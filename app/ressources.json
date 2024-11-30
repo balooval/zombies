@@ -84,30 +84,6 @@
 			"url": "assets/pointer.png"
 		},
 		{
-			"id": "wolfWalk",
-			"url": "assets/wolf-walk.png"
-		},
-		{
-			"id": "wolfFall",
-			"url": "assets/loup-animation-chute.png"
-		},
-		{
-			"id": "wolfFallLevel2",
-			"url": "assets/wolf-fall-level-2.png"
-		},
-		{
-			"id": "wolfDeath",
-			"url": "assets/loup-animation-death.png"
-		},
-		{
-			"id": "wolfClimb",
-			"url": "assets/wolf-climb.png"
-		},
-		{
-			"id": "wolfBite",
-			"url": "assets/wolf-bite.png"
-		},
-		{
 			"id": "wolfStillDeath",
 			"url": "assets/loup-still-death.png"
 		},
@@ -128,60 +104,12 @@
 			"url": "assets/map.png"
 		},
 		{
-			"id": "skyNight",
-			"url": "assets/map-night-sky.png"
-		},
-		{
-			"id": "backgroundDay",
-			"url": "assets/map-day.png"
-		},
-		{
-			"id": "skyDay",
-			"url": "assets/map-day-sky.png"
-		},
-		{
-			"id": "pouleAnimation",
-			"url": "assets/poule-animation.png"
-		},
-		{
-			"id": "basket",
-			"url": "assets/basket.png"
-		},
-		{
 			"id": "egg",
 			"url": "assets/oeuf-animation.png"
 		},
 		{
-			"id": "stone",
-			"url": "assets/stone.png"
-		},
-		{
-			"id": "moon",
-			"url": "assets/moon.png"
-		},
-		{
-			"id": "sun",
-			"url": "assets/sun.png"
-		},
-		{
 			"id": "hit",
 			"url": "assets/hit.png"
-		},
-		{
-			"id": "rope",
-			"url": "assets/rope.png"
-		},
-		{
-			"id": "dust",
-			"url": "assets/dust.png"
-		},
-		{
-			"id": "poussin",
-			"url": "assets/poussin-corde.png"
-		},
-		{
-			"id": "bonusFlying",
-			"url": "assets/bonus-flying.png"
 		},
 		{
 			"id": "bonusBullet",
@@ -202,6 +130,10 @@
 		{
 			"id": "hole",
 			"url": "assets/hole.png"
+		},
+		{
+			"id": "skyNight",
+			"url": "assets/map-night-sky.png"
 		}
 	]
 }

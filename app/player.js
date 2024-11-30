@@ -232,7 +232,6 @@ export class Player {
 
 	onShot() {
 		this.isShoting = true;
-		// this.sprite.changeAnimation('playerIdle');
 		Stepper.stopListenStep(this.endShotAnimatonStep, this, this.setToIdle);
 		this.weapon.startShot();
 	}
@@ -249,27 +248,41 @@ export class Player {
 		if (this.isShoting === true) {
 			return;
 		}
-		// this.changeAnimation('playerWalk');
 	}
 
 	onWheelDown() {
-		this.currentWeaponIndex --;
-		if (this.currentWeaponIndex < 0) {
-			this.currentWeaponIndex = this.weaponsList.length - 1;
-		}
-		const prevWeapon = this.weaponsList[this.currentWeaponIndex];
-		this.weapon.changeWeapon(prevWeapon);
-		WeaponList.setActive(prevWeapon);
+		this.#getNextAvailableWeapon(-1);
 	}
 	
 	onWheelUp() {
-		this.currentWeaponIndex ++;
-		if (this.currentWeaponIndex >= this.weaponsList.length) {
-			this.currentWeaponIndex = 0;
+		this.#getNextAvailableWeapon(1);
+	}
+
+	#getNextAvailableWeapon(direction) {
+		let watchDog = 20;
+
+		while(true) {
+			this.currentWeaponIndex += direction;
+			if (this.currentWeaponIndex >= this.weaponsList.length) {
+				this.currentWeaponIndex = 0;
+			}
+			if (this.currentWeaponIndex < 0) {
+				this.currentWeaponIndex = this.weaponsList.length - 1;
+			}
+
+			const nextWeapon = this.weaponsList[this.currentWeaponIndex];
+			if (nextWeapon.canShot() === true) {
+				this.weapon.changeWeapon(nextWeapon);
+				WeaponList.setActive(nextWeapon);
+				break;
+			}
+
+			watchDog --;
+			if (watchDog === 0) {
+				console.log('AUCUNE ARME DISPO TROUVEE');
+				break;
+			}
 		}
-		const nextWeapon = this.weaponsList[this.currentWeaponIndex];
-		this.weapon.changeWeapon(nextWeapon);
-		WeaponList.setActive(nextWeapon);
 	}
 
 	onMouseDown() {

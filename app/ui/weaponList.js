@@ -27,8 +27,8 @@ export function addWeapon(weapon) {
     const weaponImage = TextureLoader.get(weapon.icon).image;
     const weaponName = weapon.constructor.name;
     getContainer().innerHTML += `<div class="weaponIcon" id="weapon-${weaponName}">
-        <img src="${weaponImage.src}">
         <div id="ammo-${weaponName}">${weapon.ammo}</div>
+        <img src="${weaponImage.src}">
     </div>`;
 }
 

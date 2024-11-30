@@ -12,6 +12,10 @@ class Weapon {
 		this.shootInterval = new Interval(shotIntervalSteps, () => this.launchProjectile(), true);
 	}
 
+	canShot() {
+		return this.ammo > 0;
+	}
+
 	update() {
 		
 	}

@@ -15,7 +15,7 @@ export class RayLauncher extends Weapon {
 	launchProjectile() {
 		super.launchProjectile();
 		
-		if (this.ammo === 0) {
+		if (this.canShot() === false) {
 			return;
 		}
 

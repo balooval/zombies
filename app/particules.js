@@ -42,40 +42,6 @@ export class WolfFallingParticules {
 	}
 }
 
-
-export class EggWallParticules {
-	constructor(entitie) {
-		this.entitie = entitie;
-		this.count = 10;
-		this.interval = new Interval(3, () => this.update(), true);
-		this.interval.start();
-	}
-
-	update() {
-		this.count = Math.max(1, this.count * 0.9);
-		for (let i = 0; i < this.count; i ++) {
-			const color = randomElement([0xf5e042, 0xd9b336]);
-			const particule = new Particule(
-				this.entitie.position.x + randomDirection(this.count / 4),
-				this.entitie.position.y +  + randomDirection(this.count / 4),
-				0,
-				0,
-				115 + randomDirection(20),
-				0.99,
-				0,
-				1,
-				color,
-			);
-		}
-    }
-
-	dispose() {
-		this.interval.dispose();
-	}
-}
-
-
-
 export function create(type, position, direction) {
 	switch (type) {
 		case EGG_EXPLOSION:

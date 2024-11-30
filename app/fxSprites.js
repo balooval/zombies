@@ -25,10 +25,3 @@ export class HitSprite extends FxSprite {
 		super(x, y, size, 'hit');
 	}
 }
-
-export class DustSprite extends FxSprite {
-
-	constructor(x, y, size) {
-		super(x, y, size, 'dust');
-	}
-}
