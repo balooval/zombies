@@ -6,6 +6,7 @@ import * as WeaponList from './ui/weaponList.js';
 import Hitbox from './collisionHitbox.js';
 import Translation from './translation.js';
 import CollisionResolver from './collisionResolver.js';
+import * as Renderer from './renderer.js';
 import {
 	PLAYER_START_POSITION,
 	PLAYER_MAX_POS_X,
@@ -153,6 +154,8 @@ export class Player {
 		this.move();
 		this.#updateViewAngle();
 		this.weapon.update();
+		Renderer.lights[0].x = this.position.x;
+		Renderer.lights[0].y = this.position.y;
 	}
 
 	#updateViewAngle() {

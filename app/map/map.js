@@ -45,9 +45,8 @@ export class GameMap {
     constructor() {
         const spriteType = 'Night';
         this.evt = new Evt();
-        this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
-        // this.skySprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapSky' + spriteType);
-        // this.skySprite.setDepth(-10);
+        // this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
+        this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'test');
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
         this.leftWall = new Walls.LeftWall(GROUND_POSITION);

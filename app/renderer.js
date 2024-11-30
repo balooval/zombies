@@ -1,6 +1,7 @@
 import {
 	OrthographicCamera,
 	Scene,
+	Vector2,
 	Vector3,
 	WebGLRenderer,
 
@@ -17,6 +18,8 @@ export const worldHeight = 120;
 const ratio = 4 / 3;
 let ratioWidth = 1;
 let ratioHeight = 1;
+
+export const lights = [new Vector2(0, 0), new Vector2(-30, 20)];
 
 export function init(elmtId) {
 	const mainElmt = document.getElementById(elmtId);

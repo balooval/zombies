@@ -134,6 +134,10 @@
 		{
 			"id": "skyNight",
 			"url": "assets/map-night-sky.png"
+		},
+		{
+			"id": "test",
+			"url": "assets/test.png"
 		}
 	]
 }
