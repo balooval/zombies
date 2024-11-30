@@ -30,12 +30,11 @@ void main() {
         
         luminosity += localLight;
     }
+
+
+    luminosity = 1.0;
     
-    // float dist = distance(lightPosition, vPos);
-    // vec4 color = texture2D(map, vUv);
     
-    // float luminosity = 1.0 - (dist / 80.0);
-        
     vec4 color = texture2D(map, vUv);
     vec4 finalColor = vec4(color.x * luminosity, color.y * luminosity, color.z * luminosity, color.w);
     
