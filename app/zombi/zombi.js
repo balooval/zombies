@@ -4,6 +4,7 @@ import StateFollow from './stateFollow.js'
 import StatePauseAndSearch from './statePauseAndSearch.js'
 import StateSlide from './stateSlide.js'
 import StateHole from './stateHole.js'
+import StateAttack from './stateAttack.js'
 
 export const pool = new Map();
 
@@ -13,6 +14,7 @@ export function createZombi(player, map, startPosition) {
 	zombiStates.set('WALK', new StateTravelGraph(startPosition, map, player));
 	zombiStates.set('FOLLOW', new StateFollow(startPosition, player, map));
 	zombiStates.set('SLIDE', new StateSlide(startPosition, map));
+	zombiStates.set('ATTACK', new StateAttack(startPosition));
 	zombiStates.set('PAUSE_AND_SEARCH', new StatePauseAndSearch(startPosition, map, player));
 	const zombi = new Zombi(zombiStates);
 	pool.set(zombi, zombi);

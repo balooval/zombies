@@ -124,7 +124,9 @@ export class Player {
 	}
 
 	hit(zombi) {
-		console.warn('HIT', zombi);
+		// console.log('HIT');
+		// console.warn('HIT', zombi);
+		// return;
 
 		if (this.hitCooldown > 0) {
 			return;

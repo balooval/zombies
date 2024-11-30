@@ -55,9 +55,10 @@ class StateFollow extends State {
 
 	#onPlayerTouch(players) {
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        const player = players.pop();
-		player.hit(this);
+        // const player = players.pop();
+		// player.hit(this);
 		// this.entity.dispose();
+		this.entity.setState('ATTACK', this.entitieToReach);
     }
 
 	updateDirection(step) {

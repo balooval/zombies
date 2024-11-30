@@ -116,7 +116,6 @@ class Grenade {
 		Stepper.stopListenStep(Stepper.curStep, this, this.blink);
 		
 		this.isActive = !this.isActive;
-		console.log('BLINK', this.isActive);
 		
 		if (this.isActive === true) {
 			this.nextStep = Stepper.curStep + 3;

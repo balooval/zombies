@@ -6,18 +6,16 @@ export class BulletLauncher extends Weapon {
 	constructor() {
 		super(10);
 		this.icon = 'bullet';
-		this.ammo = 20;
+		this.ammo = 60;
 	}
 
 	launchProjectile() {
 		super.launchProjectile();
 
-		console.log('launchProjectile A', this.ammo);
-		
 		if (this.ammo === 0) {
 			return;
 		}
-		console.log('launchProjectile B');
+
 		SoundLoader.play('eggLaunch');
 		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle);
 		super.launchProjectile();

@@ -35,13 +35,12 @@ export class TextureAnimation {
 		this.material = mesh.material;
 		this.mirrorH = false;
 		this.lastStep = 0;
-		this.updateFunction = this.doNothing;
-		AnimationControl.registerToUpdate(this);
-
 		this.evt = new Evt();
-
+		this.updateFunction = this.doNothing;
 		this.animationProps = null;
 		this.spriteSheet = null;
+		
+		AnimationControl.registerToUpdate(this);
 		
 		this.geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
 			0, 0,
@@ -177,6 +176,10 @@ const spriteSheets = new Map(Object.entries({
 		frames: [],
 	},
 	zombiWalk: {
+		textureId: 'zombiWalk',
+		frames: [],
+	},
+	zombiAtack: {
 		textureId: 'zombiWalk',
 		frames: [],
 	},
@@ -396,6 +399,11 @@ const animations = {
 		spriteSheet: 'zombiWalk',
 		stepsByFrame: 15,
 		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiAtack: {
+		spriteSheet: 'zombiAtack',
+		stepsByFrame: 15,
+		framesToDisplay: [4, 4, 5, 4],
 	},
 	zombiHit: {
 		spriteSheet: 'zombiHit',
