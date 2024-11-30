@@ -6,10 +6,17 @@ class Weapon {
 		this.owner = null;
 		this.isActive = false;
 		this.endShotAnimatonStep = 0;
-		this.ammo = -1;
+		this.ammo = 0;
 		this.activesSteps = -1;
 		this.icon = 'pistolIcon';
-		this.shootInterval = new Interval(shotIntervalSteps, () => this.launchProjectile(), true);
+		
+		this.shotFunction = this.shotWithAmmoCheck;
+
+		this.shootInterval = new Interval(shotIntervalSteps, () => this.shotFunction(), true);
+	}
+	
+	notUseAmmo() {
+		this.shotFunction = this.launchProjectile;
 	}
 
 	canShot() {
@@ -47,8 +54,18 @@ class Weapon {
 		WeaponList.updateWeaponAmmo(this);
 	}
 
-	launchProjectile() {
+	shotWithAmmoCheck() {
 		this.ammo = Math.max(this.ammo - 1, 0);
+		if (this.ammo === 0) {
+			WeaponList.updateWeaponAmmo(this);
+			return;
+		}
+		
+		this.launchProjectile();
+	}
+
+	launchProjectile() {
+		// this.ammo = Math.max(this.ammo - 1, 0);
 		WeaponList.updateWeaponAmmo(this);
 	}
 }

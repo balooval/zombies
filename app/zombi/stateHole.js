@@ -5,7 +5,7 @@ import {ANIMATION_END_EVENT} from './../textureAnimation.js';
 class StateHole extends State {
 	constructor(position) {
 		super(position);
-		this.setSprite(8, 8, 'hole');
+		this.setSprite(12, 12, 'hole');
         this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.onAnimationEnd);
 	}
 

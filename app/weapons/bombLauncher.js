@@ -12,9 +12,10 @@ export class BombLauncher extends Weapon {
 	launchProjectile() {
 		super.launchProjectile();
 		
-		if (this.canShot() === false) {
-			return;
-		}
+		// if (this.canShot() === false) {
+		// 	return;
+		// }
+		
 		SoundLoader.play('eggLaunch');
 		new Grenade(this.owner.position, this.owner.weaponTargetPosition, this.owner);
 		super.launchProjectile();

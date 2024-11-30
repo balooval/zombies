@@ -17,9 +17,9 @@ export class Minigun extends Weapon {
 	launchProjectile() {
 		super.launchProjectile();
 
-        if (this.canShot() === false) {
-			return;
-		}
+        // if (this.canShot() === false) {
+		// 	return;
+		// }
 
 		SoundLoader.playRandom(['gunA', 'gunB'], 1);
 

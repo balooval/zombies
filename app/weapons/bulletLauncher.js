@@ -12,9 +12,9 @@ export class BulletLauncher extends Weapon {
 	launchProjectile() {
 		super.launchProjectile();
 
-		if (this.canShot() === false) {
-			return;
-		}
+		// if (this.canShot() === false) {
+		// 	return;
+		// }
 
 		SoundLoader.play('eggLaunch');
 		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle);

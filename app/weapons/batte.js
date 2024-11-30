@@ -11,7 +11,7 @@ export class Batte extends Weapon {
 	constructor() {
 		super(25);
 		this.icon = 'bonusBatte';
-		this.ammo = -1;
+		this.ammo = 1;
         this.hitBox = new Hitbox(-4, 4, -4, 4, true);
         this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'batteIdle');
         this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.onAnimationEnd);
@@ -19,11 +19,13 @@ export class Batte extends Weapon {
         this.sprite.textureAnimation.evt.addEventListener(`FRAME_${4}`, this, this.onAnimationStopHit);
         this.position = {x: 0, y: 0};
         this.vector = {x: 0, y: 0};
+
+        this.notUseAmmo();
 	}
 
-    canShot() {
-		return true;
-	}
+    // canShot() {
+	// 	return true;
+	// }
 
     enable() {
         this.update();
