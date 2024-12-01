@@ -1,6 +1,7 @@
+import * as MATH from '../utils/math.js';
+
 import Evt from '../utils/event.js';
 import Translation from '../translation.js';
-import * as MATH from '../utils/math.js';
 import { getIntersection } from '../intersectionResolver.js';
 
 class PlayerFinder {
@@ -11,6 +12,8 @@ class PlayerFinder {
 		this.entity = null;
 		this.viewAngle = 1.5;
 		this.viewTranslation = new Translation();
+		this.isViewingPlayer = true;
+		this.lastViewPosition = {x: this.player.position.x, y: this.player.position.y};
 	}
 	
 	init(entity) {
@@ -36,10 +39,14 @@ class PlayerFinder {
 		const wallHit = this.map.blocks.map(block => getIntersection(this.viewTranslation, block.hitBox)).filter(res => res).pop();
 		
 		if (wallHit) {
+			this.isViewingPlayer = false;
 			this.evt.fireEvent('LOST');
 			return;
 		}
 
+		this.lastViewPosition.x = this.player.position.x;
+		this.lastViewPosition.y = this.player.position.y;
+		this.isViewingPlayer = true;
 		this.evt.fireEvent('VIEW');
 	}
 }

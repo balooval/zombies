@@ -3,6 +3,10 @@ import * as Renderer from '../renderer.js';
 const elementId = 'interactiv-popup';
 const element = document.getElementById(elementId);
 
+export function setContent(html) {
+    element.innerHTML = html;
+}
+
 export function display() {
     element.classList.remove('hidden');
 }

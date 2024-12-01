@@ -93,14 +93,13 @@ body {
     position: absolute;
     top: 200px;
     left: 300px;
-    background-color: rgba(200, 200, 200, 0.2);
+    background-color: rgb(128, 128, 128);
     padding: 8px;
     border-radius: 5px;
     display: inline-block;
     user-select: none;
-    border: 1px solid red;
-    width: 100px;
-    height: 80px;
+    border: 1px solid rgb(51, 51, 51);
+    max-width: 150px;
 }
 
 #interactiv-popup.hidden {

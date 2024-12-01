@@ -1,8 +1,9 @@
-import * as Stepper from '../utils/stepper.js';
 import * as MATH from '../utils/math.js';
-import {State} from '../states.js';
-import PlayerFinder from './playerFinder.js';
+import * as Stepper from '../utils/stepper.js';
+
 import Hitable from './hitable.js';
+import PlayerFinder from './playerFinder.js';
+import {State} from '../states.js';
 import Translation from '../translation.js';
 
 class StatePauseAndSearch extends State {
@@ -25,8 +26,10 @@ class StatePauseAndSearch extends State {
 		this.hitable.setEntity(this.entity);
 	}
 
-	start() {
+	start(angle) {
 		super.start();
+		this.rotationDirection = MATH.randomDirection(0.02);
+		this.sprite.setRotation(angle);
 		this.translation.angle = this.sprite.getRotation();
 		this.stopSearchStep = Stepper.curStep + Math.round(MATH.random(120, 600));
 		this.hitable.enable();
@@ -35,7 +38,7 @@ class StatePauseAndSearch extends State {
 	
 	onStopSearch() {
 		Stepper.stopListenStep(this.stopSearchStep, this, this.onStopSearch);
-		this.entity.setState('FOLLOW');
+		this.entity.setState('WALK');
 	}
 
 	update(step, time) {

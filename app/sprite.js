@@ -7,6 +7,7 @@ import {
 	Vector2,
 	Vector3
 } from '../vendor/three.module.js';
+import * as Renderer from './renderer.js';
 import * as TextureLoader from './net/loaderTexture.js';
 import {TextureAnimation} from './textureAnimation.js';
 import * as LightingShader from './shaders/lighting.js';
@@ -20,19 +21,21 @@ function getSpriteMaterial(animationId) {
 	
 	const material = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(animationId), transparent: true});
 
-	// const texture = TextureLoader.get(animationId);
-	// console.log(animationId, texture);
-	
+	const texture = TextureLoader.get(animationId);
 
 	// const uniforms = {
 	// 	lightPosition: {value: new Vector2(0, 0)},
-	// 	map: { type: "t", value: texture}
+	// 	map: { type: "t", value: texture},
+	// 	lights: {
+	// 		value: Renderer.lights
+	// 	}
 	// }
 
 	// const material = new ShaderMaterial({
 	// 	uniforms: uniforms,
 	// 	fragmentShader: LightingShader.fragment,
 	// 	vertexShader: LightingShader.vertex,
+	// 	transparent: true,
 	// })
 
 

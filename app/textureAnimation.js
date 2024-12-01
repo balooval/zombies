@@ -2,6 +2,7 @@ import {BufferAttribute} from '../vendor/three.module.js';
 import Evt from './utils/event.js';
 import * as AnimationControl from './animationControl.js';
 import * as TextureLoader from './net/loaderTexture.js';
+import * as Renderer from './renderer.js';
 
 export const ANIMATION_END_EVENT = 'ANIMATION_END_EVENT';
 
@@ -82,6 +83,13 @@ export class TextureAnimation {
 
 	update(step, time) {
 		this.updateFunction(step, time);
+
+		// this.material.uniforms.lightPosition.value.x = Renderer.light.x;
+		// this.material.uniforms.lightPosition.value.y = Renderer.light.y;
+		// for (const light of Renderer.lights) {
+		// 	this.material.uniforms.lights.value[0].x = light.x;
+		// 	this.material.uniforms.lights.value[0].y = light.y;
+		// }
 	}
 
 	updateFrames(step, time) {
@@ -223,9 +231,27 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'skyNight',
 		frames: [],
 	},
+	test: {
+		textureId: 'test',
+		frames: [],
+	},
+	light: {
+		textureId: 'light',
+		frames: [],
+	},
 }));
 
 const animations = {
+	light: {
+		spriteSheet: 'light',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	test: {
+		spriteSheet: 'test',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	grenade: {
 		spriteSheet: 'grenade',
 		stepsByFrame: -1,

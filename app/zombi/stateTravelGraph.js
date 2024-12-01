@@ -1,10 +1,10 @@
-import Translation from '../translation.js';
+import BloodDropping from './bloodDropping.js';
+import Hitable from './hitable.js';
 import Hitbox from '../collisionHitbox.js';
 import Move from './move.js';
 import PlayerFinder from './playerFinder.js';
-import BloodDropping from './bloodDropping.js';
-import Hitable from './hitable.js';
 import { State } from '../states.js';
+import Translation from '../translation.js';
 
 class StateTravelGraph extends State {
 	constructor(position, map, player) {
@@ -77,7 +77,7 @@ class StateTravelGraph extends State {
 	
 	updateDirection() {
 		if (this.test > 1) {
-			this.entity.setState('PAUSE_AND_SEARCH');
+			this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
 			return;
 		}
 

@@ -1,14 +1,14 @@
 import * as MATH from '../utils/math.js';
 import * as Stepper from '../utils/stepper.js';
-import {State} from '../states.js';
-import Hitbox from '../collisionHitbox.js';
-import Translation from '../translation.js';
-import BloodDropping from './bloodDropping.js'
-import Hitable from './hitable.js'
-import CollisionResolver from './../collisionResolver.js';
-import PlayerFinder from './playerFinder.js';
-import Move from './move.js';
 
+import BloodDropping from './bloodDropping.js'
+import CollisionResolver from './../collisionResolver.js';
+import Hitable from './hitable.js'
+import Hitbox from '../collisionHitbox.js';
+import Move from './move.js';
+import PlayerFinder from './playerFinder.js';
+import {State} from '../states.js';
+import Translation from '../translation.js';
 
 class StateFollow extends State {
 	constructor(position, player, map) {
@@ -20,7 +20,7 @@ class StateFollow extends State {
 		this.translation = new Translation();
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable();
-		this.playerFinder = new PlayerFinder(player, map);
+		this.playerFinder = new PlayerFinder(this.entitieToReach, map);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
 
 		this.zombieMove = new Move(0.2, this.position);
@@ -28,7 +28,7 @@ class StateFollow extends State {
 	}
 
 	onLostPlayer() {
-		this.entity.setState('WALK');
+		// this.entity.setState('WALK');
 	}
 
 	setEntity(entity) {
@@ -42,7 +42,9 @@ class StateFollow extends State {
 		super.start();
 		this.hitable.enable();
 		CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
-		this.updateDirection(0);
+		this.zombieMove.setDestination(this.entitieToReach.position.x, this.entitieToReach.position.y)
+		this.playerFinder.update(this.position, this.zombieMove.moveTranslation);
+		this.changeDirection(0);
 	}
 
 	onCollide(collisions, layersName) {
@@ -55,18 +57,14 @@ class StateFollow extends State {
 
 	#onPlayerTouch(players) {
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        // const player = players.pop();
-		// player.hit(this);
-		// this.entity.dispose();
 		this.entity.setState('ATTACK', this.entitieToReach);
     }
 
-	updateDirection(step) {
-		this.zombieMove.setDestination(this.entitieToReach.position.x, this.entitieToReach.position.y)
-
+	changeDirection(step) {
+		Stepper.stopListenStep(Stepper.curStep, this, this.changeDirection);
+		this.zombieMove.setDestination(this.playerFinder.lastViewPosition.x, this.playerFinder.lastViewPosition.y)
 		const nextUpdateDirectionStepDelay = Math.round(MATH.randomValue(10, 120));
-		Stepper.stopListenStep(Stepper.curStep, this, this.updateDirection);
-		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.updateDirection);
+		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.changeDirection);
 	}
 
 	suspend() {
@@ -84,8 +82,14 @@ class StateFollow extends State {
 	}
 
 	onReachDestination() {
-		this.updateDirection();
-		// this.entitieToReach.hit(this);
+		const distanceToLastPlayerPosition = MATH.distance(this.playerFinder.lastViewPosition, this.position);
+
+		if (distanceToLastPlayerPosition < 2) {
+			this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
+			return;
+		}
+		
+		this.changeDirection();
 	}
 
 	takeDamage(vector, damageCount) {

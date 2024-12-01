@@ -97,6 +97,7 @@ export function onKeyDown(event) {
 			evt.fireEvent('DOWN', 'D');
 			
 		}else if( key == 69 ){ // e
+			evt.fireEvent('DOWN', 'E');
 			
 		}else if( key == 71 ){ // g
 			

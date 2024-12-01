@@ -1,12 +1,15 @@
-import CollisionResolver from '../collisionResolver.js';
-import Hitbox from '../collisionHitbox.js';
-import * as SpriteFactory from '../spriteFactory.js';
+import * as Input from '../input.js';
 import * as InteractivePopup from '../ui/interactivePopup.js';
+import * as Light from '../light.js';
+import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
 
+import CollisionResolver from '../collisionResolver.js';
+import Hitbox from '../collisionHitbox.js';
 
 class InteractiveBlock {
-    constructor(posX, posY, width, height) {
+    constructor(map, posX, posY, width, height) {
+        this.map = map;
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -26,9 +29,9 @@ class InteractiveBlock {
 
         this.touchedPlayer = false;
         this.stepToHide = 0;
+        this.isActive = true;
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
-
     }
 
     getWorldCollisionBox() {
@@ -47,6 +50,24 @@ class InteractiveBlock {
         console.log('onHide');
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         InteractivePopup.hide();
+        Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+    }
+
+    onKeyDown(toto) {
+        if (this.isActive === false) {
+            return;
+        }
+
+        new Light.RectLight(-15, 0, 120, 25);
+        new Light.BlinkRectLight(-15, 25, 120, 25);
+        
+        const spot = new Light.SpotLight(-17, -8, 40, 40);
+        spot.setRotation(Math.PI * -0.5);
+
+        Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
+        this.isActive = false;
+
     }
 
     #onPlayerTouch(players) {
@@ -56,8 +77,11 @@ class InteractiveBlock {
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         this.stepToHide = Stepper.curStep + 5;
 		Stepper.listenStep(this.stepToHide, this, this.onHide);
+        InteractivePopup.setContent('<b>E</b> pour allumer');
         InteractivePopup.display();
         InteractivePopup.place(this.centerX, this.centerY);
+
+        Input.evt.addEventListener('DOWN_69', this, this.onKeyDown);
     }
 }
 

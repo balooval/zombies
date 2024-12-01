@@ -26,7 +26,7 @@ export class RayLauncher extends Weapon {
 		Particules.createRay(hit.start, hit.point);
 
 		
-		new HitSprite(hit.point.x, hit.point.y, 6);
+		new HitSprite(hit.point.x, hit.point.y, 6, 35);
 
 		if (hit.target === null) {
 			Particules.create(Particules.EGG_EXPLOSION, hit.point, {x: 1, y: 0.7});

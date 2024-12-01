@@ -1,26 +1,30 @@
-import Evt from './utils/event.js';
-import * as Input from './input.js';
-import * as Mouse from './inputMouse.js';
 import * as AnimationControl from './animationControl.js';
-import * as WeaponList from './ui/weaponList.js';
-import Hitbox from './collisionHitbox.js';
-import Translation from './translation.js';
-import CollisionResolver from './collisionResolver.js';
-import {
-	PLAYER_START_POSITION,
-	PLAYER_MAX_POS_X,
-	PLAYER_MIN_POS_X,
-	PLAYER_MAX_POS_Y,
-	PLAYER_MIN_POS_Y,
-} from './map/map.js';
+import * as Input from './input.js';
+import * as Light from './light.js';
+import * as Mouse from './inputMouse.js';
+import * as Renderer from './renderer.js';
 import * as SpriteFactory from './spriteFactory.js';
 import * as Stepper from './utils/stepper.js';
+import * as WeaponList from './ui/weaponList.js';
+
+import {
+	PLAYER_MAX_POS_X,
+	PLAYER_MAX_POS_Y,
+	PLAYER_MIN_POS_X,
+	PLAYER_MIN_POS_Y,
+	PLAYER_START_POSITION,
+} from './map/map.js';
+
 import { ActiveWeapon } from './weapons/activeWeapon.js';
 import Batte from './weapons/batte.js';
 import BombLauncher from './weapons/bombLauncher.js';
+import BulletLauncher from './weapons/bulletLauncher.js';
+import CollisionResolver from './collisionResolver.js';
+import Evt from './utils/event.js';
+import Hitbox from './collisionHitbox.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
-import BulletLauncher from './weapons/bulletLauncher.js';
+import Translation from './translation.js';
 import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
@@ -82,6 +86,9 @@ export class Player {
 		CollisionResolver.checkCollisionWithLayer(this, 'BONUS');
 
 		this.currentAnimation = '';
+
+		this.ambiantLight = new Light.PointLight(80, 0, 0);
+		this.torchLight = new Light.SpotLight(0, 0, 100, 40);
 	}
 
 	onCollide(collisions, layersName) {
@@ -154,13 +161,14 @@ export class Player {
 		this.#updateViewAngle();
 		this.weapon.update();
 	}
-
+	
 	#updateViewAngle() {
 		this.viewAngle = Math.atan2(Mouse.worldPosition[1] - this.position.y, Mouse.worldPosition[0] - this.position.x);
 		this.weaponTargetPosition.x = Mouse.worldPosition[0];
 		this.weaponTargetPosition.y = Mouse.worldPosition[1];
 		this.weaponPointer.setPosition(this.weaponTargetPosition.x, this.weaponTargetPosition.y);
 		this.sprite.setRotation(this.viewAngle);
+		this.torchLight.setRotation(this.viewAngle);
 	}
 
 	move() {
@@ -224,6 +232,8 @@ export class Player {
 			this.moveSpeed = 0;
 		}
 		this.sprite.setPosition(this.position.x, this.position.y);
+		this.torchLight.setPosition(this.position.x, this.position.y);
+		this.ambiantLight.setPosition(this.position.x, this.position.y);
 	}
 	
 	getWorldCollisionBox() {
