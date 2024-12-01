@@ -1,10 +1,11 @@
+import * as Input from '../input.js';
+import * as InteractivePopup from '../ui/interactivePopup.js';
+import * as Light from '../light.js';
+import * as SpriteFactory from '../spriteFactory.js';
+import * as Stepper from '../utils/stepper.js';
+
 import CollisionResolver from '../collisionResolver.js';
 import Hitbox from '../collisionHitbox.js';
-import * as SpriteFactory from '../spriteFactory.js';
-import * as InteractivePopup from '../ui/interactivePopup.js';
-import * as Stepper from '../utils/stepper.js';
-import * as Input from '../input.js';
-
 
 class InteractiveBlock {
     constructor(map, posX, posY, width, height) {
@@ -56,21 +57,12 @@ class InteractiveBlock {
         if (this.isActive === false) {
             return;
         }
+
+        new Light.RectLight(-15, 0, 120, 25);
+        new Light.BlinkRectLight(-15, 25, 120, 25);
         
-        console.log('onKeyDown', toto);
-        const lightsData = [
-            {x: -60, y: 0, size: 35},
-            {x: -40, y: 0, size: 35},
-            {x: -20, y: 0, size: 35},
-            {x: 0, y: 0, size: 35},
-            {x: 20, y: 0, size: 35},
-            {x: -60, y: 30, size: 35},
-            {x: -40, y: 30, size: 35},
-            {x: -20, y: 30, size: 35},
-            {x: 0, y: 30, size: 35},
-            {x: 20, y: 30, size: 35},
-        ];
-        this.map.addLights(lightsData);
+        const spot = new Light.SpotLight(-17, -8, 40, 40);
+        spot.setRotation(Math.PI * -0.5);
 
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
@@ -85,6 +77,7 @@ class InteractiveBlock {
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         this.stepToHide = Stepper.curStep + 5;
 		Stepper.listenStep(this.stepToHide, this, this.onHide);
+        InteractivePopup.setContent('<b>E</b> pour allumer');
         InteractivePopup.display();
         InteractivePopup.place(this.centerX, this.centerY);
 

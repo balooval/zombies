@@ -1,33 +1,35 @@
-import {Vector2} from '../../vendor/three.module.js';
-import Evt from '../utils/event.js';
-import CollisionResolver from '../collisionResolver.js';
-import {
-    Player,
-    PLAYER_IS_DEAD_EVENT
-} from '../player.js';
-import Hitbox from '../collisionHitbox.js';
+import * as Bonus from '../bonus.js';
+import * as Debug from '../debugCanvas.js';
+import * as Light from '../light.js';
+import * as MATH from '../utils/math.js';
 import * as SpriteFactory from '../spriteFactory.js';
-import * as Zombi from '../zombi/zombi.js';
 import * as Stepper from '../utils/stepper.js';
 import * as Walls from './walls.js';
-import Block from './block.js';
-import InteractiveBlock from './interactiveBlock.js';
-import * as MATH from '../utils/math.js';
+import * as Zombi from '../zombi/zombi.js';
+
+import {
+    PLAYER_IS_DEAD_EVENT,
+    Player
+} from '../player.js';
+
 import AstarBuilder from '../astar/AStarBuilder.js';
-import * as Debug from '../debugCanvas.js';
-import * as Bonus from '../bonus.js';
-import {getIntersection} from '../intersectionResolver.js';
-import Light from '../light.js';
+import Block from './block.js';
+import CollisionResolver from '../collisionResolver.js';
+import Evt from '../utils/event.js';
+import Hitbox from '../collisionHitbox.js';
+import InteractiveBlock from './interactiveBlock.js';
+import { Vector2 } from '../../vendor/three.module.js';
+import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
 
 export const WIDTH = 160;
 export const HEIGHT = 120;
-const MIN_X = -80; 
-const MAX_X = 80; 
-const MIN_Y = -60; 
-const MAX_Y = 60; 
+const MIN_X = -80;
+const MAX_X = 80;
+const MIN_Y = -60;
+const MAX_Y = 60;
 export const GROUND_POSITION = -50;
 export const GROUND_LIMITE_X_MIN = -65;
 export const GROUND_LIMITE_X_MAX = 65;
@@ -55,13 +57,13 @@ export class GameMap {
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
         this.player = null;
-        
+
         this.addBonusRate = 300;
         this.maxBonusCount = 2;
-        
+
         this.addZombiRate = 80;
         this.maxZombiesCount = 10;
-        
+
         this.blocks = this.#buildBlocks();
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
@@ -73,39 +75,17 @@ export class GameMap {
 
         this.placeLights();
     }
-    
-    addLights(lightsData) {
-        console.log('addLights');
-        const positions = [
-            [-60, 0, 35],
-            [-40, 0, 35],
-            [-20, 0, 35],
-            [0, 0, 35],
-            [20, 0, 35],
-
-            [-60, 30, 35],
-            [-40, 30, 35],
-            [-20, 30, 35],
-            [0, 30, 35],
-            [20, 30, 35],
-        ];
-
-        for (const lightData of lightsData) {
-            const light = new Light(lightData.size);
-            light.setPosition(lightData.x, lightData.y);
-        }
-    }
 
     placeLights() {
-
         const positions = [
             [47, -20, 30],
         ];
 
         for (const pos of positions) {
-            const light = new Light(pos[2]);
-            light.setPosition(pos[0], pos[1]);
+            new Light.PointLight(pos[2], pos[0], pos[1]);
         }
+        
+        new Light.RectLight(50, 15, 40, 70);
     }
 
     getTravel(startPos, endPos) {
@@ -128,12 +108,12 @@ export class GameMap {
 
     getRandomCell() {
         const flat = this.rootCell
-        .flat([])
-        .filter(cell => cell.blocks.length === 0);
+            .flat([])
+            .filter(cell => cell.blocks.length === 0);
 
         return MATH.randomElement(flat);
     }
-    
+
     start() {
         this.player = new Player(this);
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
@@ -151,7 +131,7 @@ export class GameMap {
         }
 
         const destCell = this.getRandomCell();
-		const destPos = destCell.center;
+        const destPos = destCell.center;
 
         Bonus.createRandomBonus(destPos, this);
     }
@@ -200,7 +180,7 @@ export class GameMap {
         const zone = MATH.randomElement(zones);
         const startX = MATH.randomValue(zone.minX, zone.maxX);
         const startY = MATH.randomValue(zone.minY, zone.maxY);
-        const startPosition = {x: startX, y: startY};
+        const startPosition = { x: startX, y: startY };
         // const startPosition = {x: 5, y: 0};
 
         Zombi.createZombi(this.player, this, startPosition);
@@ -211,8 +191,8 @@ export class GameMap {
     }
 
     getWorldCollisionBox() {
-		return this.hitBox;
-	}
+        return this.hitBox;
+    }
 
     getWallsIntersections(segment) {
         const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox)).filter(res => res);
@@ -221,7 +201,7 @@ export class GameMap {
             return {
                 x: position.x,
                 y: position.y,
-                distance: MATH.distance({x: segment.startX, y: segment.startY}, position),
+                distance: MATH.distance({ x: segment.startX, y: segment.startY }, position),
             };
         }).sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));
 
@@ -246,7 +226,7 @@ export class GameMap {
         // blocks.push(new Block(-10, -10, 50, 10));
         // blocks.push(new Block(-30, -25, 30, 10));
 
-        
+
         blocks.push(new Block(30, 40, 5, 50));
         blocks.push(new Block(-70, 40, 5, 50));
         blocks.push(new Block(-70, 40, 45, 5));
@@ -255,7 +235,7 @@ export class GameMap {
         blocks.push(new Block(-10, -10, 45, 5));
         blocks.push(new Block(-55, 15, 75, 5));
         blocks.push(new Block(45, 15, 25, 5));
-        
+
         blocks.push(new InteractiveBlock(this, 45, -20, 5, 5));
 
         return blocks;
@@ -302,7 +282,7 @@ export class GameMap {
             const y = cell.center.y;
             const index = x + '_' + y;
             const cellNode = navigationGrid.get(index);
-            
+
             for (const connection of cell.connections) {
                 const x = connection.point[0];
                 const y = connection.point[1];
@@ -346,7 +326,7 @@ class NavigationNode {
 class Cell {
     constructor(left, right, bottom, top, blocks) {
         this.id = debugId;
-        debugId ++;
+        debugId++;
         this.left = left;
         this.right = right;
         this.bottom = bottom;
@@ -368,7 +348,7 @@ class Cell {
             res.push(this);
             return res;
         }
-        
+
         for (const child of this.childs) {
             const childRes = child.flat(res);
             res = childRes;
@@ -396,9 +376,9 @@ class Cell {
         }
 
         return this.childs
-        .map(child => child.getCellByPosition(posX, posY))
-        .filter(cell => cell !== null)
-        .pop();
+            .map(child => child.getCellByPosition(posX, posY))
+            .filter(cell => cell !== null)
+            .pop();
     }
 
     buildConnections(flatCells) {
@@ -413,7 +393,7 @@ class Cell {
                 touchBottom,
                 touchTop,
             ];
-            
+
             if (contacts.some(value => value === true) === false) {
                 continue;
             }
@@ -425,11 +405,11 @@ class Cell {
                 this.#createHorConnection(cell);
                 continue;
             }
-            
+
             if (this.left !== cell.left) {
                 continue;
             }
-            
+
             if (touchBottom || touchTop) {
                 this.#createVertConnection(cell);
                 continue;
@@ -442,7 +422,7 @@ class Cell {
             MATH.lerpFloat(this.left, this.right, 0.5),
             0
         ];
-        
+
         if (this.top < connectedCell.top) {
             point[1] = this.top;
         }
@@ -459,7 +439,7 @@ class Cell {
             this.left,
             MATH.lerpFloat(connectedCell.bottom, connectedCell.top, 0.5)
         ];
-        
+
         if (this.right < connectedCell.right) {
             point[0] = this.right;
         }
@@ -486,7 +466,7 @@ class Cell {
         horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));
 
         let prevLeft = this.left;
-        
+
         for (const posX of horPositions) {
             const child = new Cell(
                 prevLeft,
@@ -509,7 +489,7 @@ class Cell {
         vertPositions = vertPositions.toSorted((xA, xB) => Math.sign(xA - xB));
 
         let prevBottom = this.bottom;
-        
+
         for (const posY of vertPositions) {
             this.childs.push(new Cell(
                 this.left,

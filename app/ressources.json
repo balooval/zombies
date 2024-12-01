@@ -60,6 +60,14 @@
 
 	"textures": [
 		{
+			"id": "lightRect",
+			"url": "assets/light-rect.png"
+		},
+		{
+			"id": "lightSpot",
+			"url": "assets/light-spot.png"
+		},
+		{
 			"id": "screenGameOver",
 			"url": "assets/screen-game-over.png"
 		},
