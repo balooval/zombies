@@ -1,4 +1,8 @@
+import * as LightingShader from './shaders/lighting.js';
+import * as PostProcess from './shaders/postProcess.js';
+
 import {
+	BoxGeometry,
 	BufferAttribute,
 	BufferGeometry,
 	LinearFilter,
@@ -6,20 +10,14 @@ import {
 	MeshBasicMaterial,
 	NearestFilter,
 	OrthographicCamera,
+	PlaneGeometry,
 	Scene,
 	ShaderMaterial,
 	Vector2,
 	Vector3,
-	WebGLRenderer,
 	WebGLRenderTarget,
-	BoxGeometry,
-	PlaneGeometry,
-
+	WebGLRenderer,
 } from '../vendor/three.module.js';
-
-
-import * as PostProcess from './shaders/postProcess.js';
-import * as LightingShader from './shaders/lighting.js';
 
 export let renderer;
 export let camera;
@@ -81,6 +79,7 @@ export function start() {
 	// renderer.clear();
 	// renderer.render(scene, camera);
 	
+	
 	renderer.setRenderTarget(renderTargetGame)
 	renderer.setClearColor(0x2a2958, 1);
 	renderer.clear();
@@ -95,6 +94,7 @@ export function start() {
 	renderer.setClearColor(0xff0000, 1);
 	renderer.clear();
 	renderer.render(finalScene, camera);
+	
 
 	requestAnimationFrame(start);
 }

@@ -13,7 +13,7 @@ class PlayerFinder {
 		this.viewAngle = 1.5;
 		this.viewTranslation = new Translation();
 		this.isViewingPlayer = true;
-		this.lastViewPosition = {x: 0, y: 0};
+		this.lastViewPosition = {x: this.player.position.x, y: this.player.position.y};
 	}
 	
 	init(entity) {
