@@ -4,12 +4,24 @@ import * as Stepper from './utils/stepper.js';
 import * as TextureLoader from './net/loaderTexture.js';
 
 import {
+	AdditiveBlending,
 	BufferAttribute,
 	BufferGeometry,
 	Mesh,
 	MeshBasicMaterial,
+	ShaderMaterial,
 	Vector3,
 } from '../vendor/three.module.js';
+
+function getLightMaterial(textureId) {
+
+	return new MeshBasicMaterial({
+		opacity: 1,
+		map: TextureLoader.get(textureId),
+		transparent: true,
+		blending: AdditiveBlending,
+	});
+}
 
 class Light {
     constructor(x, y, width, height, textureId) {
@@ -21,12 +33,12 @@ class Light {
 		this.isOn = false;
 	}
 
-	display() {
+	turnOn() {
 		this.isOn = true;
 		Renderer.lightScene.add(this.mesh);
 	}
 	
-	hide() {
+	turnOff() {
 		this.isOn = false;
 		Renderer.lightScene.remove(this.mesh);
 	}
@@ -60,12 +72,12 @@ class Light {
 			0, 1,
 		]), 2));
 
-        const lightMaterial = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(textureId), transparent: true});
+        const lightMaterial = getLightMaterial(textureId);
 		this.mesh = new Mesh(this.geometry, lightMaterial);
 	}
 
 	dispose() {
-		this.hide();
+		this.turnOff();
         this.geometry.dispose();
         this.mesh.material.dispose();
 	}
@@ -114,7 +126,7 @@ export class SpotLight extends Light {
 			0, 1,
 		]), 2));
 
-        const lightMaterial = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(textureId), transparent: true});
+        const lightMaterial = getLightMaterial(textureId);
 		this.mesh = new Mesh(this.geometry, lightMaterial);
 	}
 }
@@ -129,18 +141,35 @@ export class RectLight extends Light {
 export class BlinkRectLight extends Light {
     constructor(x, y, width, height) {
 		super(x, y, width, height, 'lightRect');
+		this.blinkStep = 0;
 	}
 	
-	hide() {
-		super.hide();
-		Stepper.stopListenStep(Stepper.curStep, this, this.hide);
-		Stepper.listenStep(Stepper.curStep + 2, this, this.display);
+	turnOff() {
+		super.turnOff();
+		Stepper.stopListenStep(this.blinkStep, this, this.blinkOff);
+		Stepper.stopListenStep(this.blinkStep, this, this.blinkOn);
 	}
 	
-	display() {
-		super.display();
-		Stepper.stopListenStep(Stepper.curStep, this, this.display);
-		Stepper.listenStep(Stepper.curStep + this.getNextStepBlink(), this, this.hide);
+	turnOn() {
+		super.turnOn();
+
+		this.blinkStep = Stepper.curStep + this.getNextStepBlink();
+		this.blinkOn();
+	}
+
+
+	blinkOff() {
+		Stepper.stopListenStep(this.blinkStep, this, this.blinkOff);
+		Renderer.lightScene.remove(this.mesh);
+		this.blinkStep = Stepper.curStep + 2;
+		Stepper.listenStep(this.blinkStep, this, this.blinkOn);
+	}
+	
+	blinkOn() {
+		Stepper.stopListenStep(this.blinkStep, this, this.blinkOn);
+		Renderer.lightScene.add(this.mesh);
+		this.blinkStep = Stepper.curStep + this.getNextStepBlink();
+		Stepper.listenStep(this.blinkStep, this, this.blinkOff);
 	}
 
 	getNextStepBlink() {

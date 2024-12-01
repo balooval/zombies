@@ -1,3 +1,7 @@
+import * as LightingShader from './shaders/applyLights.js';
+import * as Renderer from './renderer.js';
+import * as TextureLoader from './net/loaderTexture.js';
+
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -7,10 +11,8 @@ import {
 	Vector2,
 	Vector3
 } from '../vendor/three.module.js';
-import * as Renderer from './renderer.js';
-import * as TextureLoader from './net/loaderTexture.js';
+
 import {TextureAnimation} from './textureAnimation.js';
-import * as LightingShader from './shaders/lighting.js';
 
 const materials = new Map();
 

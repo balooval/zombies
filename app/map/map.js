@@ -83,11 +83,11 @@ export class GameMap {
 
         for (const pos of positions) {
             const light = new Light.PointLight(pos[2], pos[0], pos[1]);
-            light.display();
+            light.turnOn();
         }
         
         const light = new Light.RectLight(50, 15, 40, 70);
-        light.display();
+        light.turnOn();
     }
 
     getTravel(startPos, endPos) {
@@ -182,8 +182,11 @@ export class GameMap {
         const zone = MATH.randomElement(zones);
         const startX = MATH.randomValue(zone.minX, zone.maxX);
         const startY = MATH.randomValue(zone.minY, zone.maxY);
-        const startPosition = { x: startX, y: startY };
+        // const startPosition = { x: startX, y: startY };
         // const startPosition = {x: 5, y: 0};
+
+        const destCell = this.getRandomCell();
+		const startPosition = {x: destCell.center.x, y: destCell.center.y};
 
         Zombi.createZombi(this.player, this, startPosition);
     }

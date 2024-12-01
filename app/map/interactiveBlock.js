@@ -39,11 +39,11 @@ class InteractiveBlock {
 
         this.lights = [
             new Light.RectLight(-15, 0, 120, 25),
-            new Light.RectLight(-15, 25, 120, 25),
+            new Light.BlinkRectLight(-15, 25, 120, 25),
             spot,
         ];
 
-        this.lights.forEach(light => light.hide());
+        this.lights.forEach(light => light.turnOff());
         
     }
 
@@ -70,7 +70,7 @@ class InteractiveBlock {
             return;
         }
 
-        this.lights.forEach(light => light.display());
+        this.lights.forEach(light => light.turnOn());
 
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
@@ -82,7 +82,7 @@ class InteractiveBlock {
     turnOff() {
         console.log('turnOff');
         Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
-        this.lights.forEach(light => light.hide());
+        this.lights.forEach(light => light.turnOff());
         this.lightAreOn = false;
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
     }

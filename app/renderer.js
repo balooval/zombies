@@ -1,4 +1,4 @@
-import * as LightingShader from './shaders/lighting.js';
+import * as LightingShader from './shaders/applyLights.js';
 import * as PostProcess from './shaders/postProcess.js';
 
 import {
@@ -139,18 +139,6 @@ function buildBufferLightMesh(width, height) {
 		0, 1,
 	]), 2));
 
-
-	const uniforms = {
-		map: { type: "t", value: renderTargetGame.texture},
-	}
-
-	const shaderMaterial = new ShaderMaterial({
-		uniforms: uniforms,
-		fragmentShader: PostProcess.fragment,
-		vertexShader: PostProcess.vertex,
-		transparent: true,
-	})
-
 	const material = new MeshBasicMaterial({opacity: 1, color: 0x000000, transparent: true});
 
 	return new Mesh(geometry, material);
@@ -192,7 +180,9 @@ function buildBufferFinalMesh(width, height) {
 		fragmentShader: LightingShader.fragment,
 		vertexShader: LightingShader.vertex,
 		transparent: true,
-	})
+	});
+	
+	const materialTest = new MeshBasicMaterial({opacity: 1, map: renderTargetLight.texture, transparent: true});
 
 	return new Mesh(geometry, material);
 }

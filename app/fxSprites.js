@@ -29,7 +29,7 @@ export class HitSprite extends FxSprite {
 
 		if (lightSize > 0) {
 			this.light = new Light.PointLight(lightSize, x, y);
-			this.light.display();
+			this.light.turnOn();
 		}
 	}
 

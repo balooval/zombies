@@ -1,6 +1,7 @@
-import * as SoundLoader from './../net/loaderSound.js';
-import CollisionResolver from './../collisionResolver.js';
 import * as Particules from './../particules.js';
+import * as SoundLoader from './../net/loaderSound.js';
+
+import CollisionResolver from './../collisionResolver.js';
 import {HitSprite} from './../fxSprites.js';
 import Weapon from './baseWeapon.js';
 
@@ -38,7 +39,7 @@ export class RayLauncher extends Weapon {
 			x: Math.cos(this.owner.viewAngle) * vectorPower,
 			y: Math.sin(this.owner.viewAngle) * vectorPower,
 		}
-		hit.target.takeDamage(vector, 1);
+		hit.target.takeDamage(vector, 2);
 	}
 
 	#getZombiTouched() {
