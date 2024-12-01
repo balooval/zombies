@@ -1,12 +1,14 @@
 import * as AnimationControl from './animationControl.js';
+import * as Clock from './utils/clock.js';
 import * as Input from './input.js';
 import * as Renderer from './renderer.js';
 import * as Stepper from './utils/stepper.js';
-import * as Clock from './utils/clock.js';
+
 import {
-	GameMap,
 	GAME_OVER_EVENT,
+	GameMap,
 }  from './map/map.js';
+
 import GameOverScreen from './ui/gameOverScreen.js';
 
 let gameLevel;
@@ -50,7 +52,6 @@ class GameLevel {
 	}
 
 	onPressPause() {
-		console.log('PAUSE');
 		Clock.switchPause();
 	}
 	

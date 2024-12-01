@@ -1,5 +1,6 @@
-import Evt from './../utils/event.js';
 import * as Sound from './../sound.js';
+
+import Evt from './../utils/event.js';
 
 class HomeScreen {
     constructor(containerId) {
@@ -12,6 +13,7 @@ class HomeScreen {
     build() {
         this.buttons.start = document.createElement('div');
         this.buttons.start.id = 'start-button';
+        this.buttons.start.innerHTML = 'Start';
         this.buttons.start.addEventListener('click', () => this.launchGame());
         this.container.appendChild(this.buttons.start);
 
