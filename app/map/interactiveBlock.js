@@ -29,9 +29,22 @@ class InteractiveBlock {
 
         this.touchedPlayer = false;
         this.stepToHide = 0;
-        this.isActive = true;
+        this.lightAreOn = false;
+        this.lightDuration = 1000;
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
+
+        const spot = new Light.SpotLight(-17, -8, 40, 40);
+        spot.setRotation(Math.PI * -0.5);
+
+        this.lights = [
+            new Light.RectLight(-15, 0, 120, 25),
+            new Light.RectLight(-15, 25, 120, 25),
+            spot,
+        ];
+
+        this.lights.forEach(light => light.hide());
+        
     }
 
     getWorldCollisionBox() {
@@ -47,27 +60,31 @@ class InteractiveBlock {
 	}
 
     onHide() {
-        console.log('onHide');
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         InteractivePopup.hide();
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
     }
 
-    onKeyDown(toto) {
-        if (this.isActive === false) {
+    onKeyDown() {
+        if (this.lightAreOn === true) {
             return;
         }
 
-        new Light.RectLight(-15, 0, 120, 25);
-        new Light.BlinkRectLight(-15, 25, 120, 25);
-        
-        const spot = new Light.SpotLight(-17, -8, 40, 40);
-        spot.setRotation(Math.PI * -0.5);
+        this.lights.forEach(light => light.display());
 
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        this.isActive = false;
+        this.lightAreOn = true;
 
+        Stepper.listenStep(Stepper.curStep + this.lightDuration, this, this.turnOff);
+    }
+
+    turnOff() {
+        console.log('turnOff');
+        Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
+        this.lights.forEach(light => light.hide());
+        this.lightAreOn = false;
+        CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
     }
 
     #onPlayerTouch(players) {

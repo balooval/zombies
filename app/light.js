@@ -18,14 +18,16 @@ class Light {
 		this.buildMesh(this.width, this.height, textureId);
 		this.depthPosition = 15;
 		this.setPosition(x, y);
-		this.display();
+		this.isOn = false;
 	}
 
 	display() {
+		this.isOn = true;
 		Renderer.lightScene.add(this.mesh);
 	}
 	
 	hide() {
+		this.isOn = false;
 		Renderer.lightScene.remove(this.mesh);
 	}
 
@@ -123,26 +125,25 @@ export class RectLight extends Light {
 	}
 }
 
+// TODO: à fixer, elle se rallume tout seule après un blink
 export class BlinkRectLight extends Light {
     constructor(x, y, width, height) {
 		super(x, y, width, height, 'lightRect');
-		this.turnOn();
-
 	}
 	
-	turnOff() {
-		this.hide();
-		Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
-		Stepper.listenStep(Stepper.curStep + 2, this, this.turnOn);
+	hide() {
+		super.hide();
+		Stepper.stopListenStep(Stepper.curStep, this, this.hide);
+		Stepper.listenStep(Stepper.curStep + 2, this, this.display);
+	}
+	
+	display() {
+		super.display();
+		Stepper.stopListenStep(Stepper.curStep, this, this.display);
+		Stepper.listenStep(Stepper.curStep + this.getNextStepBlink(), this, this.hide);
 	}
 
-	turnOn() {
-		this.display();
-		Stepper.stopListenStep(Stepper.curStep, this, this.turnOn);
-		Stepper.listenStep(Stepper.curStep + this.#getNextStepBlink(), this, this.turnOff);
-	}
-
-	#getNextStepBlink() {
+	getNextStepBlink() {
 		return MATH.randomFloat(8, 100);
 	}
 }

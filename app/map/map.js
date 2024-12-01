@@ -82,10 +82,12 @@ export class GameMap {
         ];
 
         for (const pos of positions) {
-            new Light.PointLight(pos[2], pos[0], pos[1]);
+            const light = new Light.PointLight(pos[2], pos[0], pos[1]);
+            light.display();
         }
         
-        new Light.RectLight(50, 15, 40, 70);
+        const light = new Light.RectLight(50, 15, 40, 70);
+        light.display();
     }
 
     getTravel(startPos, endPos) {

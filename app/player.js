@@ -88,7 +88,9 @@ export class Player {
 		this.currentAnimation = '';
 
 		this.ambiantLight = new Light.PointLight(80, 0, 0);
+		this.ambiantLight.display();
 		this.torchLight = new Light.SpotLight(0, 0, 100, 40);
+		this.torchLight.display();
 	}
 
 	onCollide(collisions, layersName) {
