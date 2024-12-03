@@ -1,5 +1,6 @@
 import * as FogShader from './shaders/fog.js';
 import * as LightingShader from './shaders/applyLights.js';
+import * as Mouse from './inputMouse.js';
 import * as TextureLoader from './net/loaderTexture.js';
 
 import {
@@ -44,7 +45,8 @@ let fogRenderB;
 let fogScene;
 let fogMesh;
 let bufferFinalMesh;
-let toto = 0;
+let time = 0;
+let rand = 0;
 
 export const lights = [new Vector2(0, 0), new Vector2(-30, 20)];
 
@@ -74,8 +76,8 @@ export function init(elmtId) {
 	renderTargetLight = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	renderTargetGame = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	
-	fogRenderA = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
-	fogRenderB = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
+	fogRenderA = new WebGLRenderTarget(worldWidth, worldHeight, { minFilter: LinearFilter, magFilter: LinearFilter});
+	fogRenderB = new WebGLRenderTarget(worldWidth, worldHeight, { minFilter: LinearFilter, magFilter: LinearFilter});
 
 	fogInput = fogRenderA;
 	fogOutput = fogRenderB;
@@ -98,11 +100,7 @@ export function start() {
 	// renderer.clear();
 	// renderer.render(scene, camera);
 
-	// if (toto === 0) {
-	// 	fogMesh.material.uniforms.fogMap.value = TextureLoader.get('fogTest');
-	// }
-
-	// toto ++;
+	time ++;
 
 
 	renderer.setRenderTarget(fogOutput)
@@ -119,8 +117,15 @@ export function start() {
 	fogInput = fogOutput;
 	fogOutput = temp;
 
+	rand = (Math.random() * 2) - 1;
+	const randY = (Math.random() * 2) - 1;
+
 	bufferFinalMesh.material.map = fogOutput.texture;
+	fogMesh.material.uniforms.time.value = time;
+	fogMesh.material.uniforms.rand.value = rand;
 	fogMesh.material.uniforms.fogMap.value = fogInput.texture;
+	fogMesh.material.uniforms.mouse.value = new Vector2(Mouse.worldPosition[0] + 80 + rand, Mouse.worldPosition[1] + 60 + randY);
+	
 
 	
 	// renderer.setRenderTarget(renderTargetGame)
@@ -256,8 +261,12 @@ function buildFogMesh(width, height) {
 	]), 2));
 
 	const uniforms = {
-		// fogMap: { type: "t", value: fogInput.texture},
-		fogMap: { type: "t", value: TextureLoader.get('fogTest')},
+		mouse: { type: "t", value: new Vector2(0, 0)},
+		// fogMap: { type: "t", value: TextureLoader.get('fogTest')},
+		time: { type: "t", value: 0},
+		rand: { type: "t", value: 0},
+		fogMap: { type: "t", value: fogInput.texture},
+		fluxMap: { type: "t", value: TextureLoader.get('fogFlux')},
 	}
 
 	const material = new ShaderMaterial({

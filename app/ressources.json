@@ -154,6 +154,10 @@
 		{
 			"id": "fogTest",
 			"url": "assets/fog-test.png"
+		},
+		{
+			"id": "fogFlux",
+			"url": "assets/fog-flux.png"
 		}
 	]
 }
