@@ -1,5 +1,6 @@
+import * as FogShader from './shaders/fog.js';
 import * as LightingShader from './shaders/applyLights.js';
-import * as PostProcess from './shaders/postProcess.js';
+import * as TextureLoader from './net/loaderTexture.js';
 
 import {
 	BoxGeometry,
@@ -36,6 +37,15 @@ export let lightScene;
 export let renderTargetGame;
 let renderTargetLight;
 
+let fogInput;
+let fogOutput;
+let fogRenderA;
+let fogRenderB;
+let fogScene;
+let fogMesh;
+let bufferFinalMesh;
+let toto = 0;
+
 export const lights = [new Vector2(0, 0), new Vector2(-30, 20)];
 
 export function init(elmtId) {
@@ -64,11 +74,20 @@ export function init(elmtId) {
 	renderTargetLight = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	renderTargetGame = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	
+	fogRenderA = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
+	fogRenderB = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
+
+	fogInput = fogRenderA;
+	fogOutput = fogRenderB;
+	fogScene = new Scene();
+	fogMesh = buildFogMesh(worldWidth, worldHeight);
+	fogScene.add(fogMesh);
+	
 	const bufferLightMesh = buildBufferLightMesh(worldWidth, worldHeight);
 	lightScene = new Scene();
 	lightScene.add(bufferLightMesh);
 	
-	const bufferFinalMesh = buildBufferFinalMesh(worldWidth, worldHeight);
+	bufferFinalMesh = buildBufferFinalMesh(worldWidth, worldHeight);
 	finalScene = new Scene();
 	finalScene.add(bufferFinalMesh);
 } 
@@ -78,22 +97,46 @@ export function start() {
 	// renderer.setClearColor(0x2a2958, 1);
 	// renderer.clear();
 	// renderer.render(scene, camera);
-	
-	
-	renderer.setRenderTarget(renderTargetGame)
-	renderer.setClearColor(0x2a2958, 1);
-	renderer.clear();
-	renderer.render(scene, camera);
 
-	renderer.setRenderTarget(renderTargetLight)
+	// if (toto === 0) {
+	// 	fogMesh.material.uniforms.fogMap.value = TextureLoader.get('fogTest');
+	// }
+
+	// toto ++;
+
+
+	renderer.setRenderTarget(fogOutput)
 	renderer.setClearColor(0x808080, 1);
 	renderer.clear();
-	renderer.render(lightScene, camera);
+	renderer.render(fogScene, camera);
 	
 	renderer.setRenderTarget(null);
 	renderer.setClearColor(0xff0000, 1);
 	renderer.clear();
 	renderer.render(finalScene, camera);
+
+	const temp = fogInput
+	fogInput = fogOutput;
+	fogOutput = temp;
+
+	bufferFinalMesh.material.map = fogOutput.texture;
+	fogMesh.material.uniforms.fogMap.value = fogInput.texture;
+
+	
+	// renderer.setRenderTarget(renderTargetGame)
+	// renderer.setClearColor(0x2a2958, 1);
+	// renderer.clear();
+	// renderer.render(scene, camera);
+
+	// renderer.setRenderTarget(renderTargetLight)
+	// renderer.setClearColor(0x808080, 1);
+	// renderer.clear();
+	// renderer.render(lightScene, camera);
+	
+	// renderer.setRenderTarget(null);
+	// renderer.setClearColor(0xff0000, 1);
+	// renderer.clear();
+	// renderer.render(finalScene, camera);
 	
 
 	requestAnimationFrame(start);
@@ -170,19 +213,60 @@ function buildBufferFinalMesh(width, height) {
 		0, 1,
 	]), 2));
 
+	// const uniforms = {
+	// 	bgMap: { type: "t", value: renderTargetGame.texture},
+	// 	lightMap: { type: "t", value: renderTargetLight.texture},
+	// }
+
+	// const material = new ShaderMaterial({
+	// 	uniforms: uniforms,
+	// 	fragmentShader: LightingShader.fragment,
+	// 	vertexShader: LightingShader.vertex,
+	// 	transparent: true,
+	// });
+	
+	const materialTest = new MeshBasicMaterial({opacity: 1, map: fogOutput.texture, transparent: true});
+
+	return new Mesh(geometry, materialTest);
+}
+
+function buildFogMesh(width, height) {
+	const geometry = new BufferGeometry();
+		
+	const vertices = new Float32Array([
+		-0.5 * width, -0.5 * height, 0,
+		0.5 * width, -0.5 * height, 0,
+		0.5 * width, 0.5 * height, 0,
+		-0.5 * width, 0.5 * height, 0,
+	]);
+	
+	const indices = [
+		0, 1, 2,
+		2, 3, 0,
+	];
+
+	geometry.setIndex(indices);
+	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+
+	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
+		0, 0,
+		1, 0,
+		1, 1,
+		0, 1,
+	]), 2));
+
 	const uniforms = {
-		bgMap: { type: "t", value: renderTargetGame.texture},
-		lightMap: { type: "t", value: renderTargetLight.texture},
+		// fogMap: { type: "t", value: fogInput.texture},
+		fogMap: { type: "t", value: TextureLoader.get('fogTest')},
 	}
 
 	const material = new ShaderMaterial({
 		uniforms: uniforms,
-		fragmentShader: LightingShader.fragment,
-		vertexShader: LightingShader.vertex,
+		fragmentShader: FogShader.fragment,
+		vertexShader: FogShader.vertex,
 		transparent: true,
 	});
 	
-	const materialTest = new MeshBasicMaterial({opacity: 1, map: renderTargetLight.texture, transparent: true});
 
 	return new Mesh(geometry, material);
 }
