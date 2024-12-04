@@ -13,13 +13,19 @@ export const fragment = `
 varying vec2 vUv;
 uniform sampler2D bgMap;
 uniform sampler2D lightMap;
+uniform sampler2D fogMap;
 varying vec2 vPos;
 
 void main() {
     vec4 lightColor = 0.2 + texture2D(lightMap, vUv) * 1.2;
+    vec4 fogColor = texture2D(fogMap, vUv);
     vec4 bgColor = texture2D(bgMap, vUv);
 
     vec4 finalColor = vec4(bgColor.r * lightColor.r, bgColor.g * lightColor.g, bgColor.b * lightColor.b, bgColor.a);
+
+    finalColor.r += fogColor.r * 0.9;
+    finalColor.g += fogColor.g * 0.9;
+    finalColor.b += fogColor.b * 0.9;
     
     gl_FragColor = finalColor;
 }

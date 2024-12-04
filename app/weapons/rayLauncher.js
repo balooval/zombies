@@ -1,4 +1,5 @@
 import * as Particules from './../particules.js';
+import * as Renderer from '../renderer.js';
 import * as SoundLoader from './../net/loaderSound.js';
 
 import CollisionResolver from './../collisionResolver.js';
@@ -10,7 +11,7 @@ export class RayLauncher extends Weapon {
 		super(30);
 		this.map = map;
 		this.icon = 'pistolIcon';
-		this.ammo = 10;
+		this.ammo = 20;
 	}
 
 	launchProjectile() {
@@ -25,6 +26,8 @@ export class RayLauncher extends Weapon {
 		const hit = this.#getZombiTouched();
 
 		Particules.createRay(hit.start, hit.point);
+
+		Renderer.setFogFlux(hit.start.x, hit.start.y, hit.point.x, hit.point.y, 5, 1);
 
 		
 		new HitSprite(hit.point.x, hit.point.y, 6, 35);

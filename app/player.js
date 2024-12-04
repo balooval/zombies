@@ -21,6 +21,7 @@ import BombLauncher from './weapons/bombLauncher.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
 import Evt from './utils/event.js';
+import {FogEmiter} from './fogEmiter.js';
 import Hitbox from './collisionHitbox.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
@@ -62,12 +63,12 @@ export class Player {
 		
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
-		const baseWeapon = new Batte();
+		// const baseWeapon = new Batte();
 		// const baseWeapon = new RayLauncher(this.map);
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new BombLauncher();
-		// const baseWeapon = new Minigun(this.map);
+		const baseWeapon = new Minigun(this.map);
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};
@@ -88,9 +89,12 @@ export class Player {
 		this.currentAnimation = '';
 
 		this.ambiantLight = new Light.PointLight(80, 0, 0);
-		this.ambiantLight.turnOn();
+		// this.ambiantLight.turnOn();
 		this.torchLight = new Light.SpotLight(0, 0, 100, 40);
-		this.torchLight.turnOn();
+		// this.torchLight.turnOn();
+
+		// this.fogEmiter = new FogEmiter(this.position.x, this.position.y);
+		this.fogEmiter = new FogEmiter(0, -40);
 	}
 
 	onCollide(collisions, layersName) {
@@ -236,6 +240,11 @@ export class Player {
 		this.sprite.setPosition(this.position.x, this.position.y);
 		this.torchLight.setPosition(this.position.x, this.position.y);
 		this.ambiantLight.setPosition(this.position.x, this.position.y);
+		
+		// this.fogEmiter.setPosition(this.position.x, this.position.y);
+		if (this.moveSpeed > 0) {
+			Renderer.setFogFlux(this.translation.startX, this.translation.startY, this.translation.destX, this.translation.destY, 15, 0.5);
+		}
 	}
 	
 	getWorldCollisionBox() {

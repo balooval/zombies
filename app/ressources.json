@@ -156,6 +156,10 @@
 			"url": "assets/fog-test.png"
 		},
 		{
+			"id": "fogEmiter",
+			"url": "assets/fog-emiter.png"
+		},
+		{
 			"id": "fogFlux",
 			"url": "assets/fog-flux.png"
 		}

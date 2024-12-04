@@ -37,6 +37,8 @@ let ratioHeight = 1;
 
 let finalScene;
 export let lightScene;
+export let fogScene;
+export let fogResultScene;
 export let renderTargetGame;
 let renderTargetLight;
 
@@ -44,7 +46,6 @@ let fogInput;
 let fogOutput;
 let fogRenderA;
 let fogRenderB;
-let fogScene;
 let fogMesh;
 let bufferFinalMesh;
 let time = 0;
@@ -98,8 +99,9 @@ export function init(elmtId) {
 	fogInput = fogRenderA;
 	fogOutput = fogRenderB;
 	fogScene = new Scene();
+	fogResultScene = new Scene();
 	fogMesh = buildFogMesh(worldWidth, worldHeight);
-	fogScene.add(fogMesh);
+	fogResultScene.add(fogMesh);
 
 	
 	const bufferLightMesh = buildBufferLightMesh(worldWidth, worldHeight);
@@ -109,7 +111,21 @@ export function init(elmtId) {
 	bufferFinalMesh = buildFinalMesh(worldWidth, worldHeight);
 	finalScene = new Scene();
 	finalScene.add(bufferFinalMesh);
-} 
+}
+
+export function setFogFlux(xA, yA, xB, yB, width, power) {
+	const startX = toSmallLocalX(xA);
+	const startY = toSmallLocalY(yA);
+	const endX = toSmallLocalX(xB);
+	const endY = toSmallLocalY(yB);
+	const angle = MATH.pointsAngle([startX, startY], [endX, endY]);
+	const speed = power;
+	const colFactor = 128 * speed;
+	const moveX = Math.cos(angle) * colFactor;
+	const moveY = Math.sin(angle) * colFactor;
+	const color = `rgb(${128 + moveX}, ${128 - moveY}, 0)`;
+	drawLine(contextFogFlux, [startX, startY], [endX, endY], color, width);
+}
 
 export function start() {
 	// renderer.setRenderTarget(null);
@@ -120,15 +136,21 @@ export function start() {
 	time ++;
 
 
-	renderer.setRenderTarget(fogOutput)
-	renderer.setClearColor(0x808080, 1);
-	renderer.clear();
+	renderer.autoClear = false;
+	renderer.setRenderTarget(fogInput)
+	// renderer.setClearColor(0x000000, 0);
+	// renderer.clear();
 	renderer.render(fogScene, camera);
-	
-	renderer.setRenderTarget(null);
-	renderer.setClearColor(0xff0000, 1);
+
+	renderer.setRenderTarget(fogOutput)
+	renderer.setClearColor(0x000000, 1);
 	renderer.clear();
-	renderer.render(finalScene, camera);
+	renderer.render(fogResultScene, camera);
+	
+	// renderer.setRenderTarget(null);
+	// renderer.setClearColor(0x000000, 1);
+	// renderer.clear();
+	// renderer.render(fogResultScene, camera);
 
 	const temp = fogInput
 	fogInput = fogOutput;
@@ -145,47 +167,43 @@ export function start() {
 	);
 	mousePositions = mousePositions.slice(-20);
 
-	contextFogFlux.fillStyle = 'rgba(128, 140, 0, 0.1)';
+	contextFogFlux.fillStyle = 'rgba(128, 128, 0, 0.1)';
 	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
 
 	
-	for (let i = 1; i < mousePositions.length; i ++) {
-		const start = mousePositions[i - 1];
-		const end = mousePositions[i];
-		const angle = MATH.pointsAngle(start, end);
-		// const speed = MATH.distance({x: start[0], y: start[1]}, {x: end[0], y: end[1]}) * 0.2;
-		const speed = 1;
-		const colFactor = 128 * speed;
-		const color = `rgb(${128 + Math.cos(angle) * colFactor}, ${128 - Math.sin(angle) * colFactor}, 0)`;
-		drawLine(contextFogFlux, start, end, color, 15);
-	}
+	// for (let i = 1; i < mousePositions.length; i ++) {
+	// 	setFogFlux(
+	// 		mousePositions[i - 1][0],
+	// 		mousePositions[i - 1][1],
+	// 		mousePositions[i][0],
+	// 		mousePositions[i][1],
+	// 		15
+	// 	);
+	// }
 	canvasTexture.needsUpdate = true;
 
 	bufferFinalMesh.material.map = fogOutput.texture;
 	fogMesh.material.uniforms.time.value = time;
 	fogMesh.material.uniforms.rand.value = rand;
 	fogMesh.material.uniforms.fogMap.value = fogInput.texture;
-	// fogMesh.material.uniforms.emiterPos.value = new Vector2(
-	// 	Mouse.worldPosition[0] + 80, // + rand,
-	// 	Mouse.worldPosition[1] + 60, // + randY
-	// );
+		
+		
+	bufferFinalMesh.material.uniforms.fogMap.value = fogOutput.texture;
 	
+	renderer.setRenderTarget(renderTargetGame)
+	renderer.setClearColor(0x2a2958, 1);
+	renderer.clear();
+	renderer.render(scene, camera);
 
+	renderer.setRenderTarget(renderTargetLight)
+	renderer.setClearColor(0x808080, 1);
+	renderer.clear();
+	renderer.render(lightScene, camera);
 	
-	// renderer.setRenderTarget(renderTargetGame)
-	// renderer.setClearColor(0x2a2958, 1);
-	// renderer.clear();
-	// renderer.render(scene, camera);
-
-	// renderer.setRenderTarget(renderTargetLight)
-	// renderer.setClearColor(0x808080, 1);
-	// renderer.clear();
-	// renderer.render(lightScene, camera);
-	
-	// renderer.setRenderTarget(null);
-	// renderer.setClearColor(0xff0000, 1);
-	// renderer.clear();
-	// renderer.render(finalScene, camera);
+	renderer.setRenderTarget(null);
+	renderer.setClearColor(0x000000, 1);
+	renderer.clear();
+	renderer.render(finalScene, camera);
 	
 
 	requestAnimationFrame(start);
@@ -206,7 +224,15 @@ export function toLocalX(worldX) {
 }
 
 export function toLocalY(worldY) {
-    return (worldHeight + ((worldY + 60) * -1)) / ratioHeight;
+	return (worldHeight + ((worldY + 60) * -1)) / ratioHeight;
+}
+
+export function toSmallLocalX(worldX) {
+    return (worldX + 80);
+}
+
+export function toSmallLocalY(worldY) {
+    return (worldHeight + ((worldY + 60) * -1));
 }
 
 export function toWorldX(localX) {
@@ -230,7 +256,20 @@ function buildFinalMesh(width, height) {
 	
 	const materialTest = new MeshBasicMaterial({opacity: 1, map: fogOutput.texture, transparent: true});
 
-	return new Mesh(geometry, materialTest);
+	const uniforms = {
+		bgMap: { type: "t", value: renderTargetGame.texture},
+		lightMap: { type: "t", value: renderTargetLight.texture},
+		fogMap: { type: "t", value: fogOutput.texture},
+	}
+
+	const material = new ShaderMaterial({
+		uniforms: uniforms,
+		fragmentShader: LightingShader.fragment,
+		vertexShader: LightingShader.vertex,
+		transparent: true,
+	});
+	
+	return new Mesh(geometry, material);
 }
 
 function buildFogMesh(width, height) {

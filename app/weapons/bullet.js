@@ -1,11 +1,13 @@
-import {Vector2} from './../../vendor/three.module.js';
 import * as AnimationControl from './../animationControl.js';
-import CollisionResolver from './../collisionResolver.js';
-import Hitbox from './../collisionHitbox.js';
-import {HitSprite} from './../fxSprites.js';
 import * as Particules from './../particules.js';
+import * as Renderer from '../renderer.js';
 import * as SoundLoader from './../net/loaderSound.js';
 import * as SpriteFactory from './../spriteFactory.js';
+
+import CollisionResolver from './../collisionResolver.js';
+import {HitSprite} from './../fxSprites.js';
+import Hitbox from './../collisionHitbox.js';
+import {Vector2} from './../../vendor/three.module.js';
 
 class Bullet {
 
@@ -69,6 +71,8 @@ class Bullet {
 		this.position.x += this.velX;
 		this.position.y += this.velY;
 		this.sprite.setPosition(this.position.x, this.position.y, 12);
+
+		Renderer.setFogFlux(this.position.x, this.position.y, this.position.x + this.velX, this.position.y + this.velY, 5, 1);
 	}
 	
 	update() {
