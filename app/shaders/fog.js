@@ -13,13 +13,13 @@ export const fragment = `
 varying vec2 vUv;
 uniform sampler2D fogMap;
 uniform sampler2D fluxMap;
-uniform vec2 mouse;
+uniform vec2 emiterPos;
 uniform float time;
 uniform float rand;
 varying vec2 vPos;
 
 void main() {
-    float dist = distance(gl_FragCoord.xy, mouse);
+    float dist = distance(gl_FragCoord.xy, emiterPos);
 
     vec2 nextUv = vec2(vUv.x, vUv.y);
     vec4 fluxColor = texture2D(fluxMap, vUv);
@@ -30,14 +30,18 @@ void main() {
 
     float distMax = 1.0 * (1.0 + (1.0 + (sin(time * 0.4))) * 0.5);
     
-    if (dist < 1.0) {
+    if (dist < 15.0) {
+        // fogValue += 1.0;
+        // fogValue += (1.0 + (sin(time * 0.1)));
+    }
+        
+    if (gl_FragCoord.x > 60.0 && gl_FragCoord.x < 100.0 && abs(gl_FragCoord.y - emiterPos.y) < 2.0) {
         fogValue += 1.0;
-        // fogValue += (1.0 + (sin(time * 0.1))) * 0.5;
     }
 
     float nextOffset = 0.005;
     float horOffset = (fluxColor.r - 0.5) * 2.0;
-    float vertOffset = (fluxColor.g - 0.5) * 2.0;
+    float vertOffset = (fluxColor.g - 0.5) * 2.0 + 0.5;
 
     float translationFactor = 3.0;
     
@@ -67,11 +71,13 @@ void main() {
 
     fogValue *= 1.0 - fluxColor.b;
 
-    fogValue *= 0.99;
+    // fogValue *= 0.99;
 
     vec4 finalColor = vec4(fogValue, fogValue, fogValue, 1.0);
     
     gl_FragColor += finalColor;
+    
+    // gl_FragColor = fluxColor;
 }
 
 `;

@@ -1,5 +1,6 @@
 import * as FogShader from './shaders/fog.js';
 import * as LightingShader from './shaders/applyLights.js';
+import * as MATH from './utils/math.js';
 import * as Mouse from './inputMouse.js';
 import * as TextureLoader from './net/loaderTexture.js';
 
@@ -7,6 +8,7 @@ import {
 	BoxGeometry,
 	BufferAttribute,
 	BufferGeometry,
+	CanvasTexture,
 	LinearFilter,
 	Mesh,
 	MeshBasicMaterial,
@@ -47,6 +49,12 @@ let fogMesh;
 let bufferFinalMesh;
 let time = 0;
 let rand = 0;
+const canvasFogFlux = new OffscreenCanvas(worldWidth, worldHeight);
+let canvasTexture;
+let contextFogFlux;
+
+let mousePositions = [];
+
 
 export const lights = [new Vector2(0, 0), new Vector2(-30, 20)];
 
@@ -76,6 +84,14 @@ export function init(elmtId) {
 	renderTargetLight = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	renderTargetGame = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	
+
+	contextFogFlux = canvasFogFlux.getContext('2d');
+	contextFogFlux.fillStyle = 'rgb(128, 128, 0)';
+	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
+	canvasTexture = new CanvasTexture(canvasFogFlux);
+	canvasTexture.needsUpdate = true;
+
+	
 	fogRenderA = new WebGLRenderTarget(worldWidth, worldHeight, { minFilter: LinearFilter, magFilter: LinearFilter});
 	fogRenderB = new WebGLRenderTarget(worldWidth, worldHeight, { minFilter: LinearFilter, magFilter: LinearFilter});
 
@@ -84,12 +100,13 @@ export function init(elmtId) {
 	fogScene = new Scene();
 	fogMesh = buildFogMesh(worldWidth, worldHeight);
 	fogScene.add(fogMesh);
+
 	
 	const bufferLightMesh = buildBufferLightMesh(worldWidth, worldHeight);
 	lightScene = new Scene();
 	lightScene.add(bufferLightMesh);
 	
-	bufferFinalMesh = buildBufferFinalMesh(worldWidth, worldHeight);
+	bufferFinalMesh = buildFinalMesh(worldWidth, worldHeight);
 	finalScene = new Scene();
 	finalScene.add(bufferFinalMesh);
 } 
@@ -120,11 +137,38 @@ export function start() {
 	rand = (Math.random() * 2) - 1;
 	const randY = (Math.random() * 2) - 1;
 
+	mousePositions.push(
+		[
+			Mouse.screenPosition[0] * ratioWidth,
+			Mouse.screenPosition[1] * ratioHeight,
+		]
+	);
+	mousePositions = mousePositions.slice(-20);
+
+	contextFogFlux.fillStyle = 'rgba(128, 140, 0, 0.1)';
+	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
+
+	
+	for (let i = 1; i < mousePositions.length; i ++) {
+		const start = mousePositions[i - 1];
+		const end = mousePositions[i];
+		const angle = MATH.pointsAngle(start, end);
+		// const speed = MATH.distance({x: start[0], y: start[1]}, {x: end[0], y: end[1]}) * 0.2;
+		const speed = 1;
+		const colFactor = 128 * speed;
+		const color = `rgb(${128 + Math.cos(angle) * colFactor}, ${128 - Math.sin(angle) * colFactor}, 0)`;
+		drawLine(contextFogFlux, start, end, color, 15);
+	}
+	canvasTexture.needsUpdate = true;
+
 	bufferFinalMesh.material.map = fogOutput.texture;
 	fogMesh.material.uniforms.time.value = time;
 	fogMesh.material.uniforms.rand.value = rand;
 	fogMesh.material.uniforms.fogMap.value = fogInput.texture;
-	fogMesh.material.uniforms.mouse.value = new Vector2(Mouse.worldPosition[0] + 80 + rand, Mouse.worldPosition[1] + 60 + randY);
+	// fogMesh.material.uniforms.emiterPos.value = new Vector2(
+	// 	Mouse.worldPosition[0] + 80, // + rand,
+	// 	Mouse.worldPosition[1] + 60, // + randY
+	// );
 	
 
 	
@@ -147,6 +191,16 @@ export function start() {
 	requestAnimationFrame(start);
 }
 
+function drawLine(context, start, end, color, width) {
+    context.strokeStyle = color;
+    context.lineWidth = width;
+    context.lineCap = 'round';
+    context.beginPath();
+    context.moveTo(start[0], start[1])
+    context.lineTo(end[0], end[1])
+    context.stroke();
+}
+
 export function toLocalX(worldX) {
     return (worldX + 80) / ratioWidth;
 }
@@ -163,29 +217,7 @@ export function toWorldY(localX) {
 }
 
 function buildBufferLightMesh(width, height) {
-	const geometry = new BufferGeometry();
-		
-	const vertices = new Float32Array([
-		-0.5 * width, -0.5 * height, 0,
-		0.5 * width, -0.5 * height, 0,
-		0.5 * width, 0.5 * height, 0,
-		-0.5 * width, 0.5 * height, 0,
-	]);
-	
-	const indices = [
-		0, 1, 2,
-		2, 3, 0,
-	];
-
-	geometry.setIndex(indices);
-	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	]), 2));
+	const geometry = buildScreenGeometry(width, height);
 
 	const material = new MeshBasicMaterial({opacity: 1, color: 0x000000, transparent: true});
 
@@ -193,42 +225,8 @@ function buildBufferLightMesh(width, height) {
 }
 
 
-function buildBufferFinalMesh(width, height) {
-	const geometry = new BufferGeometry();
-		
-	const vertices = new Float32Array([
-		-0.5 * width, -0.5 * height, 0,
-		0.5 * width, -0.5 * height, 0,
-		0.5 * width, 0.5 * height, 0,
-		-0.5 * width, 0.5 * height, 0,
-	]);
-	
-	const indices = [
-		0, 1, 2,
-		2, 3, 0,
-	];
-
-	geometry.setIndex(indices);
-	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	]), 2));
-
-	// const uniforms = {
-	// 	bgMap: { type: "t", value: renderTargetGame.texture},
-	// 	lightMap: { type: "t", value: renderTargetLight.texture},
-	// }
-
-	// const material = new ShaderMaterial({
-	// 	uniforms: uniforms,
-	// 	fragmentShader: LightingShader.fragment,
-	// 	vertexShader: LightingShader.vertex,
-	// 	transparent: true,
-	// });
+function buildFinalMesh(width, height) {
+	const geometry = buildScreenGeometry(width, height);
 	
 	const materialTest = new MeshBasicMaterial({opacity: 1, map: fogOutput.texture, transparent: true});
 
@@ -236,37 +234,17 @@ function buildBufferFinalMesh(width, height) {
 }
 
 function buildFogMesh(width, height) {
-	const geometry = new BufferGeometry();
-		
-	const vertices = new Float32Array([
-		-0.5 * width, -0.5 * height, 0,
-		0.5 * width, -0.5 * height, 0,
-		0.5 * width, 0.5 * height, 0,
-		-0.5 * width, 0.5 * height, 0,
-	]);
-	
-	const indices = [
-		0, 1, 2,
-		2, 3, 0,
-	];
-
-	geometry.setIndex(indices);
-	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	]), 2));
+	const geometry = buildScreenGeometry(width, height);
 
 	const uniforms = {
-		mouse: { type: "t", value: new Vector2(0, 0)},
+		// emiterPos: { type: "t", value: new Vector2(0, 0)},
+		emiterPos: { type: "t", value: new Vector2(80, 40)},
 		// fogMap: { type: "t", value: TextureLoader.get('fogTest')},
 		time: { type: "t", value: 0},
 		rand: { type: "t", value: 0},
 		fogMap: { type: "t", value: fogInput.texture},
-		fluxMap: { type: "t", value: TextureLoader.get('fogFlux')},
+		// fluxMap: { type: "t", value: TextureLoader.get('fogFlux')},
+		fluxMap: { type: "t", value: canvasTexture},
 	}
 
 	const material = new ShaderMaterial({
@@ -278,4 +256,32 @@ function buildFogMesh(width, height) {
 	
 
 	return new Mesh(geometry, material);
+}
+
+function buildScreenGeometry(width, height) {
+	const geometry = new BufferGeometry();
+		
+	const vertices = new Float32Array([
+		-0.5 * width, -0.5 * height, 0,
+		0.5 * width, -0.5 * height, 0,
+		0.5 * width, 0.5 * height, 0,
+		-0.5 * width, 0.5 * height, 0,
+	]);
+	
+	const indices = [
+		0, 1, 2,
+		2, 3, 0,
+	];
+
+	geometry.setIndex(indices);
+	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+
+	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
+		0, 0,
+		1, 0,
+		1, 1,
+		0, 1,
+	]), 2));
+	
+	return geometry;
 }
