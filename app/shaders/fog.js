@@ -26,14 +26,14 @@ void main() {
     float fogValue = currentColor.r;
 
     float nextOffset = 0.005;
+    float translationFactor = 5.0;
+    
     float horOffset = (fluxColor.r - 0.5) * 2.0;
     float vertOffset = (fluxColor.g - 0.5) * 2.0;
 
-    float translationFactor = 5.0;
     
     float leftFactor = max(1.0, horOffset * translationFactor);
     float rightFactor = max(1.0, horOffset * -translationFactor);
-
     float bottomFactor = max(1.0, vertOffset * translationFactor);
     float topFactor = max(1.0, vertOffset * -translationFactor);
 
@@ -49,12 +49,14 @@ void main() {
     
     fogValue += (left.r + right.r + bottom.r + top.r - (currentColor.r * curFactor)) * factor;
 
-    float minimum = 0.003;
-    if (fogValue >= -minimum && factor < 0.0) fogValue = -minimum;
+    // float minimum = 0.003;
+    // if (fogValue >= -minimum && factor < 0.0) {
+    //     fogValue = -minimum;
+    // }
 
     fogValue *= 1.0 - fluxColor.b;
 
-    fogValue *= 0.99;
+    // fogValue *= 0.99;
 
     vec4 finalColor = vec4(fogValue, fogValue, fogValue, 1.0);
     

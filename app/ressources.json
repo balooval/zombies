@@ -160,6 +160,10 @@
 			"url": "assets/fog-emiter.png"
 		},
 		{
+			"id": "fogRadialFlux",
+			"url": "assets/fog-radial-flux.png"
+		},
+		{
 			"id": "fogFlux",
 			"url": "assets/fog-flux.png"
 		}

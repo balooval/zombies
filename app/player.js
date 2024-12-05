@@ -89,12 +89,13 @@ export class Player {
 		this.currentAnimation = '';
 
 		this.ambiantLight = new Light.PointLight(80, 0, 0);
-		// this.ambiantLight.turnOn();
+		this.ambiantLight.turnOn();
 		this.torchLight = new Light.SpotLight(0, 0, 100, 40);
-		// this.torchLight.turnOn();
+		this.torchLight.turnOn();
 
 		// this.fogEmiter = new FogEmiter(this.position.x, this.position.y);
-		this.fogEmiter = new FogEmiter(0, -40);
+		this.fogEmiter = new FogEmiter(-15, -20);
+		new FogEmiter(-15, 30);
 	}
 
 	onCollide(collisions, layersName) {

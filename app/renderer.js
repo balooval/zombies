@@ -51,8 +51,11 @@ let bufferFinalMesh;
 let time = 0;
 let rand = 0;
 const canvasFogFlux = new OffscreenCanvas(worldWidth, worldHeight);
+const canvasFogWall = new OffscreenCanvas(worldWidth, worldHeight);
 let canvasTexture;
 let contextFogFlux;
+let contextFogWall;
+const fogWind = {x: 128, y: 128};
 
 let mousePositions = [];
 
@@ -86,6 +89,9 @@ export function init(elmtId) {
 	renderTargetGame = new WebGLRenderTarget(mainElmt.clientWidth, mainElmt.clientWidth / ratio, { minFilter: LinearFilter, magFilter: NearestFilter});
 	
 
+	contextFogWall = canvasFogWall.getContext('2d');
+	contextFogWall.fillStyle = 'rgb(0, 0, 0)';
+	contextFogWall.fillRect(0, 0, worldWidth, worldHeight);
 	contextFogFlux = canvasFogFlux.getContext('2d');
 	contextFogFlux.fillStyle = 'rgb(128, 128, 0)';
 	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
@@ -113,6 +119,13 @@ export function init(elmtId) {
 	finalScene.add(bufferFinalMesh);
 }
 
+export function setFogBlock(posX, posY, width, height) {
+	const x = toSmallLocalX(posX);
+    const y = toSmallLocalY(posY);
+    contextFogWall.fillStyle = 'rgb(0, 0, 255)';
+    contextFogWall.fillRect(x, y, width, height);
+}
+
 export function setFogFlux(xA, yA, xB, yB, width, power) {
 	const startX = toSmallLocalX(xA);
 	const startY = toSmallLocalY(yA);
@@ -125,6 +138,13 @@ export function setFogFlux(xA, yA, xB, yB, width, power) {
 	const moveY = Math.sin(angle) * colFactor;
 	const color = `rgb(${128 + moveX}, ${128 - moveY}, 0)`;
 	drawLine(contextFogFlux, [startX, startY], [endX, endY], color, width);
+}
+
+export function drawFogFlux(posX, posY, scale) {
+	const x = toSmallLocalX(posX) - 32;
+	const y = toSmallLocalY(posY) - 32;
+
+	contextFogFlux.drawImage(TextureLoader.get('fogRadialFlux').image, x, y)
 }
 
 export function start() {
@@ -167,8 +187,19 @@ export function start() {
 	);
 	mousePositions = mousePositions.slice(-20);
 
-	contextFogFlux.fillStyle = 'rgba(128, 128, 0, 0.1)';
+	fogWind.x = Math.max(90, Math.min(166, MATH.randomize(fogWind.x, 5)));
+	fogWind.y = Math.max(90, Math.min(166, MATH.randomize(fogWind.y, 5)));
+
+	// console.log('fogWind', fogWind.x, fogWind.y);
+
+	// contextFogFlux.fillStyle = 'rgba(128, 128, 0, 0.1)';
+	contextFogFlux.fillStyle = `rgba(${fogWind.x}, ${fogWind.y}, 0, 0.1)`;
 	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
+
+	contextFogFlux.globalCompositeOperation = 'lighter';
+	contextFogFlux.drawImage(canvasFogWall, 0, 0)
+	contextFogFlux.globalCompositeOperation = 'source-over';
+
 
 	
 	// for (let i = 1; i < mousePositions.length; i ++) {

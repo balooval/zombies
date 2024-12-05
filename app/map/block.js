@@ -1,8 +1,9 @@
+import * as Debug from '../debugCanvas.js';
+import * as Renderer from '../renderer.js';
+import * as SpriteFactory from '../spriteFactory.js';
+
 import CollisionResolver from '../collisionResolver.js';
 import Hitbox from '../collisionHitbox.js';
-import * as SpriteFactory from '../spriteFactory.js';
-import * as Debug from '../debugCanvas.js';
-
 
 class Block {
     constructor(posX, posY, width, height) {
@@ -22,6 +23,8 @@ class Block {
         CollisionResolver.addToLayer(this, 'WALLS');
 
         Debug.drawBlock(this);
+        
+        Renderer.setFogBlock(this.posX, this.posY, this.width, this.height);
     }
 
     getWorldCollisionBox() {

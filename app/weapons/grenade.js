@@ -1,13 +1,15 @@
-import {Vector2} from '../../vendor/three.module.js';
-import {HitSprite} from './../fxSprites.js';
 import * as AnimationControl from '../animationControl.js';
-import CollisionResolver from '../collisionResolver.js';
-import Hitbox from '../collisionHitbox.js';
+import * as MATH from '../utils/math.js';
 import * as Particules from '../particules.js';
+import * as Renderer from '../renderer.js';
 import * as SoundLoader from '../net/loaderSound.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
-import * as MATH from '../utils/math.js';
+
+import CollisionResolver from '../collisionResolver.js';
+import {HitSprite} from './../fxSprites.js';
+import Hitbox from '../collisionHitbox.js';
+import {Vector2} from '../../vendor/three.module.js';
 
 class Grenade {
 	constructor(position, targetPosition, owner) {
@@ -58,6 +60,8 @@ class Grenade {
 
 	#onCollideEnnemies(enemies) {
 		const vector = new Vector2(0, 0);
+
+		Renderer.drawFogFlux(this.position.x, this.position.y, 1);
 		
 		for (const zombi of enemies) {
 
@@ -87,6 +91,8 @@ class Grenade {
 		this.velY *= this.airResistance;
 		const movementQuantity = Math.abs(this.velX) + Math.abs(this.velY);
 
+		Renderer.setFogFlux(this.position.x, this.position.y, this.position.x + this.velX, this.position.y + this.velY, 15, 0.5);
+
 		this.position.x += this.velX;
 		this.position.y += this.velY;
 		this.sprite.setPosition(this.position.x, this.position.y);
@@ -110,6 +116,8 @@ class Grenade {
 		this.hitBox = new Hitbox(-10, 10, -10, 10, true);
 
 		this.blink();
+
+		Renderer.drawFogFlux(this.position.x, this.position.y, 0.7);
 	}
 	
 	blink() {

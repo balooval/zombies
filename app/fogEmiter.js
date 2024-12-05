@@ -21,8 +21,8 @@ function getFogMaterial(textureId) {
 
 export class FogEmiter {
     constructor(x, y) {
-		this.width = 10;
-		this.height = 10;
+		this.width = 5;
+		this.height = 5;
 		this.buildMesh(this.width, this.height, 'fogEmiter');
 		this.depthPosition = 12;
 		this.setPosition(x, y);

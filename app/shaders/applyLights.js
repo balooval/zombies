@@ -21,11 +21,9 @@ void main() {
     vec4 fogColor = texture2D(fogMap, vUv);
     vec4 bgColor = texture2D(bgMap, vUv);
 
-    vec4 finalColor = vec4(bgColor.r * lightColor.r, bgColor.g * lightColor.g, bgColor.b * lightColor.b, bgColor.a);
-
-    finalColor.r += fogColor.r * 0.9;
-    finalColor.g += fogColor.g * 0.9;
-    finalColor.b += fogColor.b * 0.9;
+    vec4 finalColor = vec4(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+    finalColor.rgb *= lightColor.rgb;
+    finalColor.rgb += fogColor.rgb * 1.0;
     
     gl_FragColor = finalColor;
 }
