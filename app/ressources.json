@@ -150,6 +150,22 @@
 		{
 			"id": "test",
 			"url": "assets/test.png"
+		},
+		{
+			"id": "fogTest",
+			"url": "assets/fog-test.png"
+		},
+		{
+			"id": "fogEmiter",
+			"url": "assets/fog-emiter.png"
+		},
+		{
+			"id": "fogRadialFlux",
+			"url": "assets/fog-radial-flux.png"
+		},
+		{
+			"id": "fogFlux",
+			"url": "assets/fog-flux.png"
 		}
 	]
 }

@@ -1,6 +1,8 @@
+import * as MATH from '../utils/math.js';
+import * as Renderer from '../renderer.js';
+
 import Evt from '../utils/event.js';
 import Translation from '../translation.js';
-import * as MATH from '../utils/math.js';
 
 class Move {
 	constructor(moveSpeed, position) {
@@ -27,8 +29,12 @@ class Move {
 		
 		this.moveTranslation.update(this.position.x, this.position.y, newX, newY);
 
-		this.position.x = newX; 
-		this.position.y = newY; 
+		this.position.x = newX;
+		this.position.y = newY;
+
+		// if (this.moveSpeed > 0) {
+			Renderer.setFogFlux(this.moveTranslation.startX, this.moveTranslation.startY, this.moveTranslation.destX, this.moveTranslation.destY, 15, 0.5);
+		// }
 
 		const distanceFromTargetX = this.destX - this.position.x;
 		const distanceFromTargetY = this.destY - this.position.y;

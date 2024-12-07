@@ -1,7 +1,7 @@
 
 let context;
-let isMute = false;
-// let isMute = true;
+// let isMute = false;
+let isMute = true;
 
 export function init() {
     context = new AudioContext();

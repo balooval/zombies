@@ -1,10 +1,11 @@
-import * as SoundLoader from './../net/loaderSound.js';
-import CollisionResolver from './../collisionResolver.js';
+import * as MATH from '../utils/math.js';
 import * as Particules from './../particules.js';
+import * as Renderer from '../renderer.js';
+import * as SoundLoader from './../net/loaderSound.js';
+
+import CollisionResolver from './../collisionResolver.js';
 import {HitSprite} from './../fxSprites.js';
 import Weapon from './baseWeapon.js';
-import * as MATH from '../utils/math.js';
-
 
 export class Minigun extends Weapon {
 	constructor(map) {
@@ -28,6 +29,8 @@ export class Minigun extends Weapon {
 		Particules.createRay(hit.start, hit.point);
 		
 		new HitSprite(hit.point.x, hit.point.y, 6, 30);
+
+		Renderer.setFogFlux(hit.start.x, hit.start.y, hit.point.x, hit.point.y, 5, 1);
 
 		if (hit.target === null) {
 			Particules.create(Particules.EGG_EXPLOSION, hit.point, {x: 1, y: 0.7});
