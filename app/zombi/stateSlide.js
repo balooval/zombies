@@ -1,11 +1,11 @@
-import {StateSlide as Slide} from '../states.js';
 import Hitable from './hitable.js'
+import {StateSlide as Slide} from '../states.js';
 
 class StateSlide extends Slide {
 	constructor(position, map) {
 		super(position, map);
 		this.id = 'SLIDE';
-		this.hitable = new Hitable();
+		this.hitable = new Hitable(map);
 		this.setSprite(8, 8, 'zombiHit');
 	}
 
@@ -35,7 +35,7 @@ class StateSlide extends Slide {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount);
+		this.hitable.hit(damageCount, this.position);
 		this.slide({
 			velocityX: vector.x,
 			velocityY: vector.y,

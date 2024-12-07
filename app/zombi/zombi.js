@@ -1,10 +1,10 @@
 import EntityWithStates from '../entityWithStates.js'
-import StateTravelGraph from './stateTravelGraph.js'
+import StateAttack from './stateAttack.js'
 import StateFollow from './stateFollow.js'
+import StateHole from './stateHole.js'
 import StatePauseAndSearch from './statePauseAndSearch.js'
 import StateSlide from './stateSlide.js'
-import StateHole from './stateHole.js'
-import StateAttack from './stateAttack.js'
+import StateTravelGraph from './stateTravelGraph.js'
 
 export const pool = new Map();
 
@@ -14,16 +14,17 @@ export function createZombi(player, map, startPosition) {
 	zombiStates.set('WALK', new StateTravelGraph(startPosition, map, player));
 	zombiStates.set('FOLLOW', new StateFollow(startPosition, player, map));
 	zombiStates.set('SLIDE', new StateSlide(startPosition, map));
-	zombiStates.set('ATTACK', new StateAttack(startPosition));
+	zombiStates.set('ATTACK', new StateAttack(startPosition, map));
 	zombiStates.set('PAUSE_AND_SEARCH', new StatePauseAndSearch(startPosition, map, player));
-	const zombi = new Zombi(zombiStates);
+	const zombi = new Zombi(zombiStates, map);
 	pool.set(zombi, zombi);
 }
 
 export class Zombi extends EntityWithStates{
 
-	constructor(states) {
+	constructor(states, map) {
 		super(states);
+		this.map = map;
 		this.life = 2;
 		this.hitCooldown = 0;
 	}

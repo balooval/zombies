@@ -172,6 +172,14 @@
 			"url": "assets/fog-radial-flux.png"
 		},
 		{
+			"id": "bloodSplash",
+			"url": "assets/blood_splash.png"
+		},
+		{
+			"id": "bloodSplashB",
+			"url": "assets/blood_splash_b.png"
+		},
+		{
 			"id": "fogFlux",
 			"url": "assets/fog-flux.png"
 		}

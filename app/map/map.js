@@ -2,6 +2,7 @@ import * as Bonus from '../bonus.js';
 import * as Debug from '../debugCanvas.js';
 import * as Light from '../light.js';
 import * as MATH from '../utils/math.js';
+import * as Renderer from '../renderer.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
 import * as TextureLoader from '../net/loaderTexture.js';
@@ -79,6 +80,30 @@ export class GameMap {
         this.astar = astarBuilder.build();
 
         this.placeLights();
+    }
+
+    placeBlood(x, y) {
+        const textureId = MATH.randomElement(['bloodSplash', 'bloodSplashB'])
+        const textureImage = TextureLoader.get(textureId).image;
+        const angle = MATH.randomDirection(3);
+        const size = MATH.randomDiff(16, 4);
+
+        this.context.globalCompositeOperation = 'overlay';
+        
+        Renderer.drawRotatedImage(
+            this.context,
+            textureImage,
+            angle,
+            Renderer.toCustomLocalX(x, 320),
+            Renderer.toCustomLocalY(y, 240),
+            size,
+            size
+        );
+
+    	this.context.globalCompositeOperation = 'source-over';
+
+        
+        this.texture.needsUpdate = true;
     }
 
     #createMapTexture() {

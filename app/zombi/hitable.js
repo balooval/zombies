@@ -1,11 +1,13 @@
-import CollisionResolver from '../collisionResolver.js';
 import * as Particules from '../particules.js';
 import * as SoundLoader from '../net/loaderSound.js';
 
+import CollisionResolver from '../collisionResolver.js';
+
 class Hitable {
 
-	constructor(entity) {
-		this.entity = entity;
+	constructor(map) {
+		this.map = map;
+		this.entity = null;
 	}
 
 	setEntity(entity) {
@@ -20,9 +22,11 @@ class Hitable {
 		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
 	}
 	
-	hit(damageCount) {
+	hit(damageCount, position) {
 		Particules.createBloodSplat(this.entity.currentState.position)
 		setTimeout(() => SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']), 100);
+
+		this.map.placeBlood(position.x, position.y);
 	}
 
 	dispose() {

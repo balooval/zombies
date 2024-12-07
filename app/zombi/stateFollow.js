@@ -19,7 +19,7 @@ class StateFollow extends State {
 		this.setSprite(8, 8, 'zombiWalk');
 		this.translation = new Translation();
 		this.bloodDropping = new BloodDropping();
-		this.hitable = new Hitable();
+		this.hitable = new Hitable(map);
 		this.playerFinder = new PlayerFinder(this.entitieToReach, map);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
 
@@ -93,7 +93,7 @@ class StateFollow extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount);
+		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}
 

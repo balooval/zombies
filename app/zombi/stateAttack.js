@@ -1,18 +1,18 @@
-import {State} from '../states.js';
-import Hitbox from '../collisionHitbox.js';
-import {ANIMATION_END_EVENT} from './../textureAnimation.js';
-import Hitable from './hitable.js'
-import CollisionResolver from './../collisionResolver.js';
 import * as MATH from '../utils/math.js';
 
+import {ANIMATION_END_EVENT} from './../textureAnimation.js';
+import CollisionResolver from './../collisionResolver.js';
+import Hitable from './hitable.js'
+import Hitbox from '../collisionHitbox.js';
+import {State} from '../states.js';
 
 class StateAttack extends State {
-	constructor(position) {
+	constructor(position, map) {
 		super(position);
 
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		this.setSprite(8, 8, 'zombiAtack');
-		this.hitable = new Hitable();
+		this.hitable = new Hitable(map);
 
 	}
     
@@ -70,10 +70,8 @@ class StateAttack extends State {
 		player.hit(this);
     }
 
-	
-
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount);
+		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}
 

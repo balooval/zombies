@@ -22,7 +22,7 @@ class StateTravelGraph extends State {
 		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
 
 		this.bloodDropping = new BloodDropping();
-		this.hitable = new Hitable();
+		this.hitable = new Hitable(map);
 		this.playerFinder = new PlayerFinder(player, this.map);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
@@ -63,7 +63,7 @@ class StateTravelGraph extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount);
+		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}
 

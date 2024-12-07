@@ -11,7 +11,7 @@ class StatePauseAndSearch extends State {
 		super(position);
 		this.setSprite(8, 8, 'zombiWalk');
 
-		this.hitable = new Hitable();
+		this.hitable = new Hitable(map);
 		this.playerFinder = new PlayerFinder(player, map);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
@@ -62,7 +62,7 @@ class StatePauseAndSearch extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount);
+		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}
 

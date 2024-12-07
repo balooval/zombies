@@ -260,7 +260,6 @@ function drawLine(context, start, end, color, width) {
 export function toLocalX(worldX) {
     return (worldX + 80) / ratioWidth;
 }
-
 export function toLocalY(worldY) {
 	return (worldHeight + ((worldY + 60) * -1)) / ratioHeight;
 }
@@ -268,9 +267,17 @@ export function toLocalY(worldY) {
 export function toSmallLocalX(worldX) {
     return (worldX + 80);
 }
-
 export function toSmallLocalY(worldY) {
     return (worldHeight + ((worldY + 60) * -1));
+}
+
+export function toCustomLocalX(worldX, localWidth) {
+	const ratio = worldWidth / localWidth;
+    return (worldX + 80) / ratio;
+}
+export function toCustomLocalY(worldY, localHeight) {
+	const ratio = worldHeight / localHeight;
+    return (worldHeight + ((worldY + 60) * -1)) / ratio;
 }
 
 export function toWorldX(localX) {
@@ -278,6 +285,21 @@ export function toWorldX(localX) {
 }
 export function toWorldY(localX) {
     return (worldHeight / 2) - (localX * ratioHeight);
+}
+
+
+export function drawRotatedImage(context, image, angle, posX, posY, destW, destH) {
+	// const x = destWidth / 2;
+	// const y = destHeight / 2;
+	const width = image.width;
+	const height = image.height;
+	console.log('width', width);
+
+	context.translate(posX, posY);
+	context.rotate(angle);
+	context.drawImage(image, 0, 0, width, height, -destW / 2, -destH / 2, destW, destH);
+	context.rotate(-angle);
+	context.translate(-posX, -posY);
 }
 
 function buildBufferLightMesh(width, height) {
