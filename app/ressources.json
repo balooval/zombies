@@ -160,6 +160,14 @@
 			"url": "assets/fog-emiter.png"
 		},
 		{
+			"id": "groundWeapons",
+			"url": "assets/ground-weapons.png"
+		},
+		{
+			"id": "mineIcon",
+			"url": "assets/mine-icon.png"
+		},
+		{
 			"id": "fogRadialFlux",
 			"url": "assets/fog-radial-flux.png"
 		},

@@ -17,12 +17,13 @@ import {
 
 import { ActiveWeapon } from './weapons/activeWeapon.js';
 import Batte from './weapons/batte.js';
-import BombLauncher from './weapons/bombLauncher.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
 import Evt from './utils/event.js';
 import {FogEmiter} from './fogEmiter.js';
+import GrenadeLauncher from './weapons/grenadeLauncher.js';
 import Hitbox from './collisionHitbox.js';
+import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
 import Translation from './translation.js';
@@ -67,8 +68,9 @@ export class Player {
 		// const baseWeapon = new RayLauncher(this.map);
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
-		// const baseWeapon = new BombLauncher();
-		const baseWeapon = new Minigun(this.map);
+		const baseWeapon = new MineLauncher();
+		// const baseWeapon = new GrenadeLauncher();
+		// const baseWeapon = new Minigun(this.map);
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};

@@ -1,31 +1,36 @@
+import * as MATH from './utils/math.js';
+import * as SpriteFactory from './spriteFactory.js';
+
+import BulletLauncher from './weapons/bulletLauncher.js';
+import CollisionResolver from './collisionResolver.js';
+import GrenadeLauncher from './weapons/grenadeLauncher.js';
+import Hitbox from './collisionHitbox.js';
+import MineLauncher from './weapons/mineLauncher.js';
+import Minigun from './weapons/minigun.js';
+import RayLauncher from './weapons/rayLauncher.js';
 import {
 	Vector2
 } from '../vendor/three.module.js';
-import CollisionResolver from './collisionResolver.js';
-import Hitbox from './collisionHitbox.js';
-import * as SpriteFactory from './spriteFactory.js';
-import RayLauncher from './weapons/rayLauncher.js';
-import BombLauncher from './weapons/bombLauncher.js';
-import BulletLauncher from './weapons/bulletLauncher.js';
-import Minigun from './weapons/minigun.js';
-import * as MATH from './utils/math.js';
 
 export const pool = new Map();
 
 export function createRandomBonus(destPos, map) {
-	const rndValue = MATH.random(0, 4);
+	const rndValue = MATH.random(0, 5);
 
 	if (rndValue < 1) {
 		return new BonusGun(destPos.x, destPos.y, map);
 	}
 	if (rndValue < 2) {
-		return new BonusGrenade(destPos.x, destPos.y, map);
+		return new BonusMine(destPos.x, destPos.y, map);
 	}
 	if (rndValue < 3) {
 		return new BonusEgg(destPos.x, destPos.y, map);
 	}
 	if (rndValue < 4) {
 		return new BonusMinigun(destPos.x, destPos.y, map);
+	}
+	if (rndValue < 5) {
+		return new BonusGrenade(destPos.x, destPos.y, map);
 	}
 }
 
@@ -89,6 +94,14 @@ export class BonusGrenade extends Bonus {
 
 	constructor(posX, posY, map) {
 		super(posX, posY, 'bonusGrenade');
-		this.weapon = new BombLauncher();
+		this.weapon = new GrenadeLauncher();
+	}
+}
+
+export class BonusMine extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(posX, posY, 'mineIcon');
+		this.weapon = new MineLauncher();
 	}
 }

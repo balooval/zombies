@@ -11,7 +11,7 @@ import {HitSprite} from './../fxSprites.js';
 import Hitbox from '../collisionHitbox.js';
 import {Vector2} from '../../vendor/three.module.js';
 
-class Grenade {
+class Mine {
 	constructor(position, targetPosition, owner) {
 		this.targetX = targetPosition.x;
 		this.targetY = targetPosition.y;
@@ -30,10 +30,11 @@ class Grenade {
 		this.hitBox = new Hitbox(-2, 2, -2, 2, true);
 		CollisionResolver.checkCollisionWithLayer(this, 'WALLS');
 
-		this.sprite = SpriteFactory.createAnimatedSprite(5, 5, 'grenade');
+		this.sprite = SpriteFactory.createAnimatedSprite(5, 5, 'mine');
 		this.sprite.setPosition(this.position.x, this.position.y);
 
 		this.updateFunction = this.move;
+		this.isActive = false;
 		this.nextStep = 0;
 	}
 
@@ -59,10 +60,12 @@ class Grenade {
 
 	#onCollideEnnemies(enemies) {
 		const vector = new Vector2(0, 0);
-
+		
+		SoundLoader.playRandom(['bombA', 'bombB'], 0.5);
 		Renderer.drawFogFlux(this.position.x, this.position.y, 1, 1);
 		
 		for (const zombi of enemies) {
+
 			const zombiPosition = zombi.getPosition();
 			vector.x = (zombiPosition.x - this.position.x) * 0.3;
 			vector.y = (zombiPosition.y - this.position.y) * 0.3;
@@ -74,6 +77,7 @@ class Grenade {
 			Particules.create(Particules.ENNEMI_HIT, this.position, vector);
 		}
 
+		const hitSprite = new HitSprite(this.position.x, this.position.y, 15, 60);
 		Particules.create(Particules.EGG_EXPLOSION, this.position, new Vector2(1, 0.7));
 		this.dispose();
 	}
@@ -111,20 +115,25 @@ class Grenade {
 		this.hitBox.dispose();
 		this.hitBox = new Hitbox(-10, 10, -10, 10, true);
 
-		this.nextStep = Stepper.curStep + 60;
-		Stepper.listenStep(this.nextStep, this, this.explode);
+		this.blink();
+
+		Renderer.drawFogFlux(this.position.x, this.position.y, 0.7, 1);
 	}
 	
-	explode() {
-		Stepper.stopListenStep(Stepper.curStep, this, this.explode);
+	blink() {
+		Stepper.stopListenStep(Stepper.curStep, this, this.blink);
 		
-		CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
-		SoundLoader.playRandom(['bombA', 'bombB'], 0.5);
-		const hitSprite = new HitSprite(this.position.x, this.position.y, 15, 60);
-		Renderer.drawFogFlux(this.position.x, this.position.y, 1, 3);
+		this.isActive = !this.isActive;
+		
+		if (this.isActive === true) {
+			this.nextStep = Stepper.curStep + 3;
+			CollisionResolver.checkCollisionWithLayer(this, 'ENNEMIES');
+		} else {
+			this.nextStep = Stepper.curStep + 50;
+			CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
+		}
 
-		this.nextStep = Stepper.curStep + 5;
-		Stepper.listenStep(this.nextStep, this, this.dispose);
+		Stepper.listenStep(this.nextStep, this, this.blink);
 	}
 
 	getWorldCollisionBox() {
@@ -132,8 +141,7 @@ class Grenade {
 	}
 	
 	dispose() {
-		Stepper.stopListenStep(this.nextStep, this, this.explode);
-		Stepper.stopListenStep(this.nextStep, this, this.dispose);
+		Stepper.stopListenStep(this.nextStep, this, this.blink);
 		CollisionResolver.forgotCollisionWithLayer(this, 'WALLS');
 		CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
 		AnimationControl.unregisterToUpdate(this);
@@ -142,4 +150,4 @@ class Grenade {
 	}
 }
 
-export {Grenade as default};
+export {Mine as default};

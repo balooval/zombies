@@ -141,10 +141,17 @@ export function setFogFlux(xA, yA, xB, yB, width, power) {
 }
 
 export function drawFogFlux(posX, posY, scale) {
-	const x = toSmallLocalX(posX) - 32;
-	const y = toSmallLocalY(posY) - 32;
+	const spriteSize = 64 * scale;
+	const x = toSmallLocalX(posX) - (spriteSize * 0.5);
+	const y = toSmallLocalY(posY) - (spriteSize * 0.5);
 
-	contextFogFlux.drawImage(TextureLoader.get('fogRadialFlux').image, x, y)
+	contextFogFlux.drawImage(
+		TextureLoader.get('fogRadialFlux').image,
+		x,
+		y,
+		spriteSize,
+		spriteSize,
+	);
 }
 
 export function start() {

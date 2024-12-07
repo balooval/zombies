@@ -1,8 +1,9 @@
+import * as AnimationControl from './animationControl.js';
+import * as Renderer from './renderer.js';
+import * as TextureLoader from './net/loaderTexture.js';
+
 import {BufferAttribute} from '../vendor/three.module.js';
 import Evt from './utils/event.js';
-import * as AnimationControl from './animationControl.js';
-import * as TextureLoader from './net/loaderTexture.js';
-import * as Renderer from './renderer.js';
 
 export const ANIMATION_END_EVENT = 'ANIMATION_END_EVENT';
 
@@ -239,6 +240,14 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'light',
 		frames: [],
 	},
+	groundWeapons: {
+		textureId: 'groundWeapons',
+		frames: [],
+	},
+	mineIcon: {
+		textureId: 'mineIcon',
+		frames: [],
+	},
 }));
 
 const animations = {
@@ -252,10 +261,20 @@ const animations = {
 		stepsByFrame: -1,
 		framesToDisplay: [0],
 	},
-	grenade: {
-		spriteSheet: 'grenade',
+	mineIcon: {
+		spriteSheet: 'mineIcon',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
+	},
+	mine: {
+		spriteSheet: 'groundWeapons',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	grenade: {
+		spriteSheet: 'groundWeapons',
+		stepsByFrame: -1,
+		framesToDisplay: [1],
 	},
 	bonusGrenade: {
 		spriteSheet: 'bonusGrenade',

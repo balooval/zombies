@@ -62,7 +62,7 @@ export class GameMap {
         this.maxBonusCount = 2;
 
         this.addZombiRate = 80;
-        this.maxZombiesCount = 0;
+        this.maxZombiesCount = 10;
 
         this.blocks = this.#buildBlocks();
         this.rootCell = this.#buildGraph();
