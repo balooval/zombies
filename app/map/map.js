@@ -4,9 +4,11 @@ import * as Light from '../light.js';
 import * as MATH from '../utils/math.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
+import * as TextureLoader from '../net/loaderTexture.js';
 import * as Walls from './walls.js';
 import * as Zombi from '../zombi/zombi.js';
 
+import { CanvasTexture, NearestFilter, Vector2 } from '../../vendor/three.module.js';
 import {
     PLAYER_IS_DEAD_EVENT,
     Player
@@ -18,7 +20,6 @@ import CollisionResolver from '../collisionResolver.js';
 import Evt from '../utils/event.js';
 import Hitbox from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
-import { Vector2 } from '../../vendor/three.module.js';
 import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
@@ -46,10 +47,14 @@ export const PLAYER_MAX_POS_Y = 55;
 
 export class GameMap {
     constructor() {
-        const spriteType = 'Night';
         this.evt = new Evt();
-        this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'mapBackground' + spriteType);
+ 
+        this.texture = null;
+        this.context = null;
+        this.#createMapTexture();
+        this.sprite = SpriteFactory.createSiilSprite(160, 120, this.texture);
         // this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'test');
+
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
         this.leftWall = new Walls.LeftWall(GROUND_POSITION);
@@ -74,6 +79,17 @@ export class GameMap {
         this.astar = astarBuilder.build();
 
         this.placeLights();
+    }
+
+    #createMapTexture() {
+        const canvas = new OffscreenCanvas(321, 240);
+        this.context = canvas.getContext('2d');
+        const textureImage = TextureLoader.get('backgroundNight').image;
+        this.context.drawImage(textureImage, 0, 0);
+        
+        this.texture = new CanvasTexture(canvas);
+        this.texture.magFilter = NearestFilter;
+        this.texture.minFilter = NearestFilter;
     }
 
     placeLights() {

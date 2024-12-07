@@ -22,25 +22,6 @@ function getSpriteMaterial(animationId) {
 	}
 	
 	const material = new MeshBasicMaterial({opacity: 1, map: TextureLoader.get(animationId), transparent: true});
-
-	const texture = TextureLoader.get(animationId);
-
-	// const uniforms = {
-	// 	lightPosition: {value: new Vector2(0, 0)},
-	// 	map: { type: "t", value: texture},
-	// 	lights: {
-	// 		value: Renderer.lights
-	// 	}
-	// }
-
-	// const material = new ShaderMaterial({
-	// 	uniforms: uniforms,
-	// 	fragmentShader: LightingShader.fragment,
-	// 	vertexShader: LightingShader.vertex,
-	// 	transparent: true,
-	// })
-
-
 	materials.set(animationId, material);
 	return material;
 }
@@ -82,6 +63,58 @@ export class SpriteBase {
 	changeAnimation(animationId) {}
 
 	dispose() {}
+}
+
+export class StillSprite extends SpriteBase {
+
+	constructor(render, width, height, texture) {
+		super();
+		this.width = width;
+		this.height = height;
+		this.mesh = this.buildMesh(width, height, texture);
+		this.render = render;
+		this.depthPosition = 5;
+		this.display();
+	}
+
+	display() {
+		this.render.scene.add(this.mesh);
+		super.display();
+	}
+	
+	hide() {
+		this.render.scene.remove(this.mesh);
+		super.hide();
+	}
+
+	getPosition() {
+		return this.mesh.position;
+	}
+
+	setPosition(x, y) {
+		this.mesh.position.set(x, y - this.animationOffsetV, this.depthPosition);
+	}
+
+	setRotation(angle) {
+		super.setRotation(angle);
+		const vector = new Vector3(0, 0, 1);
+		this.mesh.setRotationFromAxisAngle(vector, this.angle);
+	}
+
+	setDepth(depthPosition) {
+		this.depthPosition = depthPosition;
+		this.mesh.position.z = this.depthPosition;
+	}
+	
+	buildMesh(width, height, texture) {
+		this.geometry = buildFlatMesh(width, height);
+		const material = new MeshBasicMaterial({opacity: 1, color:0xffffff, map: texture, transparent: true});
+		return new Mesh(this.geometry, material);
+	}
+
+	dispose() {
+		this.hide();
+	}
 }
 
 export class AnimatedSprite extends SpriteBase {
@@ -141,22 +174,7 @@ export class AnimatedSprite extends SpriteBase {
 	}
 	
 	buildMesh(width, height, animationId) {
-		this.geometry = new BufferGeometry();
-		
-		const vertices = new Float32Array( [
-			-0.5 * width, -0.5 * height, 0,
-			0.5 * width, -0.5 * height, 0,
-			0.5 * width, 0.5 * height, 0,
-			-0.5 * width, 0.5 * height, 0,
-		] );
-		
-		const indices = [
-			0, 1, 2,
-			2, 3, 0,
-		];
-
-		this.geometry.setIndex(indices);
-		this.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+		this.geometry = buildFlatMesh(width, height);
 
 		const material = getSpriteMaterial(animationId);
 		
@@ -279,6 +297,13 @@ function buildFlatMesh(width, height) {
 
 	geometry.setIndex(indices);
 	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+
+	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
+		0, 0,
+		1, 0,
+		1, 1,
+		0, 1,
+	]), 2));
 	
 	return geometry;
 }

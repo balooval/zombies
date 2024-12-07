@@ -1,9 +1,11 @@
 import * as Renderer from './renderer.js';
+
 import {
-    SpriteBase,
     AnimatedSprite,
     FlatRectangleSprite,
-    FlatSprite
+    FlatSprite,
+    SpriteBase,
+    StillSprite
 } from './sprite.js';
 
 export function createAnimatedSprite(width, height, animationId) {
@@ -16,6 +18,10 @@ export function createDummySprite() {
 
 export function createFlatRectangleSprite(x, y, width, height, color) {
     return new FlatRectangleSprite(Renderer, x, y, width, height, color);
+}
+
+export function createSiilSprite(x, y, width, height, texture) {
+    return new StillSprite(Renderer, x, y, width, height, texture);
 }
 
 export function createFlatSprite(x, y, color) {
