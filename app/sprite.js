@@ -67,13 +67,14 @@ export class SpriteBase {
 
 export class StillSprite extends SpriteBase {
 
-	constructor(render, width, height, texture) {
+	constructor(render, x, y, width, height, texture) {
 		super();
 		this.width = width;
 		this.height = height;
 		this.mesh = this.buildMesh(width, height, texture);
 		this.render = render;
-		this.depthPosition = 5;
+		this.depthPosition = 0;
+		this.setPosition(x, y);
 		this.display();
 	}
 
@@ -92,7 +93,7 @@ export class StillSprite extends SpriteBase {
 	}
 
 	setPosition(x, y) {
-		this.mesh.position.set(x, y - this.animationOffsetV, this.depthPosition);
+		this.mesh.position.set(x, y, this.depthPosition);
 	}
 
 	setRotation(angle) {

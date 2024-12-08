@@ -1,5 +1,5 @@
 {
-    "backgroundImage": "backgroundNight",
+    "backgroundImage": "mapTiles",
 
     "playerStartPosition": {
         "x": 50,
@@ -19,7 +19,7 @@
     },
 
     "addZombiRate": 80,
-    "maxZombiesCount": 10,
+    "maxZombiesCount": 2,
     "zombiesSpawnLocations": [
         {
             "x": -60,
@@ -77,19 +77,31 @@
 
         "walls": [
             {
+                "x": -85,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            },
+            {
+                "x": 80,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            },
+            {
                 "x": 30,
                 "y": 40,
                 "width": 5,
                 "height": 50
             },
             {
-                "x": -70,
+                "x": -65,
                 "y": 40,
                 "width": 5,
                 "height": 50
             },
             {
-                "x": -70,
+                "x": -65,
                 "y": 40,
                 "width": 45,
                 "height": 5
@@ -101,7 +113,7 @@
                 "height": 5
             },
             {
-                "x": -70,
+                "x": -65,
                 "y": -10,
                 "width": 45,
                 "height": 5

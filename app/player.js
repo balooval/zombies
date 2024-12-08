@@ -88,7 +88,7 @@ export class Player {
 
 		this.currentAnimation = '';
 
-		this.ambiantLight = new Light.PointLight(80, 0, 0);
+		this.ambiantLight = new Light.PointLight(40, 0, 0);
 		this.ambiantLight.turnOn();
 		this.torchLight = new Light.SpotLight(0, 0, Math.PI / 4, {r: 255, g: 255, b: 200});
 		this.torchLight.turnOn();

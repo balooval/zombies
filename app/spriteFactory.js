@@ -20,7 +20,7 @@ export function createFlatRectangleSprite(x, y, width, height, color) {
     return new FlatRectangleSprite(Renderer, x, y, width, height, color);
 }
 
-export function createSiilSprite(x, y, width, height, texture) {
+export function createStillSprite(x, y, width, height, texture) {
     return new StillSprite(Renderer, x, y, width, height, texture);
 }
 

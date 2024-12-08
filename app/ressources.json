@@ -60,6 +60,14 @@
 
 	"textures": [
 		{
+			"id": "mapTiles",
+			"url": "assets/map-tiles.png"
+		},
+		{
+			"id": "wallTop",
+			"url": "assets/wall-top.png"
+		},
+		{
 			"id": "lightRect",
 			"url": "assets/light-rect.png"
 		},
@@ -96,10 +104,6 @@
 			"url": "assets/pointer.png"
 		},
 		{
-			"id": "wolfStillDeath",
-			"url": "assets/loup-still-death.png"
-		},
-		{
 			"id": "zombiWalk",
 			"url": "assets/zombi.png"
 		},
@@ -114,10 +118,6 @@
 		{
 			"id": "backgroundNight",
 			"url": "assets/map.png"
-		},
-		{
-			"id": "egg",
-			"url": "assets/oeuf-animation.png"
 		},
 		{
 			"id": "hit",
@@ -142,10 +142,6 @@
 		{
 			"id": "hole",
 			"url": "assets/hole.png"
-		},
-		{
-			"id": "skyNight",
-			"url": "assets/map-night-sky.png"
 		},
 		{
 			"id": "test",

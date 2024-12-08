@@ -2,6 +2,8 @@ import * as AnimationControl from './animationControl.js';
 import * as MATH from './utils/math.js';
 import * as TextureLoader from './net/loaderTexture.js';
 
+import CollisionResolver from './collisionResolver.js';
+
 class LightCanvas {
 
 	constructor() {
@@ -100,7 +102,7 @@ class LightCanvas {
 	}
 
 	drawSpotLight(spotLight) {
-		const raysCount = 10;
+		const raysCount = 15;
 		const angleStep = spotLight.fovAngle / raysCount;
 		const lightDistance = 100;
 
@@ -114,27 +116,47 @@ class LightCanvas {
 				destY: spotLight.posY + Math.sin(curAngle) * lightDistance,
 			};
 
-
-			const intersections = this.map.getWallsIntersections(hitSegment);
-			const wallHit = intersections.shift();
-
-			if (wallHit) {
-				this.#drawRay([[spotLight.posX, spotLight.posY], [wallHit.x, wallHit.y]], spotLight.color);
-			} else {
-				this.#drawRay([[spotLight.posX, spotLight.posY], [hitSegment.destX, hitSegment.destY]], spotLight.color);
-			}
-
+			const hitPoint = this.#getNearestHit(hitSegment, [hitSegment.destX, hitSegment.destY]);
+			
+			this.#drawRay([[spotLight.posX, spotLight.posY], hitPoint], spotLight.color);
 		}
+	}
+
+	#getNearestHit(hitSegment, defaultEnd) {
+		const intersections = this.map.getWallsIntersections(hitSegment);
+		const wallHit = intersections.shift();
+
+		const touched = CollisionResolver.checkIntersectionWithLayer(hitSegment, 'ENNEMIES');
+		const zombiHit = touched.shift();
+
+		if (!wallHit && !zombiHit) {
+			return defaultEnd;
+		}
+		
+		if (!wallHit && zombiHit) {
+			return [zombiHit.point.x, zombiHit.point.y];
+		}
+
+		if (wallHit && !zombiHit) {
+			return [wallHit.x, wallHit.y];
+		}
+
+		if (wallHit.distance < zombiHit.distance) {
+			return [wallHit.x, wallHit.y];
+		}
+
+		return [zombiHit.point.x, zombiHit.point.y];
 	}
 
 	#drawRay(segment, color) {
 		const dist = MATH.segmentDistance(segment);
-		const distanceByPhoton = 2;
+		const distanceByPhoton = 1.5;
 		const photonsCount = dist / distanceByPhoton;
 		const lerpStep = 1 / photonsCount;
 
-		let startRadius = 3;
+		let startRadius = 2;
 		let alpha = 1;
+		const decay = 0.88;
 
 		// this.contextDynamicLights.globalCompositeOperation = 'lighter';
 
@@ -142,7 +164,7 @@ class LightCanvas {
 			const pos = MATH.lerpPoint(segment[0], segment[1], lerpStep * i);
 			this.#drawPoint(pos[0], pos[1], `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`, startRadius);
 			startRadius *= 1.06;
-			alpha *= 0.85;
+			alpha *= decay;
 		}
 
 		// this.contextDynamicLights.globalCompositeOperation = 'source-over';

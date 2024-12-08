@@ -113,8 +113,7 @@ export function nearestPoint(point, segment) {
 
 export function segmentWithPolygonIntersection(segment, polygon) {
     return polygon.map(side => {
-        
-        return segmentIntersection(
+        const intersection = segmentIntersection(
             segment.startX,
             segment.startY,
             segment.destX,
@@ -124,7 +123,17 @@ export function segmentWithPolygonIntersection(segment, polygon) {
             side[1][0],
             side[1][1],
         );
+        if (intersection === null) {
+            return null;
+        }
+        return {
+            x: intersection.x,
+            y: intersection.y,
+            distance: distanceManathan({ x: segment.startX, y: segment.startY }, intersection),
+        };
+
     }).filter(res => res !== null)
+    .sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance))
     .pop();
 }
 

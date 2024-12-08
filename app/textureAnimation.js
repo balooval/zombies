@@ -14,6 +14,9 @@ export function init() {
 
 function calcSpriteSheetsFrames() {
 	for (const [key, spriteSheet] of spriteSheets) {
+		if (!TextureLoader.get(spriteSheet.textureId)) {
+			console.warn('spriteSheet.textureId', spriteSheet.textureId);
+		}
 		const textureImage = TextureLoader.get(spriteSheet.textureId).image;
 		const framesCount = Math.floor(textureImage.width / textureImage.height);
 
@@ -184,10 +187,6 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'playerWalk',
 		frames: [],
 	},
-	egg: {
-		textureId: 'egg',
-		frames: [],
-	},
 	hit: {
 		textureId: 'hit',
 		frames: [],
@@ -226,10 +225,6 @@ const spriteSheets = new Map(Object.entries({
 	},
 	hole: {
 		textureId: 'hole',
-		frames: [],
-	},
-	mapSkyNight: {
-		textureId: 'skyNight',
 		frames: [],
 	},
 	test: {
@@ -360,9 +355,5 @@ const animations = {
 		spriteSheet: 'mapBackgroundNight',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
-	},
-	mapSkyNight: {
-		textureId: 'skyNight',
-		frames: [],
 	},
 };

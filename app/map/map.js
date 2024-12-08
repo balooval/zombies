@@ -48,7 +48,7 @@ export class GameMap {
         this.texture = null;
         this.context = null;
         this.#createMapTexture(mapDescription.backgroundImage);
-        this.sprite = SpriteFactory.createSiilSprite(160, 120, this.texture);
+        this.sprite = SpriteFactory.createStillSprite(0, 0, 160, 120, this.texture);
 
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
@@ -101,7 +101,7 @@ export class GameMap {
     }
 
     #createMapTexture(backgroundImage) {
-        const canvas = new OffscreenCanvas(321, 240);
+        const canvas = new OffscreenCanvas(320, 240);
         this.context = canvas.getContext('2d');
         const textureImage = TextureLoader.get(backgroundImage).image;
         this.context.drawImage(textureImage, 0, 0);
