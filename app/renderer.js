@@ -23,6 +23,8 @@ import {
 	WebGLRenderer,
 } from '../vendor/three.module.js';
 
+import LightCanvas from './lightCanvas.js';
+
 export let renderer;
 export let camera;
 
@@ -50,10 +52,12 @@ let fogMesh;
 let bufferFinalMesh;
 let time = 0;
 let rand = 0;
-const canvasFogFlux = new OffscreenCanvas(worldWidth, worldHeight);
-const canvasFogWall = new OffscreenCanvas(worldWidth, worldHeight);
 let canvasTexture;
+let canvasTextureLights;
+
+const canvasFogFlux = new OffscreenCanvas(worldWidth, worldHeight);
 let contextFogFlux;
+const canvasFogWall = new OffscreenCanvas(worldWidth, worldHeight);
 let contextFogWall;
 const fogWind = {x: 128, y: 128};
 
@@ -95,6 +99,8 @@ export function init(elmtId) {
 	contextFogFlux = canvasFogFlux.getContext('2d');
 	contextFogFlux.fillStyle = 'rgb(128, 128, 0)';
 	contextFogFlux.fillRect(0, 0, worldWidth, worldHeight);
+	canvasTextureLights = new CanvasTexture(LightCanvas.canvasFinalLights);
+	canvasTextureLights.needsUpdate = true;
 	canvasTexture = new CanvasTexture(canvasFogFlux);
 	canvasTexture.needsUpdate = true;
 
@@ -219,6 +225,7 @@ export function start() {
 	// 	);
 	// }
 	canvasTexture.needsUpdate = true;
+	canvasTextureLights.needsUpdate = true;
 
 	bufferFinalMesh.material.map = fogOutput.texture;
 	fogMesh.material.uniforms.time.value = time;
@@ -233,10 +240,10 @@ export function start() {
 	renderer.clear();
 	renderer.render(scene, camera);
 
-	renderer.setRenderTarget(renderTargetLight)
-	renderer.setClearColor(0x808080, 1);
-	renderer.clear();
-	renderer.render(lightScene, camera);
+	// renderer.setRenderTarget(renderTargetLight)
+	// renderer.setClearColor(0x808080, 1);
+	// renderer.clear();
+	// renderer.render(lightScene, camera);
 	
 	renderer.setRenderTarget(null);
 	renderer.setClearColor(0x000000, 1);
@@ -317,7 +324,8 @@ function buildFinalMesh(width, height) {
 
 	const uniforms = {
 		bgMap: { type: "t", value: renderTargetGame.texture},
-		lightMap: { type: "t", value: renderTargetLight.texture},
+		// lightMap: { type: "t", value: renderTargetLight.texture},
+		lightMap: { type: "t", value: canvasTextureLights},
 		fogMap: { type: "t", value: fogOutput.texture},
 	}
 

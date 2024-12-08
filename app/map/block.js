@@ -12,6 +12,7 @@ class Block {
         this.width = width;
         this.height = height;
         this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
+
         this.sprite = SpriteFactory.createFlatRectangleSprite(
             this.posX + this.width / 2,
             this.posY - this.height / 2,

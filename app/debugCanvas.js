@@ -1,3 +1,4 @@
+import * as MATH from './utils/math.js';
 
 let canvas;
 let context;
@@ -15,7 +16,7 @@ export function init(elementId) {
 
 export function drawNavigationGrid(navigationGrid) {
     const points = [...navigationGrid.values()];
-    points.forEach(node => drawPoint(node.x, node.y, '#0000ff'));
+    points.forEach(node => drawPoint(node.x, node.y, '#0000ff', 2));
 }
 
 export function drawJourney(nodes) {
@@ -50,14 +51,47 @@ function drawLine(start, end, color, width) {
     context.stroke();
 }
 
-function drawPoint(x, y, color) {
-    mapContext.fillStyle = color;
-    mapContext.beginPath();
-    mapContext.arc(toLocalX(x), toLocalY(y), 2, 0, Math.PI * 2);
-    mapContext.closePath();
-    mapContext.fill();
+function fillePolygon(polygon, color) {
+    const points = [...polygon];
+    context.fillStyle = color;
+    context.beginPath();
+    const start = points.shift();
+    context.moveTo(toLocalX(start[0]), toLocalY(start[1]));
+    for (const point of points) {
+        context.lineTo(toLocalX(point[0]), toLocalY(point[1]));
+    }
+    context.closePath();
+    context.fill();
 }
 
+function drawPoint(x, y, color, radius) {
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(toLocalX(x), toLocalY(y), radius, 0, Math.PI * 2);
+    context.closePath();
+    context.fill();
+}
+
+function drawLight(segment, color) {
+    const dist = MATH.segmentDistance(segment);
+    const distanceByPhoton = 3;
+    const photonsCount = dist / distanceByPhoton;
+    const lerpStep = 1 / photonsCount;
+
+    let startRadius = 1;
+    let alpha = 1;
+
+    context.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < photonsCount; i ++) {
+        const pos = MATH.lerpPoint(segment[0], segment[1], lerpStep * i);
+        drawPoint(pos[0], pos[1], `rgb(0, 0, 255, ${alpha})`, startRadius);
+        startRadius *= 1.06;
+        alpha *= 0.85;
+    }
+
+    context.globalCompositeOperation = 'source-over';
+}
 
 function toLocalX(worldX) {
     return worldX + 80;

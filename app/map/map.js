@@ -18,8 +18,10 @@ import AstarBuilder from '../astar/AStarBuilder.js';
 import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
 import Evt from '../utils/event.js';
+import {FogEmiter} from '../fogEmiter.js';
 import Hitbox from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
+import LightCanvas from '../lightCanvas.js';
 import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
@@ -64,12 +66,15 @@ export class GameMap {
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
 
-        Debug.drawNavigationGrid(this.navigationGrid);
+        this.zombiesSpawnLocations = mapDescription.zombiesSpawnLocations;
 
         const astarBuilder = new AstarBuilder();
         this.astar = astarBuilder.build();
 
+        LightCanvas.setMap(this);
+
         this.placeLights(mapDescription.lights);
+        this.placeFog(mapDescription.fog);
     }
 
     placeBlood(x, y) {
@@ -104,6 +109,12 @@ export class GameMap {
         this.texture = new CanvasTexture(canvas);
         this.texture.magFilter = NearestFilter;
         this.texture.minFilter = NearestFilter;
+    }
+
+    placeFog(fogDescription) {
+        for (const fog of fogDescription) {
+            new FogEmiter(fog.x, fog.y);
+        }
     }
 
     placeLights(lightsDescription) {
@@ -177,6 +188,7 @@ export class GameMap {
 
         const destCell = this.getRandomCell();
 		const startPosition = {x: destCell.center.x, y: destCell.center.y};
+        // console.log('startPosition', startPosition);
 
         Zombi.createZombi(this.player, this, startPosition);
     }
@@ -196,7 +208,7 @@ export class GameMap {
             return {
                 x: position.x,
                 y: position.y,
-                distance: MATH.distance({ x: segment.startX, y: segment.startY }, position),
+                distance: MATH.distanceManathan({ x: segment.startX, y: segment.startY }, position),
             };
         }).sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));
 
