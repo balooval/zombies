@@ -1,3 +1,4 @@
+import * as AnimationControl from './animationControl.js';
 import * as MATH from './utils/math.js';
 import * as Renderer from './renderer.js';
 import * as Stepper from './utils/stepper.js';
@@ -13,6 +14,8 @@ import {
 	Vector3,
 } from '../vendor/three.module.js';
 
+import LightCanvas from './lightCanvas.js';
+
 function getLightMaterial(textureId) {
 
 	return new MeshBasicMaterial({
@@ -24,101 +27,99 @@ function getLightMaterial(textureId) {
 }
 
 class Light {
-    constructor(x, y, width, height, textureId) {
-		this.width = width;
-		this.height = height;
-		this.buildMesh(this.width, this.height, textureId);
-		this.depthPosition = 15;
-		this.setPosition(x, y);
+    constructor(x, y) {
+		this.posX = x;
+		this.posY = y;
 		this.isOn = false;
+
+		AnimationControl.registerToUpdate(this);
 	}
 
+	update() {
+		if (this.isOn === false) {
+			return;
+		}
+
+		this.draw();
+	}
+
+	draw() {
+
+	}
+	
 	turnOn() {
 		this.isOn = true;
-		Renderer.lightScene.add(this.mesh);
 	}
 	
 	turnOff() {
 		this.isOn = false;
-		Renderer.lightScene.remove(this.mesh);
 	}
 
 	setPosition(x, y) {
-		this.mesh.position.set(x, y, this.depthPosition);
-	}
-	
-	buildMesh(width, height, textureId) {
-		this.geometry = Renderer.buildRectangleGeometry(width, height)
-        const lightMaterial = getLightMaterial(textureId);
-		this.mesh = new Mesh(this.geometry, lightMaterial);
+		this.posX = x;
+		this.posY = y;
 	}
 
 	dispose() {
 		this.turnOff();
-        this.geometry.dispose();
-        this.mesh.material.dispose();
+        AnimationControl.unregisterToUpdate(this);
 	}
 }
 
 export class PointLight extends Light {
     constructor(size, x, y) {
-		super(x, y, size, size, 'light');
+		super(x, y);
+		this.size = size;
+	}
+
+	draw() {
+		LightCanvas.drawPointLight(this);
 	}
 }
 
 export class SpotLight extends Light {
-    constructor(x, y, width, height) {
-		super(x, y, width, height, 'lightSpot');
+    constructor(x, y, fov, color) {
+		super(x, y);
+		this.fovAngle = fov;
+		this.color = color;
 		this.angle = 0;
 	}
 
 	setRotation(angle) {
 		this.angle = angle;
-		const vector = new Vector3(0, 0, 1);
-		this.mesh.setRotationFromAxisAngle(vector, this.angle);
 	}
 
-	buildMesh(width, height, textureId) {
-		this.geometry = new BufferGeometry();
-		
-		const vertices = new Float32Array( [
-			0, -0.5 * height, 0,
-			width, -0.5 * height, 0,
-			width, 0.5 * height, 0,
-			0, 0.5 * height, 0,
-		] );
-		
-		const indices = [
-			0, 1, 2,
-			2, 3, 0,
-		];
-
-		this.geometry.setIndex(indices);
-		this.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-        this.geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-			0, 0,
-			1, 0,
-			1, 1,
-			0, 1,
-		]), 2));
-
-        const lightMaterial = getLightMaterial(textureId);
-		this.mesh = new Mesh(this.geometry, lightMaterial);
+	draw() {
+		LightCanvas.drawSpotLight(this);
 	}
 }
 
 export class RectLight extends Light {
     constructor(x, y, width, height) {
-		super(x, y, width, height, 'lightRect');
+		super(x, y);
+		this.width = width
+		this.height = height;
+		this.color = 'rgba(200, 200, 200)';
+	}
+
+	draw() {
+		LightCanvas.drawRectLight(this);
 	}
 }
 
 // TODO: à fixer, elle se rallume tout seule après un blink
-export class BlinkRectLight extends Light {
+export class BlinkRectLight extends RectLight {
     constructor(x, y, width, height) {
-		super(x, y, width, height, 'lightRect');
+		super(x, y, width, height);
 		this.blinkStep = 0;
+		this.blinkState = false;
+	}
+
+	draw() {
+		if (this.blinkState === true) {
+			return;
+		}
+		super.draw();
 	}
 	
 	turnOff() {
@@ -129,7 +130,6 @@ export class BlinkRectLight extends Light {
 	
 	turnOn() {
 		super.turnOn();
-
 		this.blinkStep = Stepper.curStep + this.getNextStepBlink();
 		this.blinkOn();
 	}
@@ -137,14 +137,14 @@ export class BlinkRectLight extends Light {
 
 	blinkOff() {
 		Stepper.stopListenStep(this.blinkStep, this, this.blinkOff);
-		Renderer.lightScene.remove(this.mesh);
+		this.blinkState = true;
 		this.blinkStep = Stepper.curStep + 2;
 		Stepper.listenStep(this.blinkStep, this, this.blinkOn);
 	}
 	
 	blinkOn() {
 		Stepper.stopListenStep(this.blinkStep, this, this.blinkOn);
-		Renderer.lightScene.add(this.mesh);
+		this.blinkState = false;
 		this.blinkStep = Stepper.curStep + this.getNextStepBlink();
 		Stepper.listenStep(this.blinkStep, this, this.blinkOff);
 	}

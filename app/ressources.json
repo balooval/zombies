@@ -64,6 +64,10 @@
 			"url": "assets/light-rect.png"
 		},
 		{
+			"id": "light",
+			"url": "assets/light.png"
+		},
+		{
 			"id": "lightSpot",
 			"url": "assets/light-spot.png"
 		},
@@ -142,10 +146,6 @@
 		{
 			"id": "skyNight",
 			"url": "assets/map-night-sky.png"
-		},
-		{
-			"id": "light",
-			"url": "assets/light.png"
 		},
 		{
 			"id": "test",

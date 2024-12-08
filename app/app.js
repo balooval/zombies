@@ -10,6 +10,7 @@ import * as Stepper from './utils/stepper.js';
 import * as TextureLoader from './net/loaderTexture.js';
 
 import HomeScreen from './ui/homeScreen.js';
+import LightCanvas from './lightCanvas.js';
 import {init as TextureAnimationInit} from './textureAnimation.js';
 
 Input.init();
@@ -44,11 +45,13 @@ function loadRessourcesList(ressourcesUrl) {
 		SoundLoader.loadBatch(ressourcesList.sounds),
 		TextureLoader.loadBatch(ressourcesList.textures),
 		GameLevel.loadMap('map-1.json')
+		// GameLevel.loadMap('map-shadow.json')
 	]));
 }
 
 function onRessourcesLoaded() {
 	LoadingScreen.hide();
+	LightCanvas.init(320, 240, Renderer.worldWidth, Renderer.worldHeight);
 	Renderer.init('main');
 	TextureAnimationInit();
 	Stepper.init();

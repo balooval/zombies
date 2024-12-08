@@ -19,7 +19,6 @@ import Batte from './weapons/batte.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
 import Evt from './utils/event.js';
-import {FogEmiter} from './fogEmiter.js';
 import GrenadeLauncher from './weapons/grenadeLauncher.js';
 import Hitbox from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
@@ -91,12 +90,8 @@ export class Player {
 
 		this.ambiantLight = new Light.PointLight(80, 0, 0);
 		this.ambiantLight.turnOn();
-		this.torchLight = new Light.SpotLight(0, 0, 100, 40);
+		this.torchLight = new Light.SpotLight(0, 0, Math.PI / 4, {r: 255, g: 255, b: 200});
 		this.torchLight.turnOn();
-
-		// this.fogEmiter = new FogEmiter(this.position.x, this.position.y);
-		this.fogEmiter = new FogEmiter(-15, -20);
-		new FogEmiter(-15, 30);
 	}
 
 	onCollide(collisions, layersName) {
@@ -217,7 +212,7 @@ export class Player {
 	}
 
 	#applyTranslation() {
-		const wallHit = this.map.blocks.map(block => getIntersection(this.translation, block.hitBox)).filter(res => res).pop();
+		const wallHit = this.map.getWallsIntersections(this.translation).shift();
 
 		let newPosX = this.translation.destX;
 		let newPosY = this.translation.destY;
@@ -243,7 +238,6 @@ export class Player {
 		this.torchLight.setPosition(this.position.x, this.position.y);
 		this.ambiantLight.setPosition(this.position.x, this.position.y);
 		
-		// this.fogEmiter.setPosition(this.position.x, this.position.y);
 		if (this.moveSpeed > 0) {
 			Renderer.setFogFlux(this.translation.startX, this.translation.startY, this.translation.destX, this.translation.destY, 15, 0.5);
 		}

@@ -1,29 +1,29 @@
 
 const eps = 0.0000001;
 
-function sqr(x) {
-    return x * x;
+export function distanceManathan(posA, posB) {
+    return Math.abs(posA.x - posB.x) + Math.abs(posA.y - posB.y)
 }
 
-function dist2(v, w) {
-    return sqr(v.x - w.x) + sqr(v.y - w.y)
+export function segmentNormal(segment) {
+    // if we define dx=x2-x1 and dy=y2-y1, then the normals are (-dy, dx) and (dy, -dx).
+    const dx = segment[1][0] - segment[0][0];
+    const dy = segment[1][1] - segment[0][1];
+    const normalSegment = [
+        [dy * -1, dx],
+        [dy, dx * -1],
+    ];
+
+    const normalLength = segmentDistance(normalSegment);
+
+    return [
+        (normalSegment[0][0] - normalSegment[1][0]) / normalLength,
+        (normalSegment[0][1] - normalSegment[1][1]) / normalLength,
+    ]
 }
 
-function distToSegmentSquared(p, v, w) {
-    const l2 = dist2(v, w);
-    if (l2 == 0) {
-        return dist2(p, v);
-    }
-
-    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-    t = Math.max(0, Math.min(1, t));
-    return dist2(
-        p,
-        {
-            x: v.x + t * (w.x - v.x),
-            y: v.y + t * (w.y - v.y)
-        }
-    );
+export function segmentDistance(segment) {
+    return Math.sqrt(sqr(segment[1][0] - segment[0][0]) + sqr(segment[1][1] - segment[0][1]));
 }
 
 export function pointsAngle(pointA, pointB) {
@@ -178,4 +178,29 @@ export function hslToRgb(h, s, l) {
 
 export function randomDirection(maxValue) {
     return (Math.random() * (maxValue * 2)) - maxValue;
+}
+
+function sqr(x) {
+    return x * x;
+}
+
+function dist2(v, w) {
+    return sqr(v.x - w.x) + sqr(v.y - w.y)
+}
+
+function distToSegmentSquared(p, v, w) {
+    const l2 = dist2(v, w);
+    if (l2 == 0) {
+        return dist2(p, v);
+    }
+
+    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return dist2(
+        p,
+        {
+            x: v.x + t * (w.x - v.x),
+            y: v.y + t * (w.y - v.y)
+        }
+    );
 }

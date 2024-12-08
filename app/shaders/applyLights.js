@@ -17,13 +17,13 @@ uniform sampler2D fogMap;
 varying vec2 vPos;
 
 void main() {
-    vec4 lightColor = 0.2 + texture2D(lightMap, vUv) * 1.2;
+    vec4 lightColor = 0.0 + texture2D(lightMap, vUv) * 1.2;
     vec4 fogColor = texture2D(fogMap, vUv);
     vec4 bgColor = texture2D(bgMap, vUv);
 
     vec4 finalColor = vec4(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
-    finalColor.rgb *= lightColor.rgb;
     finalColor.rgb += fogColor.rgb * 1.0;
+    finalColor.rgb *= lightColor.rgb;
     
     gl_FragColor = finalColor;
 }

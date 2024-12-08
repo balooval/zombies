@@ -34,13 +34,13 @@ class InteractiveBlock {
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
 
-        const spot = new Light.SpotLight(-17, -8, 40, 40);
-        spot.setRotation(Math.PI * -0.5);
+        // const spot = new Light.SpotLight(-17, -8, Math.PI / 2, {r: 180, g: 180, b: 200});
+        // spot.setRotation(Math.PI * -0.5);
 
         this.lights = [
-            new Light.RectLight(-15, 0, 120, 25),
-            new Light.BlinkRectLight(-15, 25, 120, 25),
-            spot,
+            new Light.RectLight(-75, 15, 120, 30),
+            new Light.BlinkRectLight(-75, 40, 120, 30),
+            // spot,
         ];
 
         this.lights.forEach(light => light.turnOff());
