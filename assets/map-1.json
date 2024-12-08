@@ -1,0 +1,92 @@
+{
+    "backgroundImage": "backgroundNight",
+
+    "playerStartPosition": {
+        "x": 60,
+        "y": -10
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 10,
+
+    "lights": {
+        "rectLights": [
+            {
+                "x": 50,
+                "y": 15,
+                "width": 40,
+                "height": 70
+            }   
+        ],
+        "pointLights": [
+            {
+                "size": 30,
+                "x": 47,
+                "y": -20
+            }
+        ]
+    },
+
+    "walls": [
+        {
+            "x": 30,
+            "y": 40,
+            "width": 5,
+            "height": 50
+        },
+        {
+            "x": -70,
+            "y": 40,
+            "width": 5,
+            "height": 50
+        },
+        {
+            "x": -70,
+            "y": 40,
+            "width": 45,
+            "height": 5
+        },
+        {
+            "x": -10,
+            "y": 40,
+            "width": 45,
+            "height": 5
+        },
+        {
+            "x": -70,
+            "y": -10,
+            "width": 45,
+            "height": 5
+        },
+        {
+            "x": -10,
+            "y": -10,
+            "width": 45,
+            "height": 5
+        },
+        {
+            "x": -55,
+            "y": 15,
+            "width": 45,
+            "height": 5
+        },
+        {
+            "x": 45,
+            "y": 15,
+            "width": 25,
+            "height": 5
+        }
+    ]
+}

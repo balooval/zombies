@@ -293,7 +293,6 @@ export function drawRotatedImage(context, image, angle, posX, posY, destW, destH
 	// const y = destHeight / 2;
 	const width = image.width;
 	const height = image.height;
-	console.log('width', width);
 
 	context.translate(posX, posY);
 	context.rotate(angle);

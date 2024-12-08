@@ -14,23 +14,24 @@ import {
 
 export const pool = new Map();
 
-export function createRandomBonus(destPos, map) {
-	const rndValue = MATH.random(0, 5);
+export function createRandomBonus(choices, destPos, map) {
+	const bonusName = MATH.randomElement(choices);
+	
+	switch (bonusName) {
+		case 'BonusGun':
+			return new BonusGun(destPos.x, destPos.y, map);
+			
+		case 'BonusMine':
+			return new BonusMine(destPos.x, destPos.y, map);
 
-	if (rndValue < 1) {
-		return new BonusGun(destPos.x, destPos.y, map);
-	}
-	if (rndValue < 2) {
-		return new BonusMine(destPos.x, destPos.y, map);
-	}
-	if (rndValue < 3) {
-		return new BonusEgg(destPos.x, destPos.y, map);
-	}
-	if (rndValue < 4) {
-		return new BonusMinigun(destPos.x, destPos.y, map);
-	}
-	if (rndValue < 5) {
-		return new BonusGrenade(destPos.x, destPos.y, map);
+		case 'BonusEgg':
+			return new BonusEgg(destPos.x, destPos.y, map);
+
+		case 'BonusMinigun':
+			return new BonusMinigun(destPos.x, destPos.y, map);
+
+		case 'BonusGrenade':
+			return new BonusGrenade(destPos.x, destPos.y, map);
 	}
 }
 

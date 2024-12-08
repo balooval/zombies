@@ -1,15 +1,16 @@
-import * as TextureLoader from './net/loaderTexture.js';
-import * as SoundLoader from './net/loaderSound.js';
+import * as Debug from './debugCanvas.js';
+import * as GameLevel from './gameLevel.js';
 import * as Input from './input.js';
+import * as LoadingScreen from './ui/loadingScreen.js';
 import * as Mouse from './inputMouse.js';
 import * as Renderer from './renderer.js';
-import * as LoadingScreen from './ui/loadingScreen.js';
-import * as Stepper from './utils/stepper.js';
 import * as Sound from './sound.js';
+import * as SoundLoader from './net/loaderSound.js';
+import * as Stepper from './utils/stepper.js';
+import * as TextureLoader from './net/loaderTexture.js';
+
 import HomeScreen from './ui/homeScreen.js';
-import * as GameLevel from './gameLevel.js';
 import {init as TextureAnimationInit} from './textureAnimation.js';
-import * as Debug from './debugCanvas.js';
 
 Input.init();
 Mouse.init('main', Renderer.worldWidth, Renderer.worldHeight);
@@ -41,7 +42,8 @@ function loadRessourcesList(ressourcesUrl) {
 	.then(response => response.json())
 	.then(ressourcesList => Promise.all([
 		SoundLoader.loadBatch(ressourcesList.sounds),
-		TextureLoader.loadBatch(ressourcesList.textures)
+		TextureLoader.loadBatch(ressourcesList.textures),
+		GameLevel.loadMap('map-1.json')
 	]));
 }
 

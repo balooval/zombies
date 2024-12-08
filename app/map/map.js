@@ -33,13 +33,7 @@ const MAX_X = 80;
 const MIN_Y = -60;
 const MAX_Y = 60;
 export const GROUND_POSITION = -50;
-export const GROUND_LIMITE_X_MIN = -65;
-export const GROUND_LIMITE_X_MAX = 65;
-export const ENEMIES_START_POSITION = new Vector2(-80, 52);
-export const ENEMIES_FALL_MAX_POSITION = 70;
-export const ENEMIES_GOAL_POSITION = 70;
 export const PLAYER_POSITION_X = 60;
-export const PLAYER_START_POSITION = new Vector2(60, 20);
 export const PLAYER_MIN_POS_X = -75;
 export const PLAYER_MAX_POS_X = 75;
 export const PLAYER_MIN_POS_Y = -55;
@@ -47,14 +41,13 @@ export const PLAYER_MAX_POS_Y = 55;
 
 
 export class GameMap {
-    constructor() {
+    constructor(mapDescription) {
         this.evt = new Evt();
  
         this.texture = null;
         this.context = null;
-        this.#createMapTexture();
+        this.#createMapTexture(mapDescription.backgroundImage);
         this.sprite = SpriteFactory.createSiilSprite(160, 120, this.texture);
-        // this.sprite = SpriteFactory.createAnimatedSprite(162, 120, 'test');
 
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
@@ -63,14 +56,16 @@ export class GameMap {
         this.upWall = new Walls.UpWall();
         this.bottomWall = new Walls.BottomWall();
         this.player = null;
+        this.playerStartPosition = new Vector2(mapDescription.playerStartPosition.x, mapDescription.playerStartPosition.y);
 
-        this.addBonusRate = 300;
-        this.maxBonusCount = 2;
+        this.addBonusRate = mapDescription.bonus.addBonusRate;
+        this.maxBonusCount = mapDescription.bonus.maxBonusCount;
+        this.bonusChoices = mapDescription.bonus.choices;
 
-        this.addZombiRate = 80;
-        this.maxZombiesCount = 10;
+        this.addZombiRate = mapDescription.addZombiRate;
+        this.maxZombiesCount = mapDescription.maxZombiesCount;
 
-        this.blocks = this.#buildBlocks();
+        this.blocks = this.#buildBlocks(mapDescription.walls);
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
 
@@ -79,7 +74,7 @@ export class GameMap {
         const astarBuilder = new AstarBuilder();
         this.astar = astarBuilder.build();
 
-        this.placeLights();
+        this.placeLights(mapDescription.lights);
     }
 
     placeBlood(x, y) {
@@ -101,15 +96,14 @@ export class GameMap {
         );
 
     	this.context.globalCompositeOperation = 'source-over';
-
         
         this.texture.needsUpdate = true;
     }
 
-    #createMapTexture() {
+    #createMapTexture(backgroundImage) {
         const canvas = new OffscreenCanvas(321, 240);
         this.context = canvas.getContext('2d');
-        const textureImage = TextureLoader.get('backgroundNight').image;
+        const textureImage = TextureLoader.get(backgroundImage).image;
         this.context.drawImage(textureImage, 0, 0);
         
         this.texture = new CanvasTexture(canvas);
@@ -117,18 +111,16 @@ export class GameMap {
         this.texture.minFilter = NearestFilter;
     }
 
-    placeLights() {
-        const positions = [
-            [47, -20, 30],
-        ];
-
-        for (const pos of positions) {
-            const light = new Light.PointLight(pos[2], pos[0], pos[1]);
+    placeLights(lightsDescription) {
+        for (const pointLights of lightsDescription.pointLights) {
+            const light = new Light.PointLight(pointLights.size, pointLights.x, pointLights.y);
             light.turnOn();
         }
-        
-        const light = new Light.RectLight(50, 15, 40, 70);
-        light.turnOn();
+
+        for (const rectLights of lightsDescription.rectLights) {
+            const light = new Light.RectLight(rectLights.x, rectLights.y, rectLights.width, rectLights.height);
+            light.turnOn();
+        }
     }
 
     getTravel(startPos, endPos) {
@@ -158,7 +150,7 @@ export class GameMap {
     }
 
     start() {
-        this.player = new Player(this);
+        this.player = new Player(this, this.playerStartPosition);
         this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
 
         this.#addZombi(0);
@@ -176,7 +168,7 @@ export class GameMap {
         const destCell = this.getRandomCell();
         const destPos = destCell.center;
 
-        Bonus.createRandomBonus(destPos, this);
+        Bonus.createRandomBonus(this.bonusChoices, destPos, this);
     }
 
     #addZombi(step) {
@@ -187,44 +179,6 @@ export class GameMap {
         if (Zombi.pool.size >= this.maxZombiesCount) {
             return;
         }
-
-
-        const zones = [
-            // TOP
-            {
-                minX: -78,
-                maxX: 78,
-                minY: 58,
-                maxY: 58,
-            },
-            // BOTTOM
-            {
-                minX: -78,
-                maxX: 78,
-                minY: -58,
-                maxY: -58,
-            },
-            // LEFT
-            {
-                minX: -78,
-                maxX: -78,
-                minY: -58,
-                maxY: 58,
-            },
-            // RIGHT
-            {
-                minX: 78,
-                maxX: 78,
-                minY: -58,
-                maxY: 58,
-            },
-        ];
-
-        const zone = MATH.randomElement(zones);
-        const startX = MATH.randomValue(zone.minX, zone.maxX);
-        const startY = MATH.randomValue(zone.minY, zone.maxY);
-        // const startPosition = { x: startX, y: startY };
-        // const startPosition = {x: 5, y: 0};
 
         const destCell = this.getRandomCell();
 		const startPosition = {x: destCell.center.x, y: destCell.center.y};
@@ -258,29 +212,22 @@ export class GameMap {
         CollisionResolver.removeFromLayer(this, 'MAP');
         this.player.dispose();
         this.sprite.dispose();
-        // this.skySprite.dispose();
         this.upWall.dispose();
         this.bottomWall.dispose();
         this.leftWall.dispose();
         this.rightWall.dispose();
     }
 
-    #buildBlocks() {
+    #buildBlocks(wallsDescription) {
         const blocks = [];
         // Pour DEBUG, correspond au schéma papier
         // blocks.push(new Block(-30, 40, 30, 10));
         // blocks.push(new Block(-10, -10, 50, 10));
         // blocks.push(new Block(-30, -25, 30, 10));
 
-
-        blocks.push(new Block(30, 40, 5, 50));
-        blocks.push(new Block(-70, 40, 5, 50));
-        blocks.push(new Block(-70, 40, 45, 5));
-        blocks.push(new Block(-10, 40, 45, 5));
-        blocks.push(new Block(-70, -10, 45, 5));
-        blocks.push(new Block(-10, -10, 45, 5));
-        blocks.push(new Block(-55, 15, 75, 5));
-        blocks.push(new Block(45, 15, 25, 5));
+        for (const wallDescription of wallsDescription) {
+            blocks.push(new Block(wallDescription.x, wallDescription.y, wallDescription.width, wallDescription.height));
+        }
 
         blocks.push(new InteractiveBlock(this, 45, -20, 5, 5));
 

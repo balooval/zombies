@@ -12,6 +12,15 @@ import {
 import GameOverScreen from './ui/gameOverScreen.js';
 
 let gameLevel;
+let mapDescription;
+
+export function loadMap(fileName) {
+	return fetch(`./assets/${fileName}`)
+	.then(response => response.json())
+	.then(loadedMapDescription => {
+		mapDescription = loadedMapDescription;
+	});
+}
 
 export function getNextLevel() {
 	gameLevel = new GameLevel();
@@ -32,7 +41,7 @@ class GameLevel {
 		AnimationControl.registerToUpdate(Stepper);
 		Renderer.start();
 		AnimationControl.start();
-		this.map = new GameMap();
+		this.map = new GameMap(mapDescription);
 		this.map.start();
 		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
 		Clock.start();

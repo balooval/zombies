@@ -12,7 +12,6 @@ import {
 	PLAYER_MAX_POS_Y,
 	PLAYER_MIN_POS_X,
 	PLAYER_MIN_POS_Y,
-	PLAYER_START_POSITION,
 } from './map/map.js';
 
 import { ActiveWeapon } from './weapons/activeWeapon.js';
@@ -33,14 +32,14 @@ export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
 export class Player {
 
-	constructor(map) {
+	constructor(map, startPosition) {
 		this.evt = new Evt();
 		this.map = map;
 		this.lifePoints = 1;
 		this.acceleration = 0.05;
 		this.moveSpeed = 0.2;
 		this.viewAngle = 0;
-		this.position = PLAYER_START_POSITION;
+		this.position = startPosition;
 		this.inputMoves = {
 			left: 0,
 			right: 0,
