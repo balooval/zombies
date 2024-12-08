@@ -154,17 +154,22 @@ class LightCanvas {
 		const photonsCount = dist / distanceByPhoton;
 		const lerpStep = 1 / photonsCount;
 
-		let startRadius = 2;
+		let startRadius = 3;
 		let alpha = 1;
-		const decay = 0.88;
+		const decay = 0.92;
+		const diffusion = 1.03;
 
 		// this.contextDynamicLights.globalCompositeOperation = 'lighter';
 
 		for (let i = 0; i < photonsCount; i ++) {
 			const pos = MATH.lerpPoint(segment[0], segment[1], lerpStep * i);
 			this.#drawPoint(pos[0], pos[1], `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`, startRadius);
-			startRadius *= 1.06;
+			startRadius *= diffusion;
 			alpha *= decay;
+			
+			if (alpha < 0.001) {
+				break;
+			}
 		}
 
 		// this.contextDynamicLights.globalCompositeOperation = 'source-over';

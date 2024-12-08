@@ -63,16 +63,18 @@ class InteractiveBlock {
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         InteractivePopup.hide();
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        this.touchedPlayer = false;
     }
 
     onKeyDown() {
         if (this.lightAreOn === true) {
             return;
         }
-
-        this.lights.forEach(light => light.turnOn());
-
+        
+        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
         Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        
+        this.lights.forEach(light => light.turnOn());
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
         this.lightAreOn = true;
 
@@ -80,7 +82,6 @@ class InteractiveBlock {
     }
 
     turnOff() {
-        console.log('turnOff');
         Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
         this.lights.forEach(light => light.turnOff());
         this.lightAreOn = false;
@@ -88,7 +89,11 @@ class InteractiveBlock {
     }
 
     #onPlayerTouch(players) {
-        const player = players.pop();
+
+        if (this.touchedPlayer === false) {
+            Input.evt.addEventListener('DOWN_69', this, this.onKeyDown);
+        }
+        
         this.touchedPlayer = true;
 
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
@@ -97,8 +102,6 @@ class InteractiveBlock {
         InteractivePopup.setContent('<b>E</b> pour allumer');
         InteractivePopup.display();
         InteractivePopup.place(this.centerX, this.centerY);
-
-        Input.evt.addEventListener('DOWN_69', this, this.onKeyDown);
     }
 }
 
