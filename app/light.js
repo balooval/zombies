@@ -48,30 +48,7 @@ class Light {
 	}
 	
 	buildMesh(width, height, textureId) {
-		this.geometry = new BufferGeometry();
-		
-		const vertices = new Float32Array( [
-			-0.5 * width, -0.5 * height, 0,
-			0.5 * width, -0.5 * height, 0,
-			0.5 * width, 0.5 * height, 0,
-			-0.5 * width, 0.5 * height, 0,
-		] );
-		
-		const indices = [
-			0, 1, 2,
-			2, 3, 0,
-		];
-
-		this.geometry.setIndex(indices);
-		this.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-        this.geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-			0, 0,
-			1, 0,
-			1, 1,
-			0, 1,
-		]), 2));
-
+		this.geometry = Renderer.buildRectangleGeometry(width, height)
         const lightMaterial = getLightMaterial(textureId);
 		this.mesh = new Mesh(this.geometry, lightMaterial);
 	}

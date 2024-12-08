@@ -302,7 +302,7 @@ export function drawRotatedImage(context, image, angle, posX, posY, destW, destH
 }
 
 function buildBufferLightMesh(width, height) {
-	const geometry = buildScreenGeometry(width, height);
+	const geometry = buildRectangleGeometry(width, height);
 
 	const material = new MeshBasicMaterial({opacity: 1, color: 0x000000, transparent: true});
 
@@ -311,7 +311,7 @@ function buildBufferLightMesh(width, height) {
 
 
 function buildFinalMesh(width, height) {
-	const geometry = buildScreenGeometry(width, height);
+	const geometry = buildRectangleGeometry(width, height);
 	
 	const materialTest = new MeshBasicMaterial({opacity: 1, map: fogOutput.texture, transparent: true});
 
@@ -332,7 +332,7 @@ function buildFinalMesh(width, height) {
 }
 
 function buildFogMesh(width, height) {
-	const geometry = buildScreenGeometry(width, height);
+	const geometry = buildRectangleGeometry(width, height);
 
 	const uniforms = {
 		// emiterPos: { type: "t", value: new Vector2(0, 0)},
@@ -356,7 +356,7 @@ function buildFogMesh(width, height) {
 	return new Mesh(geometry, material);
 }
 
-function buildScreenGeometry(width, height) {
+export function buildRectangleGeometry(width, height) {
 	const geometry = new BufferGeometry();
 		
 	const vertices = new Float32Array([

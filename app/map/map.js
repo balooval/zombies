@@ -6,7 +6,6 @@ import * as Renderer from '../renderer.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
 import * as TextureLoader from '../net/loaderTexture.js';
-import * as Walls from './walls.js';
 import * as Zombi from '../zombi/zombi.js';
 
 import { CanvasTexture, NearestFilter, Vector2 } from '../../vendor/three.module.js';
@@ -51,10 +50,6 @@ export class GameMap {
 
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
-        this.leftWall = new Walls.LeftWall(GROUND_POSITION);
-        this.rightWall = new Walls.RightWall(GROUND_POSITION);
-        this.upWall = new Walls.UpWall();
-        this.bottomWall = new Walls.BottomWall();
         this.player = null;
         this.playerStartPosition = new Vector2(mapDescription.playerStartPosition.x, mapDescription.playerStartPosition.y);
 
@@ -65,7 +60,7 @@ export class GameMap {
         this.addZombiRate = mapDescription.addZombiRate;
         this.maxZombiesCount = mapDescription.maxZombiesCount;
 
-        this.blocks = this.#buildBlocks(mapDescription.walls);
+        this.blocks = this.#buildBlocks(mapDescription.blocks);
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
 
@@ -212,24 +207,22 @@ export class GameMap {
         CollisionResolver.removeFromLayer(this, 'MAP');
         this.player.dispose();
         this.sprite.dispose();
-        this.upWall.dispose();
-        this.bottomWall.dispose();
-        this.leftWall.dispose();
-        this.rightWall.dispose();
     }
 
-    #buildBlocks(wallsDescription) {
+    #buildBlocks(blocksDescription) {
         const blocks = [];
         // Pour DEBUG, correspond au schéma papier
         // blocks.push(new Block(-30, 40, 30, 10));
         // blocks.push(new Block(-10, -10, 50, 10));
         // blocks.push(new Block(-30, -25, 30, 10));
 
-        for (const wallDescription of wallsDescription) {
-            blocks.push(new Block(wallDescription.x, wallDescription.y, wallDescription.width, wallDescription.height));
+        for (const wall of blocksDescription.walls) {
+            blocks.push(new Block(wall.x, wall.y, wall.width, wall.height));
         }
 
-        blocks.push(new InteractiveBlock(this, 45, -20, 5, 5));
+        for (const interactiveBlock of blocksDescription.interactiveBlocks) {
+            blocks.push(new InteractiveBlock(this, interactiveBlock.x, interactiveBlock.y, interactiveBlock.width, interactiveBlock.height));
+        }
 
         return blocks;
     }

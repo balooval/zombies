@@ -107,7 +107,7 @@ export class StillSprite extends SpriteBase {
 	}
 	
 	buildMesh(width, height, texture) {
-		this.geometry = buildFlatMesh(width, height);
+		this.geometry = Renderer.buildRectangleGeometry(width, height);
 		const material = new MeshBasicMaterial({opacity: 1, color:0xffffff, map: texture, transparent: true});
 		return new Mesh(this.geometry, material);
 	}
@@ -174,7 +174,7 @@ export class AnimatedSprite extends SpriteBase {
 	}
 	
 	buildMesh(width, height, animationId) {
-		this.geometry = buildFlatMesh(width, height);
+		this.geometry = Renderer.buildRectangleGeometry(width, height);
 
 		const material = getSpriteMaterial(animationId);
 		
@@ -190,7 +190,7 @@ export class AnimatedSprite extends SpriteBase {
 export class FlatRectangleSprite {
 
 	constructor(render, x, y, width, height, color) {
-		this.mesh = new Mesh(buildFlatMesh(width, height), getColorMaterial(color));
+		this.mesh = new Mesh(Renderer.buildRectangleGeometry(width, height), getColorMaterial(color));
 		this.render = render;
 		this.depthPosition = 1;
 		this.mesh.material = getColorMaterial(color);
@@ -264,7 +264,7 @@ export class FlatSprite {
 	}
 }
 
-let flatGeometry = buildFlatMesh(1, 1);
+let flatGeometry = Renderer.buildRectangleGeometry(1, 1);
 const colorMaterials = new Map();
 
 // 0xf5e042
@@ -278,32 +278,4 @@ function getColorMaterial(color) {
 	colorMaterials.set(color, material);
 
 	return material;
-}
-
-function buildFlatMesh(width, height) {
-	const geometry = new BufferGeometry();
-	
-	const vertices = new Float32Array( [
-		-0.5 * width, -0.5 * height, 0,
-		0.5 * width, -0.5 * height, 0,
-		0.5 * width, 0.5 * height, 0,
-		-0.5 * width, 0.5 * height, 0,
-	] );
-	
-	const indices = [
-		0, 1, 2,
-		2, 3, 0,
-	];
-
-	geometry.setIndex(indices);
-	geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-	geometry.setAttribute('uv', new BufferAttribute(new Float32Array([
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	]), 2));
-	
-	return geometry;
 }
