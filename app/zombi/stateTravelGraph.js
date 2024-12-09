@@ -1,4 +1,7 @@
+import * as SpriteFactory from '../spriteFactory.js';
+
 import BloodDropping from './bloodDropping.js';
+import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js';
 import Hitbox from '../collisionHitbox.js';
 import Move from './move.js';
@@ -14,7 +17,23 @@ class StateTravelGraph extends State {
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		
 		this.travelPoints = [];
-		this.setSprite(8, 8, 'zombiWalk');
+
+
+		const compositeSprite = new CompositeSprite();
+		const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
+		const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
+		const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
+		const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
+		compositeSprite.addSprite('base', tronc);
+		compositeSprite.addSprite('cou', cou);
+		compositeSprite.addSprite('life2', brain);
+		compositeSprite.addSprite('life3', crane);
+		compositeSprite.hide();
+		compositeSprite.setPosition(position);
+		this.sprite = compositeSprite;
+
+
+		// this.setSprite(8, 8, 'zombiWalk');
 
 		this.translation = new Translation();
 
@@ -27,6 +46,10 @@ class StateTravelGraph extends State {
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
 		this.test = 0;
+	}
+
+	removeSpriteLayer(name) {
+		this.sprite.removeSprite(name);
 	}
 
 	setEntity(entity) {
@@ -62,7 +85,7 @@ class StateTravelGraph extends State {
 		this.entity.setState('FOLLOW');
 	}
 
-	takeDamage(vector, damageCount) {
+	takeDamage(vector, damageCount) {		
 		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}

@@ -26,6 +26,60 @@ function getSpriteMaterial(animationId) {
 	return material;
 }
 
+export class CompositeSprite {
+
+	constructor() {
+		this.angle = 0;
+		this.position = {x: 0, y: 0};
+		this.sprites = new Map();
+	}
+
+	addSprite(name, sprite) {
+		this.sprites.set(name, sprite);
+	}
+	
+	removeSprite(name) {
+		const spriteToDelete = this.sprites.get(name);
+		if (spriteToDelete === undefined) {
+			return;
+		}
+		spriteToDelete.dispose();
+		this.sprites.delete(name);
+	}
+
+	getPosition() {
+		return this.position;
+	}
+
+	display() {
+		this.sprites.forEach(sprite => sprite.display());
+	}
+
+	hide() {
+		this.sprites.forEach(sprite => sprite.hide());
+	}
+
+	setPosition(x, y) {
+		this.position.x = x;
+		this.position.y = y;
+
+		this.sprites.forEach(sprite => sprite.setPosition(this.position.x, this.position.y));
+	}
+
+	setRotation(angle) {
+		this.angle = angle;
+		this.sprites.forEach(sprite => sprite.setRotation(this.angle));
+	}
+
+	getRotation() {
+		return this.angle;
+	}
+
+	dispose() {
+		this.sprites.forEach(sprite => sprite.dispose());
+	}
+}
+
 export class SpriteBase {
 
 	constructor() {

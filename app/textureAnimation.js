@@ -166,6 +166,38 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'zombiWalk',
 		frames: [],
 	},
+	zombiHitCrane: {
+		textureId: 'zombiHitCrane',
+		frames: [],
+	},
+	zombiHitBrain: {
+		textureId: 'zombiHitBrain',
+		frames: [],
+	},
+	zombiHitCou: {
+		textureId: 'zombiHitCou',
+		frames: [],
+	},
+	zombiHitTronc: {
+		textureId: 'zombiHitTronc',
+		frames: [],
+	},
+	zombiWalkCrane: {
+		textureId: 'zombiWalkCrane',
+		frames: [],
+	},
+	zombiWalkBrain: {
+		textureId: 'zombiWalkBrain',
+		frames: [],
+	},
+	zombiWalkCou: {
+		textureId: 'zombiWalkCou',
+		frames: [],
+	},
+	zombiWalkTronc: {
+		textureId: 'zombiWalkTronc',
+		frames: [],
+	},
 	zombiAtack: {
 		textureId: 'zombiWalk',
 		frames: [],
@@ -313,6 +345,46 @@ const animations = {
 	},
 	zombiWalk: {
 		spriteSheet: 'zombiWalk',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiHitCrane: {
+		spriteSheet: 'zombiHitCrane',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitBrain: {
+		spriteSheet: 'zombiHitBrain',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitCou: {
+		spriteSheet: 'zombiHitCou',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitTronc: {
+		spriteSheet: 'zombiHitTronc',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiWalkCrane: {
+		spriteSheet: 'zombiWalkCrane',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkCou: {
+		spriteSheet: 'zombiWalkCou',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkTronc: {
+		spriteSheet: 'zombiWalkTronc',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkBrain: {
+		spriteSheet: 'zombiWalkBrain',
 		stepsByFrame: 15,
 		framesToDisplay: [0, 1, 2, 3],
 	},

@@ -25,7 +25,7 @@ export class Zombi extends EntityWithStates{
 	constructor(states, map) {
 		super(states);
 		this.map = map;
-		this.life = 2;
+		this.life = 3;
 		this.hitCooldown = 0;
 	}
 
@@ -52,9 +52,16 @@ export class Zombi extends EntityWithStates{
 			return;
 		}
 		
+		this.removeSpriteLayer();
 		this.hitCooldown = 10;
 		this.life -= damageCount;
 		this.currentState.takeDamage(vector, damageCount);
+
+	}
+
+	removeSpriteLayer() {
+		const roundLife = Math.ceil(this.life + 1);
+		this.states.forEach(state => state.removeSpriteLayer(`life${roundLife}`));
 	}
 
 	dispose() {
