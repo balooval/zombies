@@ -43,7 +43,6 @@ class LightCanvas {
 		this.contextDynamicLights = this.canvasDynamicLights.getContext('2d');
 		this.contextDynamicLights.fillStyle = '#000000';
 		this.contextDynamicLights.fillRect(0, 0, this.width, this.height);
-
 		
 		AnimationControl.registerToUpdate(this);
 	}
@@ -106,6 +105,10 @@ class LightCanvas {
 		const angleStep = spotLight.fovAngle / raysCount;
 		const lightDistance = 100;
 
+		const polygon = [
+			[spotLight.posX, spotLight.posY]
+		];
+
 		for (let i = 0; i < raysCount; i ++) {
 			const curAngle = spotLight.angle - (spotLight.fovAngle * 0.5) + (angleStep * i);
 
@@ -118,8 +121,25 @@ class LightCanvas {
 
 			const hitPoint = this.#getNearestHit(hitSegment, [hitSegment.destX, hitSegment.destY]);
 			
-			this.#drawRay([[spotLight.posX, spotLight.posY], hitPoint], spotLight.color);
+			// if (i === 0 || i === raysCount - 1) {
+				// this.#drawRay([[spotLight.posX, spotLight.posY], hitPoint], spotLight.color);
+			// }
+
+			polygon.push(hitPoint);
 		}
+
+		const spotGradient = this.contextDynamicLights.createRadialGradient(
+			this.#toLocalX(spotLight.posX),
+			this.#toLocalY(spotLight.posY),
+			2,
+			this.#toLocalX(spotLight.posX),
+			this.#toLocalY(spotLight.posY),
+			lightDistance * 2
+		);
+		spotGradient.addColorStop(0, 'rgba(255, 255, 250, 1)');
+		spotGradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+		// this.contextDynamicLights.filter = "blur(4px)";
+		this.#fillPolygon(polygon, spotGradient);
 	}
 
 	#getNearestHit(hitSegment, defaultEnd) {
@@ -146,6 +166,19 @@ class LightCanvas {
 		}
 
 		return [zombiHit.point.x, zombiHit.point.y];
+	}
+
+	#fillPolygon(polygon, color) {
+		const points = [...polygon];
+		this.contextDynamicLights.fillStyle = color;
+		this.contextDynamicLights.beginPath();
+		const start = points.shift();
+		this.contextDynamicLights.moveTo(this.#toLocalX(start[0]), this.#toLocalY(start[1]));
+		for (const point of points) {
+			this.contextDynamicLights.lineTo(this.#toLocalX(point[0]), this.#toLocalY(point[1]));
+		}
+		this.contextDynamicLights.closePath();
+		this.contextDynamicLights.fill();
 	}
 
 	#drawRay(segment, color) {
