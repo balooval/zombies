@@ -6,7 +6,9 @@ import Translation from '../translation.js';
 
 class Move {
 	constructor(moveSpeed, position) {
+		this.speedBase = moveSpeed;
 		this.moveSpeed = moveSpeed;
+		this.speedStep = 0;
 		this.position = position;
 		this.moveTranslation = new Translation();
 		this.destX = 0;
@@ -21,6 +23,9 @@ class Move {
 	}
 
 	update() {
+		this.speedStep += 0.1;
+		this.moveSpeed = (this.speedBase * 0.5) + ((Math.sin(this.speedStep) + 1) * 0.5) * this.speedBase;
+
 		const translationX = Math.cos(this.moveTranslation.angle);
 		const translationY = Math.sin(this.moveTranslation.angle);
 

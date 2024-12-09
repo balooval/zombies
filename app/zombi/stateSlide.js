@@ -9,20 +9,20 @@ class StateSlide extends Slide {
 		super(position, map);
 		this.id = 'SLIDE';
 		this.hitable = new Hitable(map);
-		// this.setSprite(8, 8, 'zombiHit');
+		this.setSprite(12, 12, 'zombiVioletHit');
 
-		const compositeSprite = new CompositeSprite();
-		const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitTronc');
-		const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitCou');
-		const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitBrain');
-		const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitCrane');
-		compositeSprite.addSprite('base', tronc);
-		compositeSprite.addSprite('cou', cou);
-		compositeSprite.addSprite('life2', brain);
-		compositeSprite.addSprite('life3', crane);
-		compositeSprite.hide();
-		compositeSprite.setPosition(position);
-		this.sprite = compositeSprite;
+		// const compositeSprite = new CompositeSprite();
+		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitTronc');
+		// const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitCou');
+		// const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitBrain');
+		// const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitCrane');
+		// compositeSprite.addSprite('base', tronc);
+		// compositeSprite.addSprite('cou', cou);
+		// compositeSprite.addSprite('life2', brain);
+		// compositeSprite.addSprite('life3', crane);
+		// compositeSprite.hide();
+		// compositeSprite.setPosition(position);
+		// this.sprite = compositeSprite;
 	}
 
 	removeSpriteLayer(name) {

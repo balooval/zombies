@@ -104,6 +104,10 @@
 			"url": "assets/pointer.png"
 		},
 		{
+			"id": "zombiVioletWalk",
+			"url": "assets/zombi-violet.png"
+		},
+		{
 			"id": "zombiWalk",
 			"url": "assets/zombi.png"
 		},

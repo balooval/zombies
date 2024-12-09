@@ -20,20 +20,20 @@ class StateFollow extends State {
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 
 
-		const compositeSprite = new CompositeSprite();
-		const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
-		const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
-		const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
-		const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
-		compositeSprite.addSprite('base', tronc);
-		compositeSprite.addSprite('cou', cou);
-		compositeSprite.addSprite('life2', brain);
-		compositeSprite.addSprite('life3', crane);
-		compositeSprite.hide();
-		compositeSprite.setPosition(position);
-		this.sprite = compositeSprite;
+		// const compositeSprite = new CompositeSprite();
+		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
+		// const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
+		// const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
+		// const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
+		// compositeSprite.addSprite('base', tronc);
+		// compositeSprite.addSprite('cou', cou);
+		// compositeSprite.addSprite('life2', brain);
+		// compositeSprite.addSprite('life3', crane);
+		// compositeSprite.hide();
+		// compositeSprite.setPosition(position);
+		// this.sprite = compositeSprite;
 
-		// this.setSprite(8, 8, 'zombiWalk');
+		this.setSprite(10, 10, 'zombiVioletWalk');
 
 
 		this.translation = new Translation();
@@ -116,8 +116,6 @@ class StateFollow extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.sprite.removeSprite('layerB');
-		
 		this.hitable.hit(damageCount, this.position);
 		this.entity.setState('SLIDE', vector);
 	}

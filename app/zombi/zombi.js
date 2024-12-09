@@ -52,7 +52,7 @@ export class Zombi extends EntityWithStates{
 			return;
 		}
 		
-		this.removeSpriteLayer();
+		// this.removeSpriteLayer();
 		this.hitCooldown = 10;
 		this.life -= damageCount;
 		this.currentState.takeDamage(vector, damageCount);

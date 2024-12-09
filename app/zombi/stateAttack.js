@@ -11,7 +11,8 @@ class StateAttack extends State {
 		super(position);
 
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
-		this.setSprite(8, 8, 'zombiAtack');
+		// this.setSprite(8, 8, 'zombiAtack');
+		this.setSprite(10, 10, 'zombiVioletAtack');
 		this.hitable = new Hitable(map);
 
 	}
@@ -29,7 +30,7 @@ class StateAttack extends State {
         this.sprite.setRotation(angle);
 
 		this.hitable.enable();
-        this.sprite.textureAnimation.setAnimation('zombiAtack');
+        this.sprite.textureAnimation.setAnimation('zombiVioletAtack');
         this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.onAnimationEnd);
         this.sprite.textureAnimation.evt.addEventListener(`FRAME_${2}`, this, this.onAnimationStartHit);
         this.sprite.textureAnimation.evt.addEventListener(`FRAME_${3}`, this, this.onAnimationStopHit);

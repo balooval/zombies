@@ -19,20 +19,20 @@ class StateTravelGraph extends State {
 		this.travelPoints = [];
 
 
-		const compositeSprite = new CompositeSprite();
-		const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
-		const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
-		const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
-		const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
-		compositeSprite.addSprite('base', tronc);
-		compositeSprite.addSprite('cou', cou);
-		compositeSprite.addSprite('life2', brain);
-		compositeSprite.addSprite('life3', crane);
-		compositeSprite.hide();
-		compositeSprite.setPosition(position);
-		this.sprite = compositeSprite;
+		// const compositeSprite = new CompositeSprite();
+		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
+		// const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
+		// const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
+		// const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
+		// compositeSprite.addSprite('base', tronc);
+		// compositeSprite.addSprite('cou', cou);
+		// compositeSprite.addSprite('life2', brain);
+		// compositeSprite.addSprite('life3', crane);
+		// compositeSprite.hide();
+		// compositeSprite.setPosition(position);
+		// this.sprite = compositeSprite;
 
-
+		this.setSprite(10, 10, 'zombiVioletWalk');
 		// this.setSprite(8, 8, 'zombiWalk');
 
 		this.translation = new Translation();

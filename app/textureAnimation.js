@@ -162,6 +162,18 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'screenGameOver',
 		frames: [],
 	},
+	zombiVioletWalk: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
+	zombiVioletAtack: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
+	zombiVioletHit: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
 	zombiWalk: {
 		textureId: 'zombiWalk',
 		frames: [],
@@ -342,6 +354,21 @@ const animations = {
 		spriteSheet: 'screenGameOver',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
+	},
+	zombiVioletWalk: {
+		spriteSheet: 'zombiVioletWalk',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiVioletAtack: {
+		spriteSheet: 'zombiVioletAtack',
+		stepsByFrame: 15,
+		framesToDisplay: [4, 4, 5, 4],
+	},
+	zombiVioletHit: {
+		spriteSheet: 'zombiVioletHit',
+		stepsByFrame: -1,
+		framesToDisplay: [6],
 	},
 	zombiWalk: {
 		spriteSheet: 'zombiWalk',
