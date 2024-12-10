@@ -42,7 +42,7 @@ class StateTravelGraph extends State {
 
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable(map);
-		this.playerFinder = new PlayerFinder(player, this.map);
+		this.playerFinder = new PlayerFinder(player, this.map, 1.5);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
 		this.test = 0;
@@ -86,7 +86,7 @@ class StateTravelGraph extends State {
 	}
 
 	takeDamage(vector, damageCount) {		
-		this.hitable.hit(damageCount, this.position);
+		this.hitable.hit(damageCount, this.position, vector);
 		this.entity.setState('SLIDE', vector);
 	}
 

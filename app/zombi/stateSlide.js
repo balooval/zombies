@@ -38,7 +38,7 @@ class StateSlide extends Slide {
 		const params = {
 			velocityX: vector.x,
 			velocityY: vector.y,
-			friction: 0.85,
+			friction: 0.80,
 		}
 		super.start(params);
 		this.hitable.enable();
@@ -55,11 +55,11 @@ class StateSlide extends Slide {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position);
+		this.hitable.hit(damageCount, this.position, vector);
 		this.slide({
 			velocityX: vector.x,
 			velocityY: vector.y,
-			friction: 0.85,
+			friction: 0.80,
 		});
 	}
 

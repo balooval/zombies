@@ -72,7 +72,7 @@ class StateAttack extends State {
     }
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position);
+		this.hitable.hit(damageCount, this.position, vector);
 		this.entity.setState('SLIDE', vector);
 	}
 

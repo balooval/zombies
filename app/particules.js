@@ -1,17 +1,19 @@
+import * as AnimationControl from './animationControl.js';
+import * as MATH from './utils/math.js';
+import * as SpriteFactory from './spriteFactory.js';
+
+import {
+	randomDiff,
+	randomElement,
+	randomFloat,
+	randomValue,
+} from './utils/math.js';
+
+import Interval from './utils/interval.js';
 import {
 	Vector2
 } from '../vendor/three.module.js';
-import * as AnimationControl from './animationControl.js';
-import * as SpriteFactory from './spriteFactory.js';
 import {randomDirection} from './utils/math.js';
-import {
-	randomElement,
-	randomValue,
-	randomFloat,
-	randomDiff,
-} from './utils/math.js';
-import Interval from './utils/interval.js';
-import * as MATH from './utils/math.js';
 
 export const BLOOD_WALK = 'BLOOD_WALK';
 export const ENNEMI_HIT = 'ENNEMI_HIT';

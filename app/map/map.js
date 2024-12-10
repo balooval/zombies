@@ -100,6 +100,47 @@ export class GameMap {
         this.texture.needsUpdate = true;
     }
 
+    spreadBlood(x, y, quantity, vector) {
+        const spreadAngle = 0.5;
+        const angle = Math.atan2(vector.y, vector.x);
+        const raysCount = quantity * 5;
+		const distance = MATH.distance(vector, {x: 0, y: 0}) * 3;
+        const distByDrop = quantity;
+
+		for (let i = 0; i <= raysCount; i ++) {
+			const curAngle = MATH.randomDiff(angle, spreadAngle);
+            const curDist = MATH.randomDiff(distByDrop, distByDrop * 0.4);
+            const stepX = Math.cos(curAngle) * curDist;
+            const stepY = Math.sin(curAngle) * curDist;
+            let alpha = 1;
+            let size = 1;
+            
+            for (let i = 0; i < distance; i += distByDrop) {
+                if (Math.random() > 0.9) {
+                    continue;
+                }
+                const dropX = x + stepX * i;
+                const dropY = y + stepY * i;
+                const color = MATH.randomElement([`rgba(181, 32, 22, ${alpha})`, `rgba(128, 37, 31, ${alpha})`]);
+                this.#drawBloodDrop(dropX, dropY, size, color);
+                alpha *= 0.8;
+                size *= 0.9;
+            }
+        }
+
+    	this.context.globalCompositeOperation = 'source-over';
+        
+        this.texture.needsUpdate = true;
+    }
+
+    #drawBloodDrop(x, y, radius, color) {
+        this.context.fillStyle = color;
+        this.context.beginPath();
+        this.context.arc(Renderer.toCustomLocalX(x, 320), Renderer.toCustomLocalY(y, 240), radius, 0, Math.PI * 2);
+        this.context.closePath();
+        this.context.fill();
+    }
+
     #createMapTexture(backgroundImage) {
         const canvas = new OffscreenCanvas(320, 240);
         this.context = canvas.getContext('2d');

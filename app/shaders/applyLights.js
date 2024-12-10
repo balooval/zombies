@@ -17,8 +17,8 @@ uniform sampler2D fogMap;
 varying vec2 vPos;
 
 void main() {
-    vec4 lightColor = 0.05 + texture2D(lightMap, vUv) * 1.2;
-    // vec4 lightColor = vec4(1.0);
+    // vec4 lightColor = 0.05 + texture2D(lightMap, vUv) * 1.2;
+    vec4 lightColor = vec4(1.0);
     vec4 fogColor = texture2D(fogMap, vUv);
     vec4 bgColor = texture2D(bgMap, vUv);
 

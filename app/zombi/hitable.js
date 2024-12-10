@@ -22,11 +22,12 @@ class Hitable {
 		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
 	}
 	
-	hit(damageCount, position) {
-		Particules.createBloodSplat(this.entity.currentState.position)
+	hit(damageCount, position, vector) {
+		// Particules.createBloodSplat(this.entity.currentState.position)
 		setTimeout(() => SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']), 100);
 
-		this.map.placeBlood(position.x, position.y);
+		// this.map.placeBlood(position.x, position.y);
+		this.map.spreadBlood(position.x, position.y, damageCount, vector);
 	}
 
 	dispose() {
