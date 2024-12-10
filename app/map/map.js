@@ -201,8 +201,8 @@ export class GameMap {
         return this.hitBox;
     }
 
-    getWallsIntersections(segment) {
-        const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox)).filter(res => res);
+    getWallsIntersections(segment, margin = 0) {
+        const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox, margin)).filter(res => res);
 
         const wallHitsWithDistance = wallHits.map(position => {
             return {

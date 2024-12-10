@@ -34,12 +34,7 @@
         "interactiveBlocks": [],
 
         "walls": [
-            {
-                "x": -10,
-                "y": -10,
-                "width": 45,
-                "height": 5
-            },
+           
             {
                 "x": -55,
                 "y": 15,

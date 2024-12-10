@@ -3,8 +3,8 @@ import {
     segmentIntersection,
 } from './utils/math.js';
 
-export function getIntersection(translation, hitbox) {
-    const hitboxSegments = hitbox.getSegments();
+export function getIntersection(translation, hitbox, margin = 0) {
+    const hitboxSegments = hitbox.getSegments(margin);
     
     return hitboxSegments.map(segment => {
         const intersection = segmentIntersection(
