@@ -37,7 +37,7 @@ class StateTravelGraph extends State {
 
 		this.translation = new Translation();
 
-		this.zombieMove = new Move(0.1, this.position);
+		this.zombieMove = new Move(0.1, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
 
 		this.bloodDropping = new BloodDropping();

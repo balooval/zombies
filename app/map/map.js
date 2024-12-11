@@ -44,11 +44,17 @@ export const PLAYER_MAX_POS_Y = 55;
 export class GameMap {
     constructor(mapDescription) {
         this.evt = new Evt();
- 
+
+        this.mapDescription = mapDescription;
         this.texture = null;
+        this.canvas = null;
         this.context = null;
         this.#createMapTexture(mapDescription.backgroundImage);
         this.sprite = SpriteFactory.createStillSprite(0, 0, 160, 120, this.texture);
+
+        this.bloodCanvas = new OffscreenCanvas(320, 240);
+        this.bloodContext = this.bloodCanvas.getContext('2d', {willReadFrequently: true});
+        this.bloodPixels = null;
 
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
@@ -75,32 +81,36 @@ export class GameMap {
 
         this.placeLights(mapDescription.lights);
         this.placeFog(mapDescription.fog);
+
+        // this.spreadBlood(40, 0, 2, {x:2, y:0});
     }
 
-    placeBlood(x, y) {
+    placeBlood(x, y, size) {
         const textureId = MATH.randomElement(['bloodSplash', 'bloodSplashB'])
         const textureImage = TextureLoader.get(textureId).image;
         const angle = MATH.randomDirection(3);
-        const size = MATH.randomDiff(16, 4);
 
-        this.context.globalCompositeOperation = 'overlay';
+        // this.context.globalCompositeOperation = 'overlay';
         
         Renderer.drawRotatedImage(
-            this.context,
+            this.bloodContext,
             textureImage,
             angle,
-            Renderer.toCustomLocalX(x, 320),
-            Renderer.toCustomLocalY(y, 240),
+            x,
+            y,
             size,
             size
         );
 
-    	this.context.globalCompositeOperation = 'source-over';
+    	// this.bloodContext.globalCompositeOperation = 'source-over';
         
         this.texture.needsUpdate = true;
     }
 
     spreadBlood(x, y, quantity, vector) {
+        if (quantity <= 0) {
+            return;
+        }
         const spreadAngle = 0.5;
         const angle = Math.atan2(vector.y, vector.x);
         const raysCount = quantity * 5;
@@ -121,33 +131,82 @@ export class GameMap {
                 }
                 const dropX = x + stepX * i;
                 const dropY = y + stepY * i;
-                const color = MATH.randomElement([`rgba(181, 32, 22, ${alpha})`, `rgba(128, 37, 31, ${alpha})`]);
-                this.#drawBloodDrop(dropX, dropY, size, color);
+                const color = MATH.randomElement([
+                    `rgba(181, 32, 22, ${alpha})`,
+                    `rgba(128, 37, 31, ${alpha})`,
+                    `rgba(150, 44, 36, ${alpha})`,
+                ]);
+                this.#drawBloodDrop(Renderer.toCustomLocalX(dropX, 320), Renderer.toCustomLocalY(dropY, 240), size, color);
                 alpha *= 0.8;
                 size *= 0.9;
             }
         }
 
-    	this.context.globalCompositeOperation = 'source-over';
-        
-        this.texture.needsUpdate = true;
+        this.#drawBloodIntoBackground();
+
     }
 
     #drawBloodDrop(x, y, radius, color) {
-        this.context.fillStyle = color;
-        this.context.beginPath();
-        this.context.arc(Renderer.toCustomLocalX(x, 320), Renderer.toCustomLocalY(y, 240), radius, 0, Math.PI * 2);
-        this.context.closePath();
-        this.context.fill();
+        this.bloodContext.fillStyle = color;
+        this.bloodContext.beginPath();
+        this.bloodContext.arc(x, y, radius, 0, Math.PI * 2);
+        this.bloodContext.closePath();
+        this.bloodContext.fill();
     }
 
+    #drawBloodIntoBackground() {
+        this.bloodPixels = this.bloodContext.getImageData(0, 0, 320, 240).data;
+        
+        const textureImage = TextureLoader.get(this.mapDescription.backgroundImage).image;
+        this.context.drawImage(textureImage, 0, 0);
+        this.context.globalCompositeOperation = 'overlay';
+        this.context.drawImage(this.bloodCanvas, 0, 0);
+    	this.context.globalCompositeOperation = 'source-over';
+
+        this.texture.needsUpdate = true;
+    }
+
+    checkBlood(translation) {
+        if (this.bloodPixels === null) {
+            return;
+        }
+
+        if (translation.length === 0) {
+            return;
+        }
+
+        const localX = Math.round(Renderer.toCustomLocalX(translation.startX, 320));
+        const localY = Math.round(Renderer.toCustomLocalY(translation.startY, 240));
+        const color = this.#getColorIndicesForCoord(localX, localY);
+        
+        if (color[3] < 10) {
+            return;
+        }
+
+        this.bloodContext.globalCompositeOperation = 'destination-out';
+        this.#drawBloodDrop(localX, localY, 0.3, `rgba(255, 0, 0, 1)`);
+        this.bloodContext.globalCompositeOperation = 'source-over';
+
+        const destX = MATH.randomDiff(Math.round(Renderer.toCustomLocalX(translation.destX, 320)), 2);
+        const destY = MATH.randomDiff(Math.round(Renderer.toCustomLocalY(translation.destY, 240)), 2);
+
+        this.#drawBloodDrop(destX, destY, 0.5, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`);
+
+        this.#drawBloodIntoBackground();
+    }
+
+    #getColorIndicesForCoord (x, y) {
+        const red = y * (320 * 4) + x * 4;
+        return [this.bloodPixels[red + 0], this.bloodPixels[red + 1], this.bloodPixels[red + 2], this.bloodPixels[red + 3]];
+    };
+
     #createMapTexture(backgroundImage) {
-        const canvas = new OffscreenCanvas(320, 240);
-        this.context = canvas.getContext('2d');
+        this.canvas = new OffscreenCanvas(320, 240);
+        this.context = this.canvas.getContext('2d');
         const textureImage = TextureLoader.get(backgroundImage).image;
         this.context.drawImage(textureImage, 0, 0);
         
-        this.texture = new CanvasTexture(canvas);
+        this.texture = new CanvasTexture(this.canvas);
         this.texture.magFilter = NearestFilter;
         this.texture.minFilter = NearestFilter;
     }

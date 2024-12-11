@@ -26,7 +26,6 @@ class Hitable {
 		// Particules.createBloodSplat(this.entity.currentState.position)
 		setTimeout(() => SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']), 100);
 
-		// this.map.placeBlood(position.x, position.y);
 		this.map.spreadBlood(position.x, position.y, damageCount, vector);
 	}
 

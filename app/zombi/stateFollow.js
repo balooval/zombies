@@ -42,7 +42,7 @@ class StateFollow extends State {
 		this.playerFinder = new PlayerFinder(this.entitieToReach, map, 1.5);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
 
-		this.zombieMove = new Move(0.2, this.position);
+		this.zombieMove = new Move(0.2, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.onReachDestination);
 	}
 

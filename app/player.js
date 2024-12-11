@@ -63,12 +63,12 @@ export class Player {
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
-		// const baseWeapon = new RayLauncher(this.map);
+		const baseWeapon = new RayLauncher(this.map);
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();
-		const baseWeapon = new Minigun(this.map);
+		// const baseWeapon = new Minigun(this.map);
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};
@@ -134,18 +134,12 @@ export class Player {
 	}
 
 	hit(zombi) {
-		// console.log('HIT');
-		// console.warn('HIT', zombi);
-		// return;
-
 		if (this.hitCooldown > 0) {
 			return;
 		}
 		
 		this.hitCooldown = 30;
 
-		// console.log('hit');
-		// return;
 		this.lifePoints --;
 
 		if (this.lifePoints <= 0) {
@@ -163,6 +157,8 @@ export class Player {
 		this.move();
 		this.#updateViewAngle();
 		this.weapon.update();
+
+		this.map.checkBlood(this.translation);
 	}
 	
 	#updateViewAngle() {
