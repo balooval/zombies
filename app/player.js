@@ -63,12 +63,12 @@ export class Player {
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
-		const baseWeapon = new RayLauncher(this.map);
+		// const baseWeapon = new RayLauncher(this.map);
 		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();
-		// const baseWeapon = new Minigun(this.map);
+		const baseWeapon = new Minigun(this.map);
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};

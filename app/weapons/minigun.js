@@ -13,18 +13,22 @@ export class Minigun extends Weapon {
 		this.map = map;
 		this.icon = 'pistolIcon';
 		this.ammo = 100;
+
+		this.shotAngleVariation = 0;
+	}
+
+	startShot() {
+		this.shotAngleVariation = 0;
+		super.startShot();
 	}
 
 	launchProjectile() {
 		super.launchProjectile();
 
-        // if (this.canShot() === false) {
-		// 	return;
-		// }
-
 		SoundLoader.playRandom(['gunA', 'gunB'], 1);
-
+		
 		const hit = this.#getZombiTouched();
+		this.shotAngleVariation = Math.min(0.15, this.shotAngleVariation + 0.01);
 
 		Particules.createRay(hit.start, hit.point);
 		
@@ -47,7 +51,7 @@ export class Minigun extends Weapon {
 
 	#getZombiTouched() {
 		const distance = 200;
-        const shotAngle = MATH.randomize(this.owner.viewAngle, 0.1);
+        const shotAngle = MATH.randomize(this.owner.viewAngle, this.shotAngleVariation);
 		const destX = this.owner.position.x + Math.cos(shotAngle) * distance;
 		const destY = this.owner.position.y + Math.sin(shotAngle) * distance;
 
