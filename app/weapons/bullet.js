@@ -44,7 +44,7 @@ class Bullet {
 		for (const zombi of enemies) {
 			zombi.takeDamage(this.vector, 0.4);
 			CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
-			Particules.create(Particules.ENNEMI_HIT, this.position, this.vector);
+			// Particules.create(Particules.ENNEMI_HIT, this.position, this.vector);
 			SoundLoader.play('eggCrack', 0.2);
 		}
 

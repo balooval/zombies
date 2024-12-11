@@ -42,12 +42,24 @@ class Hitbox {
         })
 	}
 
-	getSegments() {
+	getSegments(margin = 0) {
 		return [
-			[[this.left, this.top], [this.right, this.top]],
-			[[this.right, this.top], [this.right, this.bottom]],
-			[[this.right, this.bottom], [this.left, this.bottom]],
-			[[this.left, this.bottom], [this.left, this.top]],
+			[
+				[this.left + margin, this.top - margin],
+				[this.right - margin, this.top - margin]
+			],
+			[
+				[this.right - margin, this.top - margin],
+				[this.right - margin, this.bottom + margin]
+			],
+			[
+				[this.right - margin, this.bottom + margin],
+				[this.left, this.bottom + margin]
+			],
+			[
+				[this.left + margin, this.bottom + margin],
+				[this.left + margin, this.top - margin]
+			],
 		];
 	}
 

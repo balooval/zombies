@@ -1,8 +1,10 @@
 import * as MATH from '../utils/math.js';
+import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
 
 import BloodDropping from './bloodDropping.js'
 import CollisionResolver from './../collisionResolver.js';
+import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js'
 import Hitbox from '../collisionHitbox.js';
 import Move from './move.js';
@@ -16,15 +18,36 @@ class StateFollow extends State {
 		this.entitieToReach = player;
 
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
-		this.setSprite(8, 8, 'zombiWalk');
+
+
+		// const compositeSprite = new CompositeSprite();
+		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
+		// const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
+		// const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
+		// const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
+		// compositeSprite.addSprite('base', tronc);
+		// compositeSprite.addSprite('cou', cou);
+		// compositeSprite.addSprite('life2', brain);
+		// compositeSprite.addSprite('life3', crane);
+		// compositeSprite.hide();
+		// compositeSprite.setPosition(position);
+		// this.sprite = compositeSprite;
+
+		this.setSprite(10, 10, 'zombiVioletWalk');
+
+
 		this.translation = new Translation();
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable(map);
-		this.playerFinder = new PlayerFinder(this.entitieToReach, map);
+		this.playerFinder = new PlayerFinder(this.entitieToReach, map, 1.5);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
 
-		this.zombieMove = new Move(0.2, this.position);
+		this.zombieMove = new Move(0.2, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.onReachDestination);
+	}
+
+	removeSpriteLayer(name) {
+		this.sprite.removeSprite(name);
 	}
 
 	onLostPlayer() {
@@ -93,7 +116,7 @@ class StateFollow extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position);
+		this.hitable.hit(damageCount, this.position, vector);
 		this.entity.setState('SLIDE', vector);
 	}
 

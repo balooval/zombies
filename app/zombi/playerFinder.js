@@ -5,12 +5,12 @@ import Translation from '../translation.js';
 import { getIntersection } from '../intersectionResolver.js';
 
 class PlayerFinder {
-	constructor(player, map) {
+	constructor(player, map, viewAngle) {
 		this.player = player;
 		this.map = map;
 		this.evt = new Evt();
 		this.entity = null;
-		this.viewAngle = 1.5;
+		this.viewAngle = viewAngle;
 		this.viewTranslation = new Translation();
 		this.isViewingPlayer = true;
 		this.lastViewPosition = {x: this.player.position.x, y: this.player.position.y};

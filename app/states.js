@@ -1,15 +1,16 @@
-import * as SpriteFactory from './spriteFactory.js';
-import Hitbox from './collisionHitbox.js';
 import * as MATH from './utils/math.js';
+import * as SpriteFactory from './spriteFactory.js';
+
 import {
 	PLAYER_MAX_POS_X,
-	PLAYER_MIN_POS_X,
 	PLAYER_MAX_POS_Y,
+	PLAYER_MIN_POS_X,
 	PLAYER_MIN_POS_Y,
 } from './map/map.js';
+
+import Hitbox from './collisionHitbox.js';
 import Translation from './translation.js';
 import { getIntersection } from './intersectionResolver.js';
-
 
 export class State {
 	constructor(position) {
@@ -50,6 +51,10 @@ export class State {
 
 	getWorldCollisionBox() {
 		return this.hitBox.addPosition(this.position.x, this.position.y);
+	}
+
+	removeSpriteLayer(name) {
+		
 	}
 
 	dispose() {

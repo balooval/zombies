@@ -104,8 +104,28 @@
 			"url": "assets/pointer.png"
 		},
 		{
+			"id": "zombiVioletWalk",
+			"url": "assets/zombi-violet.png"
+		},
+		{
 			"id": "zombiWalk",
 			"url": "assets/zombi.png"
+		},
+		{
+			"id": "zombiWalkCrane",
+			"url": "assets/zombi-crane.png"
+		},
+		{
+			"id": "zombiWalkBrain",
+			"url": "assets/zombi-brain.png"
+		},
+		{
+			"id": "zombiWalkCou",
+			"url": "assets/zombi-cou.png"
+		},
+		{
+			"id": "zombiWalkTronc",
+			"url": "assets/zombi-tronc.png"
 		},
 		{
 			"id": "playerWalk",
@@ -114,6 +134,22 @@
 		{
 			"id": "zombiHit",
 			"url": "assets/zombi-hit.png"
+		},
+		{
+			"id": "zombiHitTronc",
+			"url": "assets/zombi-hit-tronc.png"
+		},
+		{
+			"id": "zombiHitCou",
+			"url": "assets/zombi-hit-cou.png"
+		},
+		{
+			"id": "zombiHitBrain",
+			"url": "assets/zombi-hit-brain.png"
+		},
+		{
+			"id": "zombiHitCrane",
+			"url": "assets/zombi-hit-crane.png"
 		},
 		{
 			"id": "backgroundNight",

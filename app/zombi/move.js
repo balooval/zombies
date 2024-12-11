@@ -5,8 +5,11 @@ import Evt from '../utils/event.js';
 import Translation from '../translation.js';
 
 class Move {
-	constructor(moveSpeed, position) {
+	constructor(moveSpeed, position, map) {
+		this.speedBase = moveSpeed;
 		this.moveSpeed = moveSpeed;
+		this.map = map;
+		this.speedStep = 0;
 		this.position = position;
 		this.moveTranslation = new Translation();
 		this.destX = 0;
@@ -21,6 +24,9 @@ class Move {
 	}
 
 	update() {
+		this.speedStep += 0.1;
+		this.moveSpeed = (this.speedBase * 0.5) + ((Math.sin(this.speedStep) + 1) * 0.5) * this.speedBase;
+
 		const translationX = Math.cos(this.moveTranslation.angle);
 		const translationY = Math.sin(this.moveTranslation.angle);
 
@@ -28,6 +34,8 @@ class Move {
 		const newY = this.position.y + translationY * this.moveSpeed;
 		
 		this.moveTranslation.update(this.position.x, this.position.y, newX, newY);
+
+		this.map.checkBlood(this.moveTranslation);
 
 		this.position.x = newX;
 		this.position.y = newY;

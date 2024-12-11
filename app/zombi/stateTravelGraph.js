@@ -1,4 +1,7 @@
+import * as SpriteFactory from '../spriteFactory.js';
+
 import BloodDropping from './bloodDropping.js';
+import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js';
 import Hitbox from '../collisionHitbox.js';
 import Move from './move.js';
@@ -14,19 +17,39 @@ class StateTravelGraph extends State {
 		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 		
 		this.travelPoints = [];
-		this.setSprite(8, 8, 'zombiWalk');
+
+
+		// const compositeSprite = new CompositeSprite();
+		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkTronc');
+		// const cou = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCou');
+		// const brain = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkBrain');
+		// const crane = SpriteFactory.createAnimatedSprite(8, 8, 'zombiWalkCrane');
+		// compositeSprite.addSprite('base', tronc);
+		// compositeSprite.addSprite('cou', cou);
+		// compositeSprite.addSprite('life2', brain);
+		// compositeSprite.addSprite('life3', crane);
+		// compositeSprite.hide();
+		// compositeSprite.setPosition(position);
+		// this.sprite = compositeSprite;
+
+		this.setSprite(10, 10, 'zombiVioletWalk');
+		// this.setSprite(8, 8, 'zombiWalk');
 
 		this.translation = new Translation();
 
-		this.zombieMove = new Move(0.1, this.position);
+		this.zombieMove = new Move(0.1, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
 
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable(map);
-		this.playerFinder = new PlayerFinder(player, this.map);
+		this.playerFinder = new PlayerFinder(player, this.map, 1.5);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
 		this.test = 0;
+	}
+
+	removeSpriteLayer(name) {
+		this.sprite.removeSprite(name);
 	}
 
 	setEntity(entity) {
@@ -62,8 +85,8 @@ class StateTravelGraph extends State {
 		this.entity.setState('FOLLOW');
 	}
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position);
+	takeDamage(vector, damageCount) {		
+		this.hitable.hit(damageCount, this.position, vector);
 		this.entity.setState('SLIDE', vector);
 	}
 

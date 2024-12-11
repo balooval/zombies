@@ -129,7 +129,7 @@ export function segmentWithPolygonIntersection(segment, polygon) {
         return {
             x: intersection.x,
             y: intersection.y,
-            distance: distanceManathan({ x: segment.startX, y: segment.startY }, intersection),
+            distance: distance({ x: segment.startX, y: segment.startY }, intersection),
         };
 
     }).filter(res => res !== null)

@@ -162,8 +162,52 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'screenGameOver',
 		frames: [],
 	},
+	zombiVioletWalk: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
+	zombiVioletAtack: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
+	zombiVioletHit: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
 	zombiWalk: {
 		textureId: 'zombiWalk',
+		frames: [],
+	},
+	zombiHitCrane: {
+		textureId: 'zombiHitCrane',
+		frames: [],
+	},
+	zombiHitBrain: {
+		textureId: 'zombiHitBrain',
+		frames: [],
+	},
+	zombiHitCou: {
+		textureId: 'zombiHitCou',
+		frames: [],
+	},
+	zombiHitTronc: {
+		textureId: 'zombiHitTronc',
+		frames: [],
+	},
+	zombiWalkCrane: {
+		textureId: 'zombiWalkCrane',
+		frames: [],
+	},
+	zombiWalkBrain: {
+		textureId: 'zombiWalkBrain',
+		frames: [],
+	},
+	zombiWalkCou: {
+		textureId: 'zombiWalkCou',
+		frames: [],
+	},
+	zombiWalkTronc: {
+		textureId: 'zombiWalkTronc',
 		frames: [],
 	},
 	zombiAtack: {
@@ -311,8 +355,63 @@ const animations = {
 		stepsByFrame: -1,
 		framesToDisplay: [0],
 	},
+	zombiVioletWalk: {
+		spriteSheet: 'zombiVioletWalk',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiVioletAtack: {
+		spriteSheet: 'zombiVioletAtack',
+		stepsByFrame: 15,
+		framesToDisplay: [4, 4, 5, 4],
+	},
+	zombiVioletHit: {
+		spriteSheet: 'zombiVioletHit',
+		stepsByFrame: -1,
+		framesToDisplay: [6],
+	},
 	zombiWalk: {
 		spriteSheet: 'zombiWalk',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiHitCrane: {
+		spriteSheet: 'zombiHitCrane',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitBrain: {
+		spriteSheet: 'zombiHitBrain',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitCou: {
+		spriteSheet: 'zombiHitCou',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiHitTronc: {
+		spriteSheet: 'zombiHitTronc',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
+	zombiWalkCrane: {
+		spriteSheet: 'zombiWalkCrane',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkCou: {
+		spriteSheet: 'zombiWalkCou',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkTronc: {
+		spriteSheet: 'zombiWalkTronc',
+		stepsByFrame: 15,
+		framesToDisplay: [0, 1, 2, 3],
+	},
+	zombiWalkBrain: {
+		spriteSheet: 'zombiWalkBrain',
 		stepsByFrame: 15,
 		framesToDisplay: [0, 1, 2, 3],
 	},

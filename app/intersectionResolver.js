@@ -1,13 +1,10 @@
-import {
-    distanceManathan,
-    segmentIntersection,
-} from './utils/math.js';
+import * as MATH from './utils/math.js';
 
-export function getIntersection(translation, hitbox) {
-    const hitboxSegments = hitbox.getSegments();
+export function getIntersection(translation, hitbox, margin = 0) {
+    const hitboxSegments = hitbox.getSegments(margin);
     
     return hitboxSegments.map(segment => {
-        const intersection = segmentIntersection(
+        const intersection = MATH.segmentIntersection(
             translation.startX,
             translation.startY,
             translation.destX,
@@ -19,11 +16,11 @@ export function getIntersection(translation, hitbox) {
         );
         if (intersection === null) {
             return null;
-        }
+        }MATH.distance
         return {
             x: intersection.x,
             y: intersection.y,
-            distance: distanceManathan({ x: translation.startX, y: translation.startY }, intersection),
+            distance: MATH.distance({ x: translation.startX, y: translation.startY }, intersection),
         };
     })
     .filter(res => res !== null)

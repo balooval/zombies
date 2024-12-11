@@ -9,10 +9,11 @@ import Translation from '../translation.js';
 class StatePauseAndSearch extends State {
 	constructor(position, map, player) {
 		super(position);
-		this.setSprite(8, 8, 'zombiWalk');
+		// this.setSprite(8, 8, 'zombiWalk');
+		this.setSprite(10, 10, 'zombiVioletWalk');
 
 		this.hitable = new Hitable(map);
-		this.playerFinder = new PlayerFinder(player, map);
+		this.playerFinder = new PlayerFinder(player, map, 1.5);
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
 		this.translation = new Translation();
@@ -62,7 +63,7 @@ class StatePauseAndSearch extends State {
 	}
 
 	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position);
+		this.hitable.hit(damageCount, this.position, vector);
 		this.entity.setState('SLIDE', vector);
 	}
 

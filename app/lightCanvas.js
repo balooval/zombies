@@ -7,8 +7,8 @@ import CollisionResolver from './collisionResolver.js';
 class LightCanvas {
 
 	constructor() {
-		// this.canvasStaticLights = null;
-		// this.contextStaticLights = null;
+		this.canvasTempLight = null;
+		this.contextTempLights = null;
 
 		this.canvasDynamicLights = null;
 		this.contextDynamicLights = null;
@@ -28,16 +28,16 @@ class LightCanvas {
 		this.worldHeight = worldHeight;
 		this.ratioW = this.worldWidth / this.width;
 		this.ratioH = this.worldHeight / this.height;
-		
+
 		this.canvasFinalLights = new OffscreenCanvas(width, height);
 		this.contextFinalLights = this.canvasFinalLights.getContext('2d');
 		this.contextFinalLights.fillStyle = '#000000';
 		this.contextFinalLights.fillRect(0, 0, this.width, this.height);
 
-		// this.canvasStaticLights = new OffscreenCanvas(width, height);
-		// this.contextStaticLights = this.canvasStaticLights.getContext('2d');
-		// this.contextStaticLights.fillStyle = '#000000';
-		// this.contextStaticLights.fillRect(0, 0, this.width, this.height);
+		this.canvasTempLight = new OffscreenCanvas(width, height);
+		this.contextTempLights = this.canvasTempLight.getContext('2d');
+		this.contextTempLights.fillStyle = '#000000';
+		this.contextTempLights.fillRect(0, 0, this.width, this.height);
 		
 		this.canvasDynamicLights = new OffscreenCanvas(width, height);
 		this.contextDynamicLights = this.canvasDynamicLights.getContext('2d');
@@ -101,15 +101,15 @@ class LightCanvas {
 	}
 
 	drawSpotLight(spotLight) {
-		const raysCount = 15;
+		const raysCount = 20;
 		const angleStep = spotLight.fovAngle / raysCount;
-		const lightDistance = 100;
+		const lightDistance = 150;
 
 		const polygon = [
 			[spotLight.posX, spotLight.posY]
 		];
 
-		for (let i = 0; i < raysCount; i ++) {
+		for (let i = 0; i <= raysCount; i ++) {
 			const curAngle = spotLight.angle - (spotLight.fovAngle * 0.5) + (angleStep * i);
 
 			const hitSegment = {
@@ -121,12 +121,11 @@ class LightCanvas {
 
 			const hitPoint = this.#getNearestHit(hitSegment, [hitSegment.destX, hitSegment.destY]);
 			
-			// if (i === 0 || i === raysCount - 1) {
-				// this.#drawRay([[spotLight.posX, spotLight.posY], hitPoint], spotLight.color);
-			// }
-
 			polygon.push(hitPoint);
 		}
+
+		this.contextTempLights.fillStyle = '#000000';
+		this.contextTempLights.fillRect(0, 0, this.width, this.height);
 
 		const spotGradient = this.contextDynamicLights.createRadialGradient(
 			this.#toLocalX(spotLight.posX),
@@ -139,11 +138,36 @@ class LightCanvas {
 		spotGradient.addColorStop(0, 'rgba(255, 255, 250, 1)');
 		spotGradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
 		// this.contextDynamicLights.filter = "blur(4px)";
-		this.#fillPolygon(polygon, spotGradient);
+		// this.#fillPolygon(this.contextDynamicLights, polygon, spotGradient);
+		
+		
+		this.#fillPolygon(this.contextTempLights, polygon, spotGradient);
+
+		
+		const conicGradient = this.contextTempLights.createConicGradient(
+			spotLight.angle * -1 + Math.PI,
+			this.#toLocalX(spotLight.posX),
+			this.#toLocalY(spotLight.posY)
+		);
+
+		const blindFovAngle = 0.5 * ((Math.PI - (spotLight.fovAngle * 0.5)) / Math.PI);
+		conicGradient.addColorStop(blindFovAngle, '#000000');
+		conicGradient.addColorStop(blindFovAngle * 1.1, '#ffffff');
+		conicGradient.addColorStop(1 - blindFovAngle * 1.1, '#ffffff');
+		conicGradient.addColorStop(1 - blindFovAngle, '#000000');
+		this.contextTempLights.globalCompositeOperation = 'multiply';
+		// this.#fillPolygon(this.contextTempLights, polygon, conicGradient);
+		this.contextTempLights.fillStyle = conicGradient;
+		this.contextTempLights.fillRect(0, 0, this.width, this.height);
+		this.contextTempLights.globalCompositeOperation = 'source-over';
+		
+		
+
+		this.contextDynamicLights.drawImage(this.canvasTempLight, 0, 0);
 	}
 
 	#getNearestHit(hitSegment, defaultEnd) {
-		const intersections = this.map.getWallsIntersections(hitSegment);
+		const intersections = this.map.getWallsIntersections(hitSegment, 1);
 		const wallHit = intersections.shift();
 
 		const touched = CollisionResolver.checkIntersectionWithLayer(hitSegment, 'ENNEMIES');
@@ -168,17 +192,17 @@ class LightCanvas {
 		return [zombiHit.point.x, zombiHit.point.y];
 	}
 
-	#fillPolygon(polygon, color) {
+	#fillPolygon(context, polygon, color) {
 		const points = [...polygon];
-		this.contextDynamicLights.fillStyle = color;
-		this.contextDynamicLights.beginPath();
+		context.fillStyle = color;
+		context.beginPath();
 		const start = points.shift();
-		this.contextDynamicLights.moveTo(this.#toLocalX(start[0]), this.#toLocalY(start[1]));
+		context.moveTo(this.#toLocalX(start[0]), this.#toLocalY(start[1]));
 		for (const point of points) {
-			this.contextDynamicLights.lineTo(this.#toLocalX(point[0]), this.#toLocalY(point[1]));
+			context.lineTo(this.#toLocalX(point[0]), this.#toLocalY(point[1]));
 		}
-		this.contextDynamicLights.closePath();
-		this.contextDynamicLights.fill();
+		context.closePath();
+		context.fill();
 	}
 
 	#drawRay(segment, color) {
