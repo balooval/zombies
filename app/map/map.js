@@ -308,7 +308,7 @@ export class GameMap {
             return {
                 x: position.x,
                 y: position.y,
-                distance: MATH.distanceManathan({ x: segment.startX, y: segment.startY }, position),
+                distance: MATH.distance({ x: segment.startX, y: segment.startY }, position),
             };
         }).sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));
 
