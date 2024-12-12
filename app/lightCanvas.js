@@ -82,13 +82,11 @@ class LightCanvas {
 	}
 
 	drawPointLight(pointLight) {
-		const textureImage = TextureLoader.get('light').image;
-
 		const finalWidth = pointLight.size / this.ratioW;
 		const finalHeight = pointLight.size / this.ratioH;
 
         this.contextDynamicLights.drawImage(
-			textureImage,
+			pointLight.textureImage,
 			0,
 			0,
 			64,

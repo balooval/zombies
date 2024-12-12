@@ -6,7 +6,7 @@ import * as SpriteFactory from './../spriteFactory.js';
 
 import CollisionResolver from './../collisionResolver.js';
 import {HitSprite} from './../fxSprites.js';
-import Hitbox from './../collisionHitbox.js';
+import {Hitbox} from './../collisionHitbox.js';
 import {Vector2} from './../../vendor/three.module.js';
 
 class Bullet {

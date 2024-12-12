@@ -4,7 +4,7 @@ import * as SpriteFactory from './spriteFactory.js';
 import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
 import GrenadeLauncher from './weapons/grenadeLauncher.js';
-import Hitbox from './collisionHitbox.js';
+import {Hitbox} from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';

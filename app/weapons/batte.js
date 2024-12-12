@@ -1,10 +1,11 @@
-import Bomb from './grenade.js';
-import CollisionResolver from './../collisionResolver.js';
+import * as Particules from './../particules.js';
 import * as SoundLoader from './../net/loaderSound.js';
 import * as SpriteFactory from './../spriteFactory.js';
+
 import {ANIMATION_END_EVENT} from './../textureAnimation.js';
-import * as Particules from './../particules.js';
-import Hitbox from './../collisionHitbox.js';
+import Bomb from './grenade.js';
+import CollisionResolver from './../collisionResolver.js';
+import {Hitbox} from './../collisionHitbox.js';
 import Weapon from './baseWeapon.js';
 
 export class Batte extends Weapon {

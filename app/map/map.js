@@ -19,7 +19,7 @@ import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
 import Evt from '../utils/event.js';
 import {FogEmiter} from '../fogEmiter.js';
-import Hitbox from '../collisionHitbox.js';
+import {Hitbox} from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
 import LightCanvas from '../lightCanvas.js';
 import { getIntersection } from '../intersectionResolver.js';
@@ -218,8 +218,8 @@ export class GameMap {
     }
 
     placeLights(lightsDescription) {
-        for (const pointLights of lightsDescription.pointLights) {
-            const light = new Light.PointLight(pointLights.size, pointLights.x, pointLights.y);
+        for (const pointLight of lightsDescription.pointLights) {
+            const light = new Light.PointLight(pointLight.size, pointLight.x, pointLight.y, pointLight.color);
             light.turnOn();
         }
 
@@ -333,7 +333,16 @@ export class GameMap {
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {
-            blocks.push(new InteractiveBlock(this, interactiveBlock.x, interactiveBlock.y, interactiveBlock.width, interactiveBlock.height));
+            blocks.push(new InteractiveBlock(
+                this,
+                interactiveBlock.x,
+                interactiveBlock.y,
+                interactiveBlock.width,
+                interactiveBlock.height,
+                interactiveBlock.label,
+                interactiveBlock.onActive,
+                interactiveBlock.isSolid,
+            ));
         }
 
         return blocks;
@@ -602,6 +611,7 @@ class Cell {
 
     #cleanBlocks(blocks) {
         return blocks.filter(block => {
+            if (block.isSolid ===false) return false;
             if (block.posX >= this.right) return false;
             if (block.posX + block.width <= this.left) return false;
             if (block.posY <= this.bottom) return false;

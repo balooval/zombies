@@ -2,7 +2,25 @@ import * as MATH from './utils/math.js';
 
 import HitboxDebug from "./hitboxDebug.js";
 
-class Hitbox {
+export class FakeHitbox {
+	constructor() {
+		this.segments = [];
+	}
+
+	addPosition(x, y) {
+		return this;
+	}
+
+	getSegments(margin = 0) {
+		return [];
+	}
+
+	dispose() {
+		
+	}
+}
+
+export class Hitbox {
 	constructor(left, right, bottom, top, debug = false) {
 		this.left = left;
 		this.right = right;
@@ -82,5 +100,3 @@ class Hitbox {
 		}
 	}
 }
-
-export {Hitbox as default};

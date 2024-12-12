@@ -16,15 +16,8 @@ import {
 
 import LightCanvas from './lightCanvas.js';
 
-function getLightMaterial(textureId) {
-
-	return new MeshBasicMaterial({
-		opacity: 1,
-		map: TextureLoader.get(textureId),
-		transparent: true,
-		blending: AdditiveBlending,
-	});
-}
+const colorCanvas = new OffscreenCanvas(64, 64);
+const colorContext = colorCanvas.getContext('2d');
 
 class Light {
     constructor(x, y) {
@@ -67,9 +60,25 @@ class Light {
 }
 
 export class PointLight extends Light {
-    constructor(size, x, y) {
+    constructor(size, x, y, color) {
 		super(x, y);
 		this.size = size;
+		this.textureImage = TextureLoader.get('light').image;
+
+		const colorCanvas = new OffscreenCanvas(64, 64);
+		const colorContext = colorCanvas.getContext('2d');
+		colorContext.clearRect(0, 0, 64, 64);
+		colorContext.fillStyle = color;
+		colorContext.fillRect(0, 0, 64, 64);
+		colorContext.globalCompositeOperation = 'destination-in';
+		colorContext.drawImage(this.textureImage, 0, 0);
+		colorContext.globalCompositeOperation = 'source-over';
+
+		createImageBitmap(colorCanvas).then(imageBitmap => this.#onImageReady(imageBitmap));
+	}
+
+	#onImageReady(imageBitmap) {
+		this.textureImage = imageBitmap;
 	}
 
 	draw() {

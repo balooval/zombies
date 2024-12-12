@@ -3,7 +3,7 @@ import * as MATH from '../utils/math.js';
 import {ANIMATION_END_EVENT} from './../textureAnimation.js';
 import CollisionResolver from './../collisionResolver.js';
 import Hitable from './hitable.js'
-import Hitbox from '../collisionHitbox.js';
+import {Hitbox} from '../collisionHitbox.js';
 import {State} from '../states.js';
 
 class StateAttack extends State {

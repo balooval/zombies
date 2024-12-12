@@ -8,7 +8,7 @@ import {
 	PLAYER_MIN_POS_Y,
 } from './map/map.js';
 
-import Hitbox from './collisionHitbox.js';
+import {Hitbox} from './collisionHitbox.js';
 import Translation from './translation.js';
 import { getIntersection } from './intersectionResolver.js';
 

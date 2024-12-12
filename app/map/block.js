@@ -4,7 +4,7 @@ import * as SpriteFactory from '../spriteFactory.js';
 import * as TextureLoader from '../net/loaderTexture.js';
 
 import CollisionResolver from '../collisionResolver.js';
-import Hitbox from '../collisionHitbox.js';
+import {Hitbox} from '../collisionHitbox.js';
 
 class Block {
     constructor(posX, posY, width, height) {
@@ -12,6 +12,7 @@ class Block {
         this.posY = posY;
         this.width = width;
         this.height = height;
+        this.isSolid = true;
         this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
 
         this.sprite = SpriteFactory.createStillSprite(

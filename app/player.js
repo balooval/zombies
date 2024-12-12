@@ -20,7 +20,7 @@ import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
 import Evt from './utils/event.js';
 import GrenadeLauncher from './weapons/grenadeLauncher.js';
-import Hitbox from './collisionHitbox.js';
+import {Hitbox} from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
@@ -53,6 +53,7 @@ export class Player {
 		Input.evt.addEventListener('DOWN', this, this.onKeyDown);
 		Input.evt.addEventListener('UP', this, this.onKeyUp);
 		Input.evt.addEventListener('SPACE', this, this.onKeyUp);
+		Input.evt.addEventListener('DOWN_67', this, this.onDebug);
 
 		AnimationControl.registerToUpdate(this);
 		this.hitBox = new Hitbox(-2.5, 2.5, -2.5, 2.5, true);
@@ -88,7 +89,7 @@ export class Player {
 
 		this.currentAnimation = '';
 
-		this.ambiantLight = new Light.PointLight(40, 0, 0);
+		this.ambiantLight = new Light.PointLight(40, 0, 0, '#FFFFFF');
 		this.ambiantLight.turnOn();
 		this.torchLight = new Light.SpotLight(0, 0, Math.PI / 4, {r: 255, g: 255, b: 200});
 		this.torchLight.turnOn();
@@ -330,6 +331,10 @@ export class Player {
 		}
 	}
 	
+	onDebug(code) {
+		console.log('Player position:', this.position);
+	}
+
 	onKeyUp(code) {
 		switch (code) {
 			case 'LEFT':

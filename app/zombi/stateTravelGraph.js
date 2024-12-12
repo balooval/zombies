@@ -3,7 +3,7 @@ import * as SpriteFactory from '../spriteFactory.js';
 import BloodDropping from './bloodDropping.js';
 import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js';
-import Hitbox from '../collisionHitbox.js';
+import {Hitbox} from '../collisionHitbox.js';
 import Move from './move.js';
 import PlayerFinder from './playerFinder.js';
 import { State } from '../states.js';
