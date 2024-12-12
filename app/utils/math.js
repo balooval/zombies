@@ -133,7 +133,7 @@ export function segmentWithPolygonIntersection(segment, polygon) {
         };
 
     }).filter(res => res !== null)
-    .sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance))
+    .sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance)) // TODO: c'est inversé mais ça mais l'ombre des zombies derrière eux :)
     .pop();
 }
 

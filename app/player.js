@@ -25,7 +25,6 @@ import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
 import Translation from './translation.js';
-import {getIntersection} from './intersectionResolver.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 

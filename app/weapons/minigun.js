@@ -60,6 +60,7 @@ export class Minigun extends Weapon {
 			startY: this.owner.position.y,
 			destX: destX,
 			destY: destY,
+			angle: shotAngle,
 		};
 
 		const res = {

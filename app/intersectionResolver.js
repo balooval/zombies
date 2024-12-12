@@ -1,22 +1,31 @@
 import * as MATH from './utils/math.js';
 
 export function getIntersection(translation, hitbox, margin = 0) {
-    const hitboxSegments = hitbox.getSegments(margin);
-    
-    return hitboxSegments.map(segment => {
+
+    if (hitbox.containTranslation(translation) === false) {
+        return undefined;
+    }
+
+    return hitbox
+    .getSegments(margin)
+    .filter(segment => {
+        const diff = MATH.angleDiff(translation.angle, segment.normalAngle);
+        return Math.abs(diff) > Math.PI / 2;
+    })
+    .map(segment => {
         const intersection = MATH.segmentIntersection(
             translation.startX,
             translation.startY,
             translation.destX,
             translation.destY,
-            segment[0][0],
-            segment[0][1],
-            segment[1][0],
-            segment[1][1],
+            segment.positions[0][0],
+            segment.positions[0][1],
+            segment.positions[1][0],
+            segment.positions[1][1],
         );
         if (intersection === null) {
             return null;
-        }MATH.distance
+        }
         return {
             x: intersection.x,
             y: intersection.y,

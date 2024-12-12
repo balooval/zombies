@@ -10,7 +10,6 @@ import {
 
 import {Hitbox} from './collisionHitbox.js';
 import Translation from './translation.js';
-import { getIntersection } from './intersectionResolver.js';
 
 export class State {
 	constructor(position) {
@@ -118,7 +117,7 @@ export class StateSlide extends State {
 	}
 	
 	#move() {
-		const wallHit = this.map.blocks.map(block => getIntersection(this.translation, block.hitBox)).filter(res => res).pop();
+		const wallHit = this.map.getWallsIntersections(this.translation).pop();
 
 		let newPosX = this.position.x + this.velocityX;
 		let newPosY = this.position.y + this.velocityY;

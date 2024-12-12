@@ -115,6 +115,7 @@ class LightCanvas {
 				startY: spotLight.posY,
 				destX: spotLight.posX + Math.cos(curAngle) * lightDistance,
 				destY: spotLight.posY + Math.sin(curAngle) * lightDistance,
+				angle: curAngle,
 			};
 
 			const hitPoint = this.#getNearestHit(hitSegment, [hitSegment.destX, hitSegment.destY]);
@@ -135,12 +136,8 @@ class LightCanvas {
 		);
 		spotGradient.addColorStop(0, 'rgba(255, 255, 250, 1)');
 		spotGradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
-		// this.contextDynamicLights.filter = "blur(4px)";
-		// this.#fillPolygon(this.contextDynamicLights, polygon, spotGradient);
-		
 		
 		this.#fillPolygon(this.contextTempLights, polygon, spotGradient);
-
 		
 		const conicGradient = this.contextTempLights.createConicGradient(
 			spotLight.angle * -1 + Math.PI,
@@ -154,7 +151,6 @@ class LightCanvas {
 		conicGradient.addColorStop(1 - blindFovAngle * 1.1, '#ffffff');
 		conicGradient.addColorStop(1 - blindFovAngle, '#000000');
 		this.contextTempLights.globalCompositeOperation = 'multiply';
-		// this.#fillPolygon(this.contextTempLights, polygon, conicGradient);
 		this.contextTempLights.fillStyle = conicGradient;
 		this.contextTempLights.fillRect(0, 0, this.width, this.height);
 		this.contextTempLights.globalCompositeOperation = 'source-over';
