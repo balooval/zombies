@@ -62,8 +62,8 @@ class StatePauseAndSearch extends State {
 		this.entity.setState('FOLLOW');
 	}
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.entity.setState('SLIDE', vector);
 	}
 

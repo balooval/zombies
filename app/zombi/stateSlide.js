@@ -54,8 +54,8 @@ class StateSlide extends Slide {
 		super.suspend();
 	}
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.slide({
 			velocityX: vector.x,
 			velocityY: vector.y,

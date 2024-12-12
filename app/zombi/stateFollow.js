@@ -1,7 +1,11 @@
 import * as MATH from '../utils/math.js';
+import * as SoundLoader from '../net/loaderSound.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as Stepper from '../utils/stepper.js';
 
+import {
+	ANIMATION_END_EVENT,
+} from '../textureAnimation.js';
 import BloodDropping from './bloodDropping.js'
 import CollisionResolver from './../collisionResolver.js';
 import { CompositeSprite } from '../sprite.js';
@@ -67,6 +71,7 @@ class StateFollow extends State {
 		CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
 		this.zombieMove.setDestination(this.entitieToReach.position.x, this.entitieToReach.position.y)
 		this.playerFinder.update(this.position, this.zombieMove.moveTranslation);
+		this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		this.changeDirection(0);
 	}
 
@@ -78,6 +83,14 @@ class StateFollow extends State {
 		}
 	}
 
+	#playStepSound() {
+			if (this.entity.isViewableByPlayer === false) {
+				return;
+			}
+	
+			this.entity.playSound(['zombieStepA', 'zombieStepB', 'zombieStepC']);
+		}
+
 	#onPlayerTouch(players) {
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
 		this.entity.setState('ATTACK', this.entitieToReach);
@@ -87,10 +100,12 @@ class StateFollow extends State {
 		Stepper.stopListenStep(Stepper.curStep, this, this.changeDirection);
 		this.zombieMove.setDestination(this.playerFinder.lastViewPosition.x, this.playerFinder.lastViewPosition.y)
 		const nextUpdateDirectionStepDelay = Math.round(MATH.randomValue(10, 120));
+		// TODO: retirer dans le dispose
 		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.changeDirection);
 	}
 
 	suspend() {
+		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		this.hitable.disable();
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
 		super.suspend();
@@ -115,12 +130,13 @@ class StateFollow extends State {
 		this.changeDirection();
 	}
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.entity.setState('SLIDE', vector);
 	}
 
 	dispose() {
+		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
 		this.zombieMove.evt.removeEventListener('REACH', this, this.onReachDestination);
 		this.playerFinder.evt.removeEventListener('LOST', this, this.onLostPlayer);

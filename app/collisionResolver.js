@@ -1,7 +1,6 @@
 import * as AnimationControl from './animationControl.js';
 import * as MATH from './utils/math.js';
 
-
 class CollisionResolver {
 
     constructor() {

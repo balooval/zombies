@@ -1,5 +1,9 @@
+import * as SoundLoader from '../net/loaderSound.js';
 import * as SpriteFactory from '../spriteFactory.js';
 
+import {
+	ANIMATION_END_EVENT,
+} from '../textureAnimation.js';
 import BloodDropping from './bloodDropping.js';
 import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js';
@@ -46,6 +50,7 @@ class StateTravelGraph extends State {
 		this.playerFinder.evt.addEventListener('VIEW', this, this.onViewPlayer);
 
 		this.test = 0;
+		this.newStepPlaySound = 0;
 	}
 
 	removeSpriteLayer(name) {
@@ -65,10 +70,14 @@ class StateTravelGraph extends State {
 		this.travelPoints = [];
 		this.#getJourney();
 		this.updateDirection();
+		// this.#playStepSound();
+		this.sprite.textureAnimation.evt.addEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		super.start();
 	}
 
 	suspend() {
+		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
+		// Stepper.stopListenStep(this.newStepPlaySound, this, this.#playStepSound);
 		this.hitable.disable();
 		super.suspend();
 	}
@@ -82,12 +91,21 @@ class StateTravelGraph extends State {
 	}
 
 	onViewPlayer() {
+		this.entity.playSound(['zombieMoanA', 'zombieMoanB']);
 		this.entity.setState('FOLLOW');
 	}
 
-	takeDamage(vector, damageCount) {		
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {		
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.entity.setState('SLIDE', vector);
+	}
+
+	#playStepSound() {
+		if (this.entity.isViewableByPlayer === false) {
+			return;
+		}
+
+		this.entity.playSound(['zombieStepA', 'zombieStepB', 'zombieStepC']);
 	}
 
 	#getJourney() {
@@ -113,6 +131,8 @@ class StateTravelGraph extends State {
 	}
 
 	dispose() {
+		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
+		// Stepper.stopListenStep(this.newStepPlaySound, this, this.#playStepSound);
 		this.zombieMove.evt.removeEventListener('REACH', this, this.updateDirection);
 		this.playerFinder.evt.removeEventListener('VIEW', this, this.onViewPlayer);
 		this.hitable.dispose();

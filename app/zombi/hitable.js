@@ -22,9 +22,14 @@ class Hitable {
 		CollisionResolver.removeFromLayer(this.entity, 'ENNEMIES');
 	}
 	
-	hit(damageCount, position, vector) {
-		// Particules.createBloodSplat(this.entity.currentState.position)
-		setTimeout(() => SoundLoader.playRandom(['wolfGruntA', 'wolfGruntB']), 100);
+	hit(damageCount, position, vector, remainingLife) {
+		let soundsList = ['wolfGruntA', 'wolfGruntB', 'zombieHitA'];
+		
+		if (remainingLife <= 0) {
+			soundsList = ['zombieDieA', 'zombieDieB', 'zombieDieC'];
+		}
+
+		setTimeout(() => SoundLoader.playRandom(soundsList), 100);
 
 		this.map.spreadBlood(position.x, position.y, damageCount, vector);
 	}
