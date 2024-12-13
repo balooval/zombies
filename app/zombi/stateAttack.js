@@ -71,8 +71,8 @@ class StateAttack extends State {
 		player.hit(this);
     }
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.entity.setState('SLIDE', vector);
 	}
 

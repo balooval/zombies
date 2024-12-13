@@ -1,7 +1,6 @@
 import * as AnimationControl from './animationControl.js';
 import * as MATH from './utils/math.js';
 
-
 class CollisionResolver {
 
     constructor() {
@@ -32,7 +31,7 @@ class CollisionResolver {
         }
     }
 
-    checkIntersectionWithLayer(segment, layerName) {
+    checkIntersectionWithLayer(translation, layerName) {
         const layer = this.layers[layerName];
         if (layer === undefined) {
             return [];
@@ -40,9 +39,9 @@ class CollisionResolver {
 
         const collisions = [];
         for (const layerEntitie of layer) {
-            const intersection = this.#entitiesIntersect(segment, layerEntitie);
+            const intersection = this.#entitiesIntersect(translation, layerEntitie);
             if (intersection !== undefined) {
-                const distance = MATH.distance({x: segment.startX, y: segment.startY}, intersection);
+                const distance = MATH.distance({x: translation.startX, y: translation.startY}, intersection);
                 collisions.push({
                     target: layerEntitie,
                     distance: distance,
@@ -88,10 +87,15 @@ class CollisionResolver {
         return collisions;
     }
 
-    #entitiesIntersect(segment, layerEntitie) {
-        const box = layerEntitie.getWorldCollisionBox();
-        const polygon = box.getSegments();
-        return MATH.segmentWithPolygonIntersection(segment, polygon);
+    #entitiesIntersect(translation, layerEntitie) {
+        const hitbox = layerEntitie.getWorldCollisionBox();
+
+        if (hitbox.containTranslation(translation) === false) {
+            return undefined;
+        }
+        
+        const polygon = hitbox.getSides();
+        return MATH.segmentWithPolygonIntersection(translation, polygon);
     }
 
     entitiesCollide(entitieA, entitieB) {

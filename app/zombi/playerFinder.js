@@ -2,7 +2,6 @@ import * as MATH from '../utils/math.js';
 
 import Evt from '../utils/event.js';
 import Translation from '../translation.js';
-import { getIntersection } from '../intersectionResolver.js';
 
 class PlayerFinder {
 	constructor(player, map, viewAngle) {
@@ -36,7 +35,7 @@ class PlayerFinder {
 		
 		this.viewTranslation.reset(position.x, position.y);
 		this.viewTranslation.updatePosition(this.player.position.x, this.player.position.y);
-		const wallHit = this.map.blocks.map(block => getIntersection(this.viewTranslation, block.hitBox)).filter(res => res).pop();
+		const wallHit = this.map.getWallsIntersections(this.viewTranslation).pop();
 		
 		if (wallHit) {
 			this.isViewingPlayer = false;

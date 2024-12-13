@@ -2,6 +2,7 @@ import * as SpriteFactory from '../spriteFactory.js';
 
 import { CompositeSprite } from '../sprite.js';
 import Hitable from './hitable.js'
+import {Hitbox} from '../collisionHitbox.js';
 import {StateSlide as Slide} from '../states.js';
 
 class StateSlide extends Slide {
@@ -10,6 +11,7 @@ class StateSlide extends Slide {
 		this.id = 'SLIDE';
 		this.hitable = new Hitable(map);
 		this.setSprite(12, 12, 'zombiVioletHit');
+		this.setHitBox(new Hitbox(-3, 3, -3, 3, true));
 
 		// const compositeSprite = new CompositeSprite();
 		// const tronc = SpriteFactory.createAnimatedSprite(8, 8, 'zombiHitTronc');
@@ -54,8 +56,8 @@ class StateSlide extends Slide {
 		super.suspend();
 	}
 
-	takeDamage(vector, damageCount) {
-		this.hitable.hit(damageCount, this.position, vector);
+	takeDamage(vector, damageCount, remainingLife) {
+		this.hitable.hit(damageCount, this.position, vector, remainingLife);
 		this.slide({
 			velocityX: vector.x,
 			velocityY: vector.y,

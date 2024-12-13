@@ -1,6 +1,38 @@
 {
 	"sounds": [
 		{
+			"id": "zombieMoanA",
+			"url": "assets/sounds/zombie-moan-a.mp3"
+		},
+		{
+			"id": "zombieMoanB",
+			"url": "assets/sounds/zombie-moan-b.mp3"
+		},
+		{
+			"id": "zombieDieA",
+			"url": "assets/sounds/zombie-die-a.mp3"
+		},
+		{
+			"id": "zombieDieB",
+			"url": "assets/sounds/zombie-die-b.mp3"
+		},
+		{
+			"id": "zombieDieC",
+			"url": "assets/sounds/zombie-die-c.mp3"
+		},
+		{
+			"id": "zombieStepA",
+			"url": "assets/sounds/zombie-step-a.mp3"
+		},
+		{
+			"id": "zombieStepB",
+			"url": "assets/sounds/zombie-step-b.mp3"
+		},
+		{
+			"id": "zombieStepC",
+			"url": "assets/sounds/zombie-step-c.mp3"
+		},
+		{
 			"id": "bombA",
 			"url": "assets/sounds/bomb-a.mp3"
 		},
@@ -21,18 +53,6 @@
 			"url": "assets/sounds/gun-b.mp3"
 		},
 		{
-			"id": "wolfHitGroundA",
-			"url": "assets/sounds/fall-a.wav"
-		},
-		{
-			"id": "wolfHitGroundB",
-			"url": "assets/sounds/fall-b.wav"
-		},
-		{
-			"id": "wolfHitGroundC",
-			"url": "assets/sounds/fall-c.wav"
-		},
-		{
 			"id": "eggCrack",
 			"url": "assets/sounds/egg-crack.wav"
 		},
@@ -41,20 +61,16 @@
 			"url": "assets/sounds/egg-launch.mp3"
 		},
 		{
+			"id": "zombieHitA",
+			"url": "assets/sounds/zombie-hit-a.mp3"
+		},
+		{
 			"id": "wolfGruntA",
 			"url": "assets/sounds/wolf-grunt-a.wav"
 		},
 		{
 			"id": "wolfGruntB",
 			"url": "assets/sounds/wolf-grunt-b.wav"
-		},
-		{
-			"id": "wolfBiteA",
-			"url": "assets/sounds/wolf-bite-a.wav"
-		},
-		{
-			"id": "wolfBiteB",
-			"url": "assets/sounds/wolf-bite-b.wav"
 		}
 	],
 

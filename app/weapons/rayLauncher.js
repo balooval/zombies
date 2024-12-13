@@ -55,6 +55,7 @@ export class RayLauncher extends Weapon {
 			startY: this.owner.position.y,
 			destX: destX,
 			destY: destY,
+			angle: this.owner.viewAngle,
 		};
 
 		const res = {

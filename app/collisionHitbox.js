@@ -14,6 +14,14 @@ export class FakeHitbox {
 	getSegments(margin = 0) {
 		return [];
 	}
+	
+	getSides() {
+		return [];
+	}
+
+	containTranslation(translation) {
+		return false;
+	}
 
 	dispose() {
 		
@@ -35,6 +43,14 @@ export class Hitbox {
 		}
 	}
 
+	containTranslation(translation) {
+		if (this.left > Math.max(translation.startX, translation.destX)) return false;
+		if (this.right < Math.min(translation.startX, translation.destX)) return false;
+		if (this.top < Math.min(translation.startY, translation.destY)) return false;
+		if (this.bottom > Math.max(translation.startY, translation.destY)) return false;
+		return true;
+	}
+
 	addPosition(x, y) {
 		if (this.hitBoxDebug) {
 			this.hitBoxDebug.setPosition(x, y);
@@ -49,7 +65,7 @@ export class Hitbox {
 	}
 
 	#buildSegments() {
-		return this.getSegments().map(segment => {
+		return this.getSides().map(segment => {
 			const normal = MATH.segmentNormal(segment);
 			return {
 				middle: MATH.lerpPoint(segment[0], segment[1], 0.5),
@@ -61,6 +77,19 @@ export class Hitbox {
 	}
 
 	getSegments(margin = 0) {
+		if (margin === 0) {
+			return this.segments;
+		}
+		
+		return this.getSides(margin).map((side, i) => {
+			return {
+				...this.segments[i],
+				positions: side,
+			};
+		});
+	}
+
+	getSides(margin = 0) {
 		return [
 			[
 				[this.left + margin, this.top - margin],
