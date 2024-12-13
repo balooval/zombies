@@ -15,6 +15,9 @@ class CollisionResolver {
     }
 
     removeFromLayer(entitie, layerName) {
+        if (!this.layers[layerName]) {
+            return;
+        }
         this.layers[layerName] = this.layers[layerName].filter(object => object !== entitie);
     }
 

@@ -132,6 +132,13 @@ class InteractiveBlock {
         InteractivePopup.display();
         InteractivePopup.place(this.centerX, this.centerY);
     }
+
+    dispose() {
+        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
+        this.hitBox.dispose();
+        this.sprite.dispose();
+        this.lights.forEach(light => light.dispose());
+    }
 }
 
 export {InteractiveBlock as default};

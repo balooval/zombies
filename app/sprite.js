@@ -116,7 +116,9 @@ export class SpriteBase {
 
 	changeAnimation(animationId) {}
 
-	dispose() {}
+	dispose() {
+		this.hide();
+	}
 }
 
 export class StillSprite extends SpriteBase {
@@ -169,6 +171,8 @@ export class StillSprite extends SpriteBase {
 
 	dispose() {
 		this.hide();
+		this.geometry.dispose();
+		this.mesh.material.dispose();
 	}
 }
 
@@ -230,15 +234,15 @@ export class AnimatedSprite extends SpriteBase {
 	
 	buildMesh(width, height, animationId) {
 		this.geometry = Renderer.buildRectangleGeometry(width, height);
-
 		const material = getSpriteMaterial(animationId);
-		
 		this.mesh = new Mesh(this.geometry, material);
 	}
 
 	dispose() {
-		this.hide();
+		super.dispose();
 		this.textureAnimation.dispose();
+		this.mesh.material.dispose();
+		this.geometry.dispose();
 	}
 }
 
@@ -271,6 +275,7 @@ export class FlatRectangleSprite {
 	
 	dispose() {
 		this.hide();
+		this.mesh.geometry.dispose();
 	}
 }
 

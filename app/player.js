@@ -359,7 +359,29 @@ export class Player {
 	}
 
 	dispose() {
-		// TODO
+		Mouse.evt.removeEventListener(Mouse.WHEEL_DOWN, this, this.onWheelDown);
+		Mouse.evt.removeEventListener(Mouse.WHEEL_UP, this, this.onWheelUp);
+		Mouse.evt.removeEventListener(Mouse.MOUSE_DOWN, this, this.onMouseDown);
+		Mouse.evt.removeEventListener(Mouse.MOUSE_UP, this, this.onMouseUp);
+		Input.evt.removeEventListener('DOWN', this, this.onKeyDown);
+		Input.evt.removeEventListener('UP', this, this.onKeyUp);
+		Input.evt.removeEventListener('SPACE', this, this.onKeyUp);
+		Input.evt.removeEventListener('DOWN_67', this, this.onDebug);
+
+		this.onStopShot();
+
+		this.weaponPointer.dispose();
+		this.sprite.dispose();
+		this.ambiantLight.dispose();
+		this.torchLight.dispose();
+		this.hitBox.dispose();
+
+		Stepper.stopListenStep(this.endShotAnimatonStep, this, this.setToIdle);
+
+		AnimationControl.unregisterToUpdate(this);
+		CollisionResolver.removeFromLayer(this, 'PLAYER');
+
+		this.evt.dispose();
 	}
 }
 
@@ -371,5 +393,9 @@ class WeaponPointer {
 
 	setPosition(x, y) {
 		this.sprite.setPosition(x, y);
+	}
+
+	dispose() {
+		this.sprite.dispose();
 	}
 }

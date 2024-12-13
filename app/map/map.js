@@ -1,5 +1,4 @@
 import * as Bonus from '../bonus.js';
-import * as Debug from '../debugCanvas.js';
 import * as Light from '../light.js';
 import * as MATH from '../utils/math.js';
 import * as Renderer from '../renderer.js';
@@ -26,6 +25,7 @@ import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
+export const DISPOSE_EVENT = 'DISPOSE_EVENT';
 
 export const WIDTH = 160;
 export const HEIGHT = 120;
@@ -64,9 +64,11 @@ export class GameMap {
         this.addBonusRate = mapDescription.bonus.addBonusRate;
         this.maxBonusCount = mapDescription.bonus.maxBonusCount;
         this.bonusChoices = mapDescription.bonus.choices;
+        this.nextBonusStep = 0;
 
         this.addZombiRate = mapDescription.addZombiRate;
         this.maxZombiesCount = mapDescription.maxZombiesCount;
+        this.nextZombiStep = 0;
 
         this.blocks = this.#buildBlocks(mapDescription.blocks);
         this.rootCell = this.#buildGraph();
@@ -79,8 +81,8 @@ export class GameMap {
 
         LightCanvas.setMap(this);
 
-        this.placeLights(mapDescription.lights);
-        this.placeFog(mapDescription.fog);
+        this.lights = this.placeLights(mapDescription.lights);
+        this.fogEmiters = this.placeFog(mapDescription.fog);
 
         // this.spreadBlood(40, 0, 2, {x:2, y:0});
     }
@@ -212,21 +214,28 @@ export class GameMap {
     }
 
     placeFog(fogDescription) {
+        const fogEmiters = [];
         for (const fog of fogDescription) {
-            new FogEmiter(fog.x, fog.y);
+            fogEmiters.push(new FogEmiter(fog.x, fog.y));
         }
+        return fogEmiters;
     }
 
     placeLights(lightsDescription) {
+        const lights = [];
         for (const pointLight of lightsDescription.pointLights) {
             const light = new Light.PointLight(pointLight.size, pointLight.x, pointLight.y, pointLight.color);
             light.turnOn();
+            lights.push(light);
         }
-
+        
         for (const rectLights of lightsDescription.rectLights) {
             const light = new Light.RectLight(rectLights.x, rectLights.y, rectLights.width, rectLights.height);
             light.turnOn();
+            lights.push(light);
         }
+        
+        return lights;
     }
 
     getTravel(startPos, endPos) {
@@ -265,7 +274,8 @@ export class GameMap {
 
     #addBonus(step) {
         Stepper.stopListenStep(Stepper.curStep, this, this.#addBonus);
-        Stepper.listenStep(Stepper.curStep + this.addBonusRate, this, this.#addBonus);
+        this.nextBonusStep = Stepper.curStep + this.addBonusRate;
+        Stepper.listenStep(this.nextBonusStep, this, this.#addBonus);
 
         if (Bonus.pool.size >= this.maxBonusCount) {
             return;
@@ -278,9 +288,9 @@ export class GameMap {
     }
 
     #addZombi(step) {
-
         Stepper.stopListenStep(Stepper.curStep, this, this.#addZombi);
-        Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
+        this.nextZombiStep = Stepper.curStep + this.addZombiRate;
+        Stepper.listenStep(this.nextZombiStep, this, this.#addZombi);
 
         if (Zombi.pool.size >= this.maxZombiesCount) {
             return;
@@ -288,7 +298,6 @@ export class GameMap {
 
         const destCell = this.getRandomCell();
 		const startPosition = {x: destCell.center.x, y: destCell.center.y};
-        // console.log('startPosition', startPosition);
 
         Zombi.createZombi(this.player, this, startPosition);
     }
@@ -319,6 +328,14 @@ export class GameMap {
         CollisionResolver.removeFromLayer(this, 'MAP');
         this.player.dispose();
         this.sprite.dispose();
+        this.blocks.forEach(block => block.dispose());
+        this.lights.forEach(light => light.dispose());
+        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
+        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
+        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
+        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+        this.evt.fireEvent(DISPOSE_EVENT);
+        this.evt.dispose();
     }
 
     #buildBlocks(blocksDescription) {
