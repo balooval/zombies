@@ -39,7 +39,7 @@ class Move {
 
 		if (wallHit) {
 			console.log('MUR DEVANT MOI');
-			this.evt.fireEvent('REACH');
+			this.evt.fireEvent('BLOCKED');
 			return;
 		}
 

@@ -48,6 +48,10 @@ class AStar {
 
     step() {
         const curWayPoint = this.getBestOpen();
+        if (!curWayPoint) {
+            console.log('Aucun chemin');
+            return [];
+        }
         if (this.isFinalWayPoint(curWayPoint)) {
             const path = this.buildPath(curWayPoint);
             return path;

@@ -43,6 +43,7 @@ class StateTravelGraph extends State {
 
 		this.zombieMove = new Move(0.1, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
+		this.zombieMove.evt.addEventListener('BLOCKED', this, this.onPathBlocked);
 
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable(map);
@@ -108,10 +109,16 @@ class StateTravelGraph extends State {
 		this.entity.playSound(['zombieStepA', 'zombieStepB', 'zombieStepC']);
 	}
 
+	onPathBlocked() {
+		console.log('onPathBlocked');
+		this.#getJourney();
+	}
+
 	#getJourney() {
 		this.test ++;
 		const destCell = this.map.getRandomCell();
 		const destPos = destCell.center;
+		// const destPos = {x: 70, y: 15};
 		this.travelPoints = this.map.getTravel(this.position, destPos);
 
 	}
@@ -127,7 +134,6 @@ class StateTravelGraph extends State {
 		}
 
 		const nextPoint = this.travelPoints.pop();
-		// console.log('nextPoint', nextPoint);
 		this.zombieMove.setDestination(nextPoint.x, nextPoint.y);
 	}
 
@@ -135,6 +141,7 @@ class StateTravelGraph extends State {
 		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		// Stepper.stopListenStep(this.newStepPlaySound, this, this.#playStepSound);
 		this.zombieMove.evt.removeEventListener('REACH', this, this.updateDirection);
+		this.zombieMove.evt.removeEventListener('BLOCKED', this, this.onPathBlocked);
 		this.playerFinder.evt.removeEventListener('VIEW', this, this.onViewPlayer);
 		this.hitable.dispose();
 		super.dispose();

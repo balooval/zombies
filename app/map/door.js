@@ -29,7 +29,7 @@ class Door {
             this.posY - this.height / 2,
             this.width,
             this.height,
-            0x102030
+            0xff0000
         );
 
         this.touchedPlayer = false;
@@ -68,6 +68,8 @@ class Door {
         } else {
             this.#open();
         }
+
+        this.map.onWallsChanged();
     }
 
     #open() {
@@ -83,7 +85,7 @@ class Door {
             this.openState.y - this.openState.height / 2,
             this.openState.width,
             this.openState.height,
-            0x102030
+            0x00ff00
         );
     }
 
@@ -100,7 +102,7 @@ class Door {
             this.posY - this.height / 2,
             this.width,
             this.height,
-            0x102030
+            0xff0000
         );
     }
 

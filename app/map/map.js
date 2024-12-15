@@ -88,6 +88,11 @@ export class GameMap {
         // this.spreadBlood(40, 0, 2, {x:2, y:0});
     }
 
+    onWallsChanged() {
+        this.rootCell = this.#buildGraph();
+        this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
+    }
+
     placeBlood(x, y, size) {
         const textureId = MATH.randomElement(['bloodSplash', 'bloodSplashB'])
         const textureImage = TextureLoader.get(textureId).image;
@@ -245,11 +250,20 @@ export class GameMap {
         const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
 
         if (!endCell) {
-            console.warn(endPos);
+            console.warn(startCell);
         }
 
         const nav = this.astar.launch(this.navigationGrid.get('cell_' + startCell.id), this.navigationGrid.get('cell_' + endCell.id));
-        console.log('nav', nav);
+
+        if (nav.length === 0) {
+            return [
+                new NavigationNode(
+                    MATH.random(startCell.left, startCell.right),
+                    MATH.random(startCell.bottom, startCell.top),
+                    'cell_' + startCell.id
+                )
+            ];
+        }
 
         for (const waypoint of nav) {
             positions.push(waypoint.node)

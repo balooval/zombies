@@ -50,6 +50,7 @@ class StateFollow extends State {
 
 		this.zombieMove = new Move(0.2, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.onReachDestination);
+		this.zombieMove.evt.addEventListener('BLOCKED', this, this.onPathBlocked);
 	}
 
 	removeSpriteLayer(name) {
@@ -121,6 +122,11 @@ class StateFollow extends State {
 		this.sprite.setRotation(this.zombieMove.moveTranslation.angle);
 	}
 
+	onPathBlocked() {
+		console.log('onPathBlocked');
+		this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
+	}
+
 	onReachDestination() {
 		const distanceToLastPlayerPosition = MATH.distance(this.playerFinder.lastViewPosition, this.position);
 
@@ -142,6 +148,7 @@ class StateFollow extends State {
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
 		Stepper.stopListenStep(this.nextUpdateDirectionStepDelay, this, this.changeDirection);
 		this.zombieMove.evt.removeEventListener('REACH', this, this.onReachDestination);
+		this.zombieMove.evt.removeEventListener('BLOCKED', this, this.onPathBlocked);
 		this.playerFinder.evt.removeEventListener('LOST', this, this.onLostPlayer);
 		this.hitable.dispose();
 		super.dispose();
