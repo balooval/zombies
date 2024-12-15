@@ -78,6 +78,10 @@ class InteractiveBlock {
 		return this.interactiveHitBox;
 	}
 
+    getLightCollisionBox() {
+		return this.interactiveHitBox;
+	}
+
     onCollide(collisions, layersName) {
 		switch (layersName) {
 			case 'PLAYER':

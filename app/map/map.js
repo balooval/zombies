@@ -330,6 +330,10 @@ export class GameMap {
         return this.hitBox;
     }
 
+    getLightCollisionBox() {
+        return this.hitBox;
+    }
+
     getWallsIntersections(segment, margin = 0) {
         const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox, margin)).filter(res => res);
 

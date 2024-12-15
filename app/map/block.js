@@ -32,6 +32,10 @@ class Block {
 		return this.hitBox;
 	}
 
+    getLightCollisionBox() {
+		return this.hitBox;
+	}
+
     dispose() {
         // TODO: retirer le Renderer.setFogBlock
         CollisionResolver.removeFromLayer(this, 'WALLS');

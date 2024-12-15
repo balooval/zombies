@@ -86,6 +86,10 @@ export class Zombi extends EntityWithStates{
 		return this.currentState.getWorldCollisionBox();
 	}
 
+	getLightCollisionBox() {
+		return this.currentState.getLightCollisionBox();
+	}
+
 	takeDamage(vector, damageCount) {
 		if (this.hitCooldown > 0) {
 			return;

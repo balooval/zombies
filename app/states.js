@@ -52,6 +52,10 @@ export class State {
 		return this.hitBox.addPosition(this.position.x, this.position.y);
 	}
 
+	getLightCollisionBox() {
+		return this.hitBox.addPosition(this.position.x, this.position.y);
+	}
+
 	removeSpriteLayer(name) {
 		
 	}

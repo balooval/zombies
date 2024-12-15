@@ -164,7 +164,7 @@ class LightCanvas {
 		const intersections = this.map.getWallsIntersections(hitSegment, 1);
 		const wallHit = intersections.shift();
 
-		const touched = CollisionResolver.checkIntersectionWithLayer(hitSegment, 'ENNEMIES');
+		const touched = CollisionResolver.checkLightIntersectionWithLayer(hitSegment, 'ENNEMIES');
 		const zombiHit = touched.shift();
 
 		if (!wallHit && !zombiHit) {

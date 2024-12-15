@@ -63,6 +63,10 @@ export class Bonus {
 		return this.hitBox.addPosition(this.position.x, this.position.y);
 	}
 
+	getLightCollisionBox() {
+		return this.hitBox.addPosition(this.position.x, this.position.y);
+	}
+
 	dispose() {
 		this.map.evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 		CollisionResolver.removeFromLayer(this, 'BONUS');

@@ -111,8 +111,8 @@ export function nearestPoint(point, segment) {
 }
 
 
-export function segmentWithPolygonIntersection(segment, polygon) {
-    return polygon.map(side => {
+export function segmentWithPolygonIntersection(segment, polygon, inverted) {
+    const res = polygon.map(side => {
         const intersection = segmentIntersection(
             segment.startX,
             segment.startY,
@@ -132,9 +132,13 @@ export function segmentWithPolygonIntersection(segment, polygon) {
             distance: distance({ x: segment.startX, y: segment.startY }, intersection),
         };
 
-    }).filter(res => res !== null)
-    .sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance)) // TODO: c'est inversé mais ça mais l'ombre des zombies derrière eux :)
-    .pop();
+    }).filter(res => res !== null);
+
+    if (inverted === true) {
+        return res.sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance)).pop();
+    }
+
+    return res.sort((hitA, hitB) => Math.sign(hitB.distance - hitA.distance)).pop();
 }
 
 export function segmentIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {

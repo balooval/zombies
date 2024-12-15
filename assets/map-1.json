@@ -2,8 +2,8 @@
     "backgroundImage": "mapTiles",
 
     "playerStartPosition": {
-        "x": 70,
-        "y": -10
+        "x": -70,
+        "y": -50
     },
 
     "bonus": {

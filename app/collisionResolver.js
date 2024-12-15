@@ -42,7 +42,29 @@ class CollisionResolver {
 
         const collisions = [];
         for (const layerEntitie of layer) {
-            const intersection = this.#entitiesIntersect(translation, layerEntitie);
+            const intersection = this.#entitiesIntersect(translation, layerEntitie.getWorldCollisionBox(), false);
+            if (intersection !== undefined) {
+                const distance = MATH.distance({x: translation.startX, y: translation.startY}, intersection);
+                collisions.push({
+                    target: layerEntitie,
+                    distance: distance,
+                    point: intersection,
+                });
+            }
+        }
+
+        return collisions.sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));;
+    }
+
+    checkLightIntersectionWithLayer(translation, layerName) {
+        const layer = this.layers[layerName];
+        if (layer === undefined) {
+            return [];
+        }
+
+        const collisions = [];
+        for (const layerEntitie of layer) {
+            const intersection = this.#entitiesIntersect(translation, layerEntitie.getLightCollisionBox(), true);
             if (intersection !== undefined) {
                 const distance = MATH.distance({x: translation.startX, y: translation.startY}, intersection);
                 collisions.push({
@@ -90,15 +112,13 @@ class CollisionResolver {
         return collisions;
     }
 
-    #entitiesIntersect(translation, layerEntitie) {
-        const hitbox = layerEntitie.getWorldCollisionBox();
-
+    #entitiesIntersect(translation, hitbox, inverted) {
         if (hitbox.containTranslation(translation) === false) {
             return undefined;
         }
         
         const polygon = hitbox.getSides();
-        return MATH.segmentWithPolygonIntersection(translation, polygon);
+        return MATH.segmentWithPolygonIntersection(translation, polygon, inverted);
     }
 
     entitiesCollide(entitieA, entitieB) {
