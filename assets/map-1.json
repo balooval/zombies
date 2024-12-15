@@ -2,8 +2,8 @@
     "backgroundImage": "mapTiles",
 
     "playerStartPosition": {
-        "x": -70,
-        "y": -50
+        "x": 70,
+        "y": -15
     },
 
     "bonus": {
@@ -110,6 +110,7 @@
                     ]
                 }
             },
+
             {
                 "comment": "Pièce bas droite",
                 "x": 52,
@@ -130,6 +131,7 @@
                         }                    ]
                 }
             },
+
             {
                 "comment": "Pièce haut droite",
                 "x": 52,
@@ -151,6 +153,7 @@
                     ]
                 }
             },
+
             {
                 "comment": "Pièce gauche",
                 "x": -35,
@@ -177,6 +180,27 @@
                             "color": "#ffff90"
                         }
                     ]
+                }
+            }
+        ],
+
+        "box": [
+            {
+                "x": -6,
+                "y": 42,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": ["BonusMine"]
+                }
+            },
+            {
+                "x": -8,
+                "y": 33,
+                "width": 9,
+                "height": 9,
+                "onBreak": {
+                    "bonus": []
                 }
             }
         ],

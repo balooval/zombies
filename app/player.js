@@ -64,7 +64,6 @@ export class Player {
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
 		const baseWeapon = new RayLauncher(this.map);
-		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();

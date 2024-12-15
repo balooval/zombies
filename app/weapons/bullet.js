@@ -11,7 +11,8 @@ import {Vector2} from './../../vendor/three.module.js';
 
 class Bullet {
 
-	constructor(posX, posY, angle) {
+	constructor(map, posX, posY, angle) {
+		this.map = map;
 		this.angle = angle;
 		const speed = 2;
 		
@@ -53,11 +54,14 @@ class Bullet {
 	}
 
 	#onCollideWall(walls) {
+		CollisionResolver.forgotCollisionWithLayer(this, 'WALLS');
+
 		for (const wall of walls) {
-			CollisionResolver.forgotCollisionWithLayer(this, 'WALLS');
-			const hitSprite = new HitSprite(this.position.x, this.position.y, 6, 10);
-			SoundLoader.play('eggCrack', 0.2);
+			wall.takeDamage(this.vector, 0.4);
 		}
+		
+		const hitSprite = new HitSprite(this.position.x, this.position.y, 6, 10);
+		SoundLoader.play('eggCrack', 0.2);
 
 		Particules.create(Particules.EGG_EXPLOSION, this.position, new Vector2(1, 0.7));
 		this.dispose();

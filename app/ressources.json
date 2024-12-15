@@ -1,6 +1,10 @@
 {
 	"sounds": [
 		{
+			"id": "woodenBoxBreak",
+			"url": "assets/sounds/woodenBoxBreak.mp3"
+		},
+		{
 			"id": "zombieMoanA",
 			"url": "assets/sounds/zombie-moan-a.mp3"
 		},
@@ -75,6 +79,10 @@
 	],
 
 	"textures": [
+		{
+			"id": "woodenBox",
+			"url": "assets/wodden-box.png"
+		},
 		{
 			"id": "mapTiles",
 			"url": "assets/map-tiles.png"

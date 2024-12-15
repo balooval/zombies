@@ -2,11 +2,12 @@ import * as MATH from './utils/math.js';
 
 export function getIntersection(translation, hitbox, margin = 0) {
 
+    // TODO: ne plus utiiser margin mais la hitbix de lumiere
     if (hitbox.containTranslation(translation) === false) {
         return undefined;
     }
 
-    return hitbox
+    const res = hitbox
     .getSegments(margin)
     .filter(segment => {
         const diff = MATH.angleDiff(translation.angle, segment.normalAngle);
@@ -32,7 +33,11 @@ export function getIntersection(translation, hitbox, margin = 0) {
             distance: MATH.distance({ x: translation.startX, y: translation.startY }, intersection),
         };
     })
-    .filter(res => res !== null)
-    .sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance))
-    .shift();
+    .filter(res => res !== null);
+
+    if (hitbox.isInverted() === true) {
+        return res.sort((hitA, hitB) => Math.sign(hitB.distance - hitA.distance)).shift();
+    }
+    
+    return res.sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance)).shift();
 }

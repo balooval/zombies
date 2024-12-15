@@ -161,7 +161,7 @@ class LightCanvas {
 	}
 
 	#getNearestHit(hitSegment, defaultEnd) {
-		const intersections = this.map.getWallsIntersections(hitSegment, 1);
+		const intersections = this.map.getWallsLightIntersections(hitSegment);
 		const wallHit = intersections.shift();
 
 		const touched = CollisionResolver.checkLightIntersectionWithLayer(hitSegment, 'ENNEMIES');

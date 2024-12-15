@@ -6,15 +6,14 @@ import * as Stepper from '../utils/stepper.js';
 
 import {FakeHitbox, Hitbox} from '../collisionHitbox.js';
 
+import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
 
-class InteractiveBlock {
+class InteractiveBlock extends BlockBase {
     constructor(map, posX, posY, width, height, label, onActive, isSolid) {
+        super(posX, posY, width, height);
+
         this.map = map;
-        this.posX = posX;
-        this.posY = posY;
-        this.width = width;
-        this.height = height;
         this.label = label;
         this.isSolid = isSolid;
         this.centerX = this.posX + (this.width * 0.5);
@@ -79,7 +78,7 @@ class InteractiveBlock {
 	}
 
     getLightCollisionBox() {
-		return this.interactiveHitBox;
+		return this.hitBox;
 	}
 
     onCollide(collisions, layersName) {
@@ -138,8 +137,8 @@ class InteractiveBlock {
     }
 
     dispose() {
+        super.dispose();
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        this.hitBox.dispose();
         this.sprite.dispose();
         this.lights.forEach(light => light.dispose());
     }

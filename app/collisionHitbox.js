@@ -23,17 +23,22 @@ export class FakeHitbox {
 		return false;
 	}
 
+	isInverted() {
+		return false;
+	}
+
 	dispose() {
 		
 	}
 }
 
 export class Hitbox {
-	constructor(left, right, bottom, top, debug = false) {
+	constructor(left, right, bottom, top, debug = false, normalFactor = 1) {
 		this.left = left;
 		this.right = right;
 		this.bottom = bottom;
 		this.top = top;
+		this.normalFactor = normalFactor;
 		this.hitBoxDebug = undefined;
 
 		this.segments = this.#buildSegments();
@@ -64,6 +69,10 @@ export class Hitbox {
 		)
 	}
 
+	isInverted() {
+		return this.normalFactor === -1;
+	}
+
 	#buildSegments() {
 		return this.getSides().map(segment => {
 			const normal = MATH.segmentNormal(segment);
@@ -71,7 +80,7 @@ export class Hitbox {
 				middle: MATH.lerpPoint(segment[0], segment[1], 0.5),
 				positions: segment,
 				normal: normal,
-				normalAngle: Math.atan2(normal[1], normal[0]),
+				normalAngle: Math.atan2(normal[1] * this.normalFactor, normal[0] * this.normalFactor),
 			}
         })
 	}

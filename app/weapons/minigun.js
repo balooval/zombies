@@ -36,16 +36,20 @@ export class Minigun extends Weapon {
 
 		Renderer.setFogFlux(hit.start.x, hit.start.y, hit.point.x, hit.point.y, 5, 1);
 
-		if (hit.target === null) {
-			Particules.create(Particules.EGG_EXPLOSION, hit.point, {x: 1, y: 0.7});
-			return;
-		}
+		
 
 		const vectorPower = 3;
 		const vector = {
 			x: Math.cos(this.owner.viewAngle) * vectorPower,
 			y: Math.sin(this.owner.viewAngle) * vectorPower,
 		}
+
+		if (hit.target === null) {
+			Particules.create(Particules.EGG_EXPLOSION, hit.point, {x: 1, y: 0.7});
+			hit.point.block.takeDamage(vector, 2);
+			return;
+		}
+		
 		hit.target.takeDamage(vector, 1);
 	}
 

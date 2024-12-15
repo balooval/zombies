@@ -287,9 +287,18 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'mineIcon',
 		frames: [],
 	},
+	woodenBox: {
+		textureId: 'woodenBox',
+		frames: [],
+	},
 }));
 
 const animations = {
+	woodenBox: {
+		spriteSheet: 'woodenBox',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	light: {
 		spriteSheet: 'light',
 		stepsByFrame: -1,

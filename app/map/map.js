@@ -22,6 +22,7 @@ import {FogEmiter} from '../fogEmiter.js';
 import {Hitbox} from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
 import LightCanvas from '../lightCanvas.js';
+import WoodenBox from './woodenBox.js';
 import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
@@ -335,13 +336,33 @@ export class GameMap {
     }
 
     getWallsIntersections(segment, margin = 0) {
-        const wallHits = this.blocks.map(block => getIntersection(segment, block.hitBox, margin)).filter(res => res);
-
-        const wallHitsWithDistance = wallHits.map(position => {
+        const wallHits = this.blocks.map(block => {
             return {
-                x: position.x,
-                y: position.y,
-                distance: MATH.distance({ x: segment.startX, y: segment.startY }, position),
+                block: block,
+                intersection: getIntersection(segment, block.getWorldCollisionBox(), margin)
+            };
+        }).filter(res => res.intersection);
+
+        return this.#getInernalWallsIntersections(segment, wallHits);
+    }
+
+    getWallsLightIntersections(segment) {
+        const wallHits = this.blocks.map(block => {
+            return {
+                block: block,
+                intersection: getIntersection(segment, block.getLightCollisionBox())
+            };
+        }).filter(res => res.intersection);
+        return this.#getInernalWallsIntersections(segment, wallHits);
+    }
+
+    #getInernalWallsIntersections(segment, wallHits) {
+        const wallHitsWithDistance = wallHits.map(hit => {
+            return {
+                block: hit.block,
+                x: hit.intersection.x,
+                y: hit.intersection.y,
+                distance: MATH.distance({ x: segment.startX, y: segment.startY }, hit.intersection),
             };
         }).sort((hitA, hitB) => Math.sign(hitA.distance - hitB.distance));
 
@@ -362,6 +383,11 @@ export class GameMap {
         this.evt.dispose();
     }
 
+    removeBlock(blockToRemove) {
+        this.blocks = this.blocks.filter(block => block !== blockToRemove);
+        this.onWallsChanged();
+    }
+
     #buildBlocks(blocksDescription) {
         const blocks = [];
         // Pour DEBUG, correspond au schéma papier
@@ -375,6 +401,10 @@ export class GameMap {
 
         for (const door of blocksDescription.doors) {
             blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
+        }
+
+        for (const box of blocksDescription.box) {
+            blocks.push(new WoodenBox(this, box.x, box.y, box.width, box.height, box.onBreak));
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {

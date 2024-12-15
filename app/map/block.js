@@ -3,17 +3,16 @@ import * as Renderer from '../renderer.js';
 import * as SpriteFactory from '../spriteFactory.js';
 import * as TextureLoader from '../net/loaderTexture.js';
 
+import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
 import {Hitbox} from '../collisionHitbox.js';
 
-class Block {
+class Block extends BlockBase {
     constructor(posX, posY, width, height) {
-        this.posX = posX;
-        this.posY = posY;
-        this.width = width;
-        this.height = height;
-        this.isSolid = true;
+        super(posX, posY, width, height);
+        
         this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
+        this.hitBoxLight = new Hitbox(this.posX + 1, this.posX + this.width - 1, this.posY - this.height + 1, this.posY - 1, true, 1);
 
         this.sprite = SpriteFactory.createStillSprite(
             this.posX + this.width / 2,
@@ -33,13 +32,13 @@ class Block {
 	}
 
     getLightCollisionBox() {
-		return this.hitBox;
+		return this.hitBoxLight;
 	}
 
     dispose() {
+        super.dispose();
         // TODO: retirer le Renderer.setFogBlock
         CollisionResolver.removeFromLayer(this, 'WALLS');
-        this.hitBox.dispose();
         this.sprite.dispose();
     }
 }

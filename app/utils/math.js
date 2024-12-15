@@ -39,6 +39,9 @@ export function random(min, max) {
 }
 
 export function randomElement(collection) {
+    if (collection.length === 0) {
+		return null;
+	}
     const index = Math.floor(Math.random() * collection.length);
     return collection[index];
 }

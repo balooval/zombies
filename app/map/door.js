@@ -6,15 +6,14 @@ import * as Stepper from '../utils/stepper.js';
 
 import {FakeHitbox, Hitbox} from '../collisionHitbox.js';
 
+import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
 
-class Door {
+class Door extends BlockBase {
     constructor(map, posX, posY, width, height, openState) {
+        super(posX, posY, width, height);
+        
         this.map = map;
-        this.posX = posX;
-        this.posY = posY;
-        this.width = width;
-        this.height = height;
         this.openState = openState;
         this.label = "E pour ouvrir";
         this.centerX = this.posX + (this.width * 0.5);
@@ -36,15 +35,17 @@ class Door {
         this.stepToHide = 0;
         this.isOpen = false;
 
+        CollisionResolver.addToLayer(this, 'WALLS');
+
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
     }
 
     getWorldCollisionBox() {
-		return this.interactiveHitBox;
+		return this.hitBox;
 	}
 
     getLightCollisionBox() {
-		return this.interactiveHitBox;
+		return this.hitBox;
 	}
 
     onCollide(collisions, layersName) {
@@ -126,8 +127,9 @@ class Door {
     }
 
     dispose() {
+        super.dispose();
+        CollisionResolver.removeFromLayer(this, 'WALLS');
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        this.hitBox.dispose();
         this.sprite.dispose();
     }
 }
