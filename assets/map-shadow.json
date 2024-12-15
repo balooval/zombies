@@ -19,7 +19,7 @@
     },
 
     "addZombiRate": 80,
-    "maxZombiesCount": 0,
+    "maxZombiesCount": 1,
 
     "fog": [],
     "zombiesSpawnLocations": [],

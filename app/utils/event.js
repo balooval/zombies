@@ -58,6 +58,11 @@ class Evt {
 			evs[i].call(lst[i], _args);
 		}
 	}
+
+	dispose() {
+		this.events = new Map();
+		this.listeners = new Map();
+	}
 }
 
 export { Evt as default}

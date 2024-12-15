@@ -3,6 +3,7 @@ import * as SpriteFactory from './spriteFactory.js';
 
 import BulletLauncher from './weapons/bulletLauncher.js';
 import CollisionResolver from './collisionResolver.js';
+import {DISPOSE_EVENT} from './map/map.js';
 import GrenadeLauncher from './weapons/grenadeLauncher.js';
 import {Hitbox} from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
@@ -37,7 +38,8 @@ export function createRandomBonus(choices, destPos, map) {
 
 export class Bonus {
 
-	constructor(posX, posY, spriteId) {
+	constructor(map, posX, posY, spriteId) {
+		this.map = map;
 		this.weapon = null;
 		this.position = new Vector2(posX, posY);
 		this.hitBox = new Hitbox(-2, 2, -2, 2, true);
@@ -48,6 +50,8 @@ export class Bonus {
 		this.sprite.setDepth(4);
 
 		pool.set(this, this);
+
+		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 
 	take() {
@@ -60,6 +64,7 @@ export class Bonus {
 	}
 
 	dispose() {
+		this.map.evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 		CollisionResolver.removeFromLayer(this, 'BONUS');
 		this.sprite.dispose();
 		this.hitBox.dispose();
@@ -70,7 +75,7 @@ export class Bonus {
 export class BonusEgg extends Bonus {
 
 	constructor(posX, posY, map) {
-		super(posX, posY, 'bullet');
+		super(map, posX, posY, 'bullet');
 		this.weapon = new BulletLauncher();
 	}
 }
@@ -78,7 +83,7 @@ export class BonusEgg extends Bonus {
 export class BonusMinigun extends Bonus {
 
 	constructor(posX, posY, map) {
-		super(posX, posY, 'bonusMinigun');
+		super(map, posX, posY, 'bonusMinigun');
 		this.weapon = new Minigun(map);
 	}
 }
@@ -86,7 +91,7 @@ export class BonusMinigun extends Bonus {
 export class BonusGun extends Bonus {
 
 	constructor(posX, posY, map) {
-		super(posX, posY, 'bonusBullet');
+		super(map, posX, posY, 'bonusBullet');
 		this.weapon = new RayLauncher(map);
 	}
 }
@@ -94,7 +99,7 @@ export class BonusGun extends Bonus {
 export class BonusGrenade extends Bonus {
 
 	constructor(posX, posY, map) {
-		super(posX, posY, 'bonusGrenade');
+		super(map, posX, posY, 'bonusGrenade');
 		this.weapon = new GrenadeLauncher();
 	}
 }
@@ -102,7 +107,7 @@ export class BonusGrenade extends Bonus {
 export class BonusMine extends Bonus {
 
 	constructor(posX, posY, map) {
-		super(posX, posY, 'mineIcon');
+		super(map, posX, posY, 'mineIcon');
 		this.weapon = new MineLauncher();
 	}
 }

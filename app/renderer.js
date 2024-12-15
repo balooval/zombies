@@ -133,6 +133,7 @@ export function setFogBlock(posX, posY, width, height) {
 }
 
 export function setFogFlux(xA, yA, xB, yB, width, power) {
+	return;
 	const startX = toSmallLocalX(xA);
 	const startY = toSmallLocalY(yA);
 	const endX = toSmallLocalX(xB);
@@ -147,6 +148,7 @@ export function setFogFlux(xA, yA, xB, yB, width, power) {
 }
 
 export function drawFogFlux(posX, posY, scale) {
+	return;
 	const spriteSize = 64 * scale;
 	const x = toSmallLocalX(posX) - (spriteSize * 0.5);
 	const y = toSmallLocalY(posY) - (spriteSize * 0.5);
@@ -170,10 +172,9 @@ export function start() {
 
 
 	renderer.autoClear = false;
-	renderer.setRenderTarget(fogInput)
-	// renderer.setClearColor(0x000000, 0);
-	// renderer.clear();
-	renderer.render(fogScene, camera);
+	// Enlever commentaire pour avoir le rendu du fog
+	// renderer.setRenderTarget(fogInput)
+	// renderer.render(fogScene, camera);
 
 	renderer.setRenderTarget(fogOutput)
 	renderer.setClearColor(0x000000, 1);

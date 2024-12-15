@@ -38,6 +38,7 @@ export class FogEmiter {
 	}
 
 	dispose() {
+		Renderer.fogScene.remove(this.mesh);
         this.geometry.dispose();
         this.mesh.material.dispose();
 	}

@@ -23,24 +23,21 @@ class Block {
             TextureLoader.get('wallTop')
         );
 
-        // this.sprite = SpriteFactory.createFlatRectangleSprite(
-        //     this.posX + this.width / 2,
-        //     this.posY - this.height / 2,
-        //     this.width,
-        //     this.height,
-        //     0x102030
-        // );
-
         CollisionResolver.addToLayer(this, 'WALLS');
 
-        // Debug.drawBlock(this);
-        
         Renderer.setFogBlock(this.posX, this.posY, this.width, this.height);
     }
 
     getWorldCollisionBox() {
 		return this.hitBox;
 	}
+
+    dispose() {
+        // TODO: retirer le Renderer.setFogBlock
+        CollisionResolver.removeFromLayer(this, 'WALLS');
+        this.hitBox.dispose();
+        this.sprite.dispose();
+    }
 }
 
 export {Block as default};

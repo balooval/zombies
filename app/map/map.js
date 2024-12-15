@@ -1,5 +1,4 @@
 import * as Bonus from '../bonus.js';
-import * as Debug from '../debugCanvas.js';
 import * as Light from '../light.js';
 import * as MATH from '../utils/math.js';
 import * as Renderer from '../renderer.js';
@@ -17,6 +16,7 @@ import {
 import AstarBuilder from '../astar/AStarBuilder.js';
 import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
+import Door from './door.js';
 import Evt from '../utils/event.js';
 import {FogEmiter} from '../fogEmiter.js';
 import {Hitbox} from '../collisionHitbox.js';
@@ -26,6 +26,7 @@ import { getIntersection } from '../intersectionResolver.js';
 
 export const GAME_OVER_EVENT = 'GAME_OVER_EVENT';
 export const WOLF_TOUCH_GROUND_EVENT = 'WOLF_TOUCH_GROUND_EVENT';
+export const DISPOSE_EVENT = 'DISPOSE_EVENT';
 
 export const WIDTH = 160;
 export const HEIGHT = 120;
@@ -64,9 +65,11 @@ export class GameMap {
         this.addBonusRate = mapDescription.bonus.addBonusRate;
         this.maxBonusCount = mapDescription.bonus.maxBonusCount;
         this.bonusChoices = mapDescription.bonus.choices;
+        this.nextBonusStep = 0;
 
         this.addZombiRate = mapDescription.addZombiRate;
         this.maxZombiesCount = mapDescription.maxZombiesCount;
+        this.nextZombiStep = 0;
 
         this.blocks = this.#buildBlocks(mapDescription.blocks);
         this.rootCell = this.#buildGraph();
@@ -79,10 +82,15 @@ export class GameMap {
 
         LightCanvas.setMap(this);
 
-        this.placeLights(mapDescription.lights);
-        this.placeFog(mapDescription.fog);
+        this.lights = this.placeLights(mapDescription.lights);
+        this.fogEmiters = this.placeFog(mapDescription.fog);
 
         // this.spreadBlood(40, 0, 2, {x:2, y:0});
+    }
+
+    onWallsChanged() {
+        this.rootCell = this.#buildGraph();
+        this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
     }
 
     placeBlood(x, y, size) {
@@ -212,21 +220,28 @@ export class GameMap {
     }
 
     placeFog(fogDescription) {
+        const fogEmiters = [];
         for (const fog of fogDescription) {
-            new FogEmiter(fog.x, fog.y);
+            fogEmiters.push(new FogEmiter(fog.x, fog.y));
         }
+        return fogEmiters;
     }
 
     placeLights(lightsDescription) {
+        const lights = [];
         for (const pointLight of lightsDescription.pointLights) {
             const light = new Light.PointLight(pointLight.size, pointLight.x, pointLight.y, pointLight.color);
             light.turnOn();
+            lights.push(light);
         }
-
+        
         for (const rectLights of lightsDescription.rectLights) {
             const light = new Light.RectLight(rectLights.x, rectLights.y, rectLights.width, rectLights.height);
             light.turnOn();
+            lights.push(light);
         }
+        
+        return lights;
     }
 
     getTravel(startPos, endPos) {
@@ -234,7 +249,22 @@ export class GameMap {
         const startCell = this.rootCell.getCellByPosition(startPos.x, startPos.y);
         const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
 
+        if (!endCell) {
+            console.warn(startCell);
+        }
+
         const nav = this.astar.launch(this.navigationGrid.get('cell_' + startCell.id), this.navigationGrid.get('cell_' + endCell.id));
+
+        if (nav.length === 0) {
+            return [
+                new NavigationNode(
+                    MATH.random(startCell.left, startCell.right),
+                    MATH.random(startCell.bottom, startCell.top),
+                    'cell_' + startCell.id,
+                    startCell
+                )
+            ];
+        }
 
         for (const waypoint of nav) {
             positions.push(waypoint.node)
@@ -265,7 +295,8 @@ export class GameMap {
 
     #addBonus(step) {
         Stepper.stopListenStep(Stepper.curStep, this, this.#addBonus);
-        Stepper.listenStep(Stepper.curStep + this.addBonusRate, this, this.#addBonus);
+        this.nextBonusStep = Stepper.curStep + this.addBonusRate;
+        Stepper.listenStep(this.nextBonusStep, this, this.#addBonus);
 
         if (Bonus.pool.size >= this.maxBonusCount) {
             return;
@@ -278,19 +309,17 @@ export class GameMap {
     }
 
     #addZombi(step) {
-
         Stepper.stopListenStep(Stepper.curStep, this, this.#addZombi);
-        Stepper.listenStep(Stepper.curStep + this.addZombiRate, this, this.#addZombi);
+        this.nextZombiStep = Stepper.curStep + this.addZombiRate;
+        Stepper.listenStep(this.nextZombiStep, this, this.#addZombi);
 
         if (Zombi.pool.size >= this.maxZombiesCount) {
             return;
         }
 
-        const destCell = this.getRandomCell();
-		const startPosition = {x: destCell.center.x, y: destCell.center.y};
-        // console.log('startPosition', startPosition);
+        const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
 
-        Zombi.createZombi(this.player, this, startPosition);
+        Zombi.createZombi(this.player, this, {x: startPosition.x, y: startPosition.y});
     }
 
     onPlayerDead() {
@@ -319,6 +348,14 @@ export class GameMap {
         CollisionResolver.removeFromLayer(this, 'MAP');
         this.player.dispose();
         this.sprite.dispose();
+        this.blocks.forEach(block => block.dispose());
+        this.lights.forEach(light => light.dispose());
+        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
+        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
+        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
+        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+        this.evt.fireEvent(DISPOSE_EVENT);
+        this.evt.dispose();
     }
 
     #buildBlocks(blocksDescription) {
@@ -330,6 +367,10 @@ export class GameMap {
 
         for (const wall of blocksDescription.walls) {
             blocks.push(new Block(wall.x, wall.y, wall.width, wall.height));
+        }
+
+        for (const door of blocksDescription.doors) {
+            blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {
@@ -372,14 +413,14 @@ export class GameMap {
             const x = cell.center.x;
             const y = cell.center.y;
             const index = x + '_' + y;
-            const node = new NavigationNode(x, y, 'cell_' + cell.id);
+            const node = new NavigationNode(x, y, 'cell_' + cell.id, cell);
             navigationGrid.set(index, node);
 
             for (const connection of cell.connections) {
                 const x = connection.point[0];
                 const y = connection.point[1];
                 const index = x + '_' + y;
-                const node = new NavigationNode(x, y, cell.id + '_' + connection.cell.id);
+                const node = new NavigationNode(x, y, cell.id + '_' + connection.cell.id, null);
                 navigationGrid.set(index, node);
             }
         }
@@ -414,10 +455,11 @@ export class GameMap {
 let debugId = 0;
 
 class NavigationNode {
-    constructor(posX, posY, id) {
+    constructor(posX, posY, id, cell) {
         this.x = posX;
         this.y = posY;
         this.id = id;
+        this.cell = cell;
         this.connections = [];
     }
 
@@ -435,6 +477,9 @@ class Cell {
         this.id = debugId;
         debugId++;
         this.left = left;
+        if (right === -85) {
+            console.warn('CELL', this);
+        }
         this.right = right;
         this.bottom = bottom;
         this.top = top;
@@ -566,7 +611,6 @@ class Cell {
     }
 
     buildHorizontalChilds() {
-
         let horPositions = this.blocks.map(block => [block.posX, block.posX + block.width]).flat();
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
@@ -575,15 +619,17 @@ class Cell {
         let prevLeft = this.left;
 
         for (const posX of horPositions) {
-            const child = new Cell(
-                prevLeft,
-                posX,
-                this.bottom,
-                this.top,
-                this.blocks,
-            );
-            child.buildVerticalChilds();
-            this.childs.push(child);
+            if (prevLeft < posX) {
+                const child = new Cell(
+                    prevLeft,
+                    posX,
+                    this.bottom,
+                    this.top,
+                    this.blocks,
+                );
+                child.buildVerticalChilds();
+                this.childs.push(child);
+            }
             prevLeft = posX;
         }
     }
@@ -611,7 +657,7 @@ class Cell {
 
     #cleanBlocks(blocks) {
         return blocks.filter(block => {
-            if (block.isSolid ===false) return false;
+            if (block.isSolid === false) return false;
             if (block.posX >= this.right) return false;
             if (block.posX + block.width <= this.left) return false;
             if (block.posY <= this.bottom) return false;

@@ -8,23 +8,20 @@ import {FakeHitbox, Hitbox} from '../collisionHitbox.js';
 
 import CollisionResolver from '../collisionResolver.js';
 
-class InteractiveBlock {
-    constructor(map, posX, posY, width, height, label, onActive, isSolid) {
+class Door {
+    constructor(map, posX, posY, width, height, openState) {
         this.map = map;
         this.posX = posX;
         this.posY = posY;
         this.width = width;
         this.height = height;
-        this.label = label;
-        this.isSolid = isSolid;
+        this.openState = openState;
+        this.label = "E pour ouvrir";
         this.centerX = this.posX + (this.width * 0.5);
         this.centerY = this.posY - (this.height * 0.5);
 
-        if (this.isSolid === true) {
-            this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
-        } else {
-            this.hitBox = new FakeHitbox();
-        }
+        this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
+        
         const margin = 2;
         this.interactiveHitBox = new Hitbox(this.posX - margin, this.posX + this.width + margin, this.posY - this.height - margin, this.posY + margin, true);
         this.sprite = SpriteFactory.createFlatRectangleSprite(
@@ -32,46 +29,14 @@ class InteractiveBlock {
             this.posY - this.height / 2,
             this.width,
             this.height,
-            0x102030
+            0xff0000
         );
 
         this.touchedPlayer = false;
         this.stepToHide = 0;
-        this.lightAreOn = false;
-        this.onDuration = onActive.duration;
+        this.isOpen = false;
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
-
-        this.lights = [
-            // new Light.RectLight(-75, 15, 120, 30),
-            // new Light.BlinkRectLight(-75, 40, 120, 30),
-        ];
-
-        this.#buildLights(onActive);
-
-        this.lights.forEach(light => light.turnOff());
-
-        
-    }
-
-    #buildLights(onActive) {
-        if (!onActive.lights) {
-            return;
-        }
-
-        for (const light of onActive.lights) {
-            if (light.type === 'rectLight') {
-                this.lights.push(new Light.RectLight(light.x, light.y, light.width, light.height));
-            }
-
-            if (light.type === 'blinkRectLight') {
-                this.lights.push(new Light.BlinkRectLight(light.x, light.y, light.width, light.height));
-            }
-            
-            if (light.type === 'pointLight') {
-                this.lights.push(new Light.PointLight(light.size, light.x, light.y, light.color));
-            }
-        }
     }
 
     getWorldCollisionBox() {
@@ -94,31 +59,54 @@ class InteractiveBlock {
     }
 
     onKeyDown() {
-        if (this.lightAreOn === true) {
-            return;
+        
+        // CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
+        // Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        
+        if (this.isOpen === true) {
+            this.#close();
+        } else {
+            this.#open();
         }
-        
-        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
-        
-        this.lights.forEach(light => light.turnOn());
-        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        this.lightAreOn = true;
 
-        if (this.onDuration > 0) {
-            Stepper.listenStep(Stepper.curStep + this.onDuration, this, this.turnOff);
-        }
+        this.map.onWallsChanged();
     }
 
-    turnOff() {
-        Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
-        this.lights.forEach(light => light.turnOff());
-        this.lightAreOn = false;
-        CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
+    #open() {
+        this.isOpen = true;
+        this.label = "E pour fermer";
+        
+        this.hitBox.dispose();
+        this.hitBox = new Hitbox(this.openState.x, this.openState.x + this.openState.width, this.openState.y - this.openState.height, this.openState.y, true);
+        
+        this.sprite.dispose();
+        this.sprite = SpriteFactory.createFlatRectangleSprite(
+            this.openState.x + this.openState.width / 2,
+            this.openState.y - this.openState.height / 2,
+            this.openState.width,
+            this.openState.height,
+            0x00ff00
+        );
+    }
+
+    #close() {
+        this.isOpen = false;
+        this.label = "E pour ouvrir";
+        
+        this.hitBox.dispose();
+        this.hitBox = new Hitbox(this.posX, this.posX + this.width, this.posY - this.height, this.posY, true);
+
+        this.sprite.dispose();
+        this.sprite = SpriteFactory.createFlatRectangleSprite(
+            this.posX + this.width / 2,
+            this.posY - this.height / 2,
+            this.width,
+            this.height,
+            0xff0000
+        );
     }
 
     #onPlayerTouch(players) {
-
         if (this.touchedPlayer === false) {
             Input.evt.addEventListener('DOWN_69', this, this.onKeyDown);
         }
@@ -137,8 +125,7 @@ class InteractiveBlock {
         CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
         this.hitBox.dispose();
         this.sprite.dispose();
-        this.lights.forEach(light => light.dispose());
     }
 }
 
-export {InteractiveBlock as default};
+export {Door as default};

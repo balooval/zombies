@@ -46,8 +46,11 @@ class StateFollow extends State {
 		this.playerFinder = new PlayerFinder(this.entitieToReach, map, 1.5);
 		this.playerFinder.evt.addEventListener('LOST', this, this.onLostPlayer);
 
+		this.nextUpdateDirectionStepDelay = 0;
+
 		this.zombieMove = new Move(0.2, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.onReachDestination);
+		this.zombieMove.evt.addEventListener('BLOCKED', this, this.onPathBlocked);
 	}
 
 	removeSpriteLayer(name) {
@@ -99,13 +102,13 @@ class StateFollow extends State {
 	changeDirection(step) {
 		Stepper.stopListenStep(Stepper.curStep, this, this.changeDirection);
 		this.zombieMove.setDestination(this.playerFinder.lastViewPosition.x, this.playerFinder.lastViewPosition.y)
-		const nextUpdateDirectionStepDelay = Math.round(MATH.randomValue(10, 120));
-		// TODO: retirer dans le dispose
-		Stepper.listenStep(Stepper.curStep + nextUpdateDirectionStepDelay, this, this.changeDirection);
+		this.nextUpdateDirectionStepDelay = Stepper.curStep + Math.round(MATH.randomValue(10, 120));
+		Stepper.listenStep(this.nextUpdateDirectionStepDelay, this, this.changeDirection);
 	}
 
 	suspend() {
 		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
+		Stepper.stopListenStep(this.nextUpdateDirectionStepDelay, this, this.changeDirection);
 		this.hitable.disable();
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
 		super.suspend();
@@ -117,6 +120,11 @@ class StateFollow extends State {
 		this.playerFinder.update(this.position, this.zombieMove.moveTranslation);
 		this.zombieMove.update();
 		this.sprite.setRotation(this.zombieMove.moveTranslation.angle);
+	}
+
+	onPathBlocked() {
+		console.log('onPathBlocked');
+		this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
 	}
 
 	onReachDestination() {
@@ -138,7 +146,9 @@ class StateFollow extends State {
 	dispose() {
 		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
+		Stepper.stopListenStep(this.nextUpdateDirectionStepDelay, this, this.changeDirection);
 		this.zombieMove.evt.removeEventListener('REACH', this, this.onReachDestination);
+		this.zombieMove.evt.removeEventListener('BLOCKED', this, this.onPathBlocked);
 		this.playerFinder.evt.removeEventListener('LOST', this, this.onLostPlayer);
 		this.hitable.dispose();
 		super.dispose();

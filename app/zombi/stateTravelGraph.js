@@ -1,3 +1,4 @@
+import * as MATH from '../utils/math.js';
 import * as SoundLoader from '../net/loaderSound.js';
 import * as SpriteFactory from '../spriteFactory.js';
 
@@ -43,6 +44,7 @@ class StateTravelGraph extends State {
 
 		this.zombieMove = new Move(0.1, this.position, map);
 		this.zombieMove.evt.addEventListener('REACH', this, this.updateDirection);
+		this.zombieMove.evt.addEventListener('BLOCKED', this, this.onPathBlocked);
 
 		this.bloodDropping = new BloodDropping();
 		this.hitable = new Hitable(map);
@@ -108,10 +110,18 @@ class StateTravelGraph extends State {
 		this.entity.playSound(['zombieStepA', 'zombieStepB', 'zombieStepC']);
 	}
 
+	onPathBlocked() {
+		console.log('onPathBlocked');
+		// this.#getJourney();
+		this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
+		return;
+	}
+
 	#getJourney() {
 		this.test ++;
 		const destCell = this.map.getRandomCell();
 		const destPos = destCell.center;
+		// const destPos = {x: 70, y: 15};
 		this.travelPoints = this.map.getTravel(this.position, destPos);
 
 	}
@@ -127,13 +137,24 @@ class StateTravelGraph extends State {
 		}
 
 		const nextPoint = this.travelPoints.pop();
-		this.zombieMove.setDestination(nextPoint.x, nextPoint.y);
+		// console.log('nextPoint', nextPoint);
+
+		let destX = nextPoint.x;
+		let destY = nextPoint.y;
+		
+		if (nextPoint.cell) {
+			destX = MATH.randomValue(nextPoint.cell.left, nextPoint.cell.right);
+			destY = MATH.randomValue(nextPoint.cell.bottom, nextPoint.cell.top);
+			// console.log('Variation');
+		}
+		this.zombieMove.setDestination(destX, destY);
 	}
 
 	dispose() {
 		this.sprite.textureAnimation.evt.removeEventListener(ANIMATION_END_EVENT, this, this.#playStepSound);
 		// Stepper.stopListenStep(this.newStepPlaySound, this, this.#playStepSound);
 		this.zombieMove.evt.removeEventListener('REACH', this, this.updateDirection);
+		this.zombieMove.evt.removeEventListener('BLOCKED', this, this.onPathBlocked);
 		this.playerFinder.evt.removeEventListener('VIEW', this, this.onViewPlayer);
 		this.hitable.dispose();
 		super.dispose();

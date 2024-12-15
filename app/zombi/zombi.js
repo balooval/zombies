@@ -1,6 +1,7 @@
 import * as MATH from '../utils/math.js';
 import * as SoundLoader from '../net/loaderSound.js';
 
+import {DISPOSE_EVENT} from '../map/map.js';
 import EntityWithStates from '../entityWithStates.js'
 import StateAttack from './stateAttack.js'
 import StateFollow from './stateFollow.js'
@@ -36,6 +37,8 @@ export class Zombi extends EntityWithStates{
 		this.translationToPlayer = new Translation();
 		this.translationToPlayer.reset(this.position.x, this.position.y);
 		this.isViewableByPlayer = false;
+
+		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 
 	update(step, time) {
@@ -50,11 +53,6 @@ export class Zombi extends EntityWithStates{
 	}
 
 	#updatePlayerRelation() {
-		// const angleToPlayer = MATH.pointsAngle(
-		// 	[this.position.x, this.position.y],
-		// 	[this.targetPlayer.position.x, this.targetPlayer.position.y]
-		// );
-		
 		this.translationToPlayer.update(
 			this.position.x,
 			this.position.y,
@@ -108,6 +106,7 @@ export class Zombi extends EntityWithStates{
 	dispose() {
 		super.dispose();
 		pool.delete(this);
+		this.map.evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 }
 

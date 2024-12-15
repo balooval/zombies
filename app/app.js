@@ -45,6 +45,7 @@ function loadRessourcesList(ressourcesUrl) {
 		SoundLoader.loadBatch(ressourcesList.sounds),
 		TextureLoader.loadBatch(ressourcesList.textures),
 		GameLevel.loadMap('map-1.json')
+		// GameLevel.loadMap('map-2.json')
 		// GameLevel.loadMap('map-shadow.json')
 	]));
 }
