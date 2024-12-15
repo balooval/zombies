@@ -260,7 +260,8 @@ export class GameMap {
                 new NavigationNode(
                     MATH.random(startCell.left, startCell.right),
                     MATH.random(startCell.bottom, startCell.top),
-                    'cell_' + startCell.id
+                    'cell_' + startCell.id,
+                    startCell
                 )
             ];
         }
@@ -317,10 +318,8 @@ export class GameMap {
         }
 
         const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
-        // const destCell = this.getRandomCell();
-		// const startPosition = {x: destCell.center.x, y: destCell.center.y};
 
-        Zombi.createZombi(this.player, this, startPosition);
+        Zombi.createZombi(this.player, this, {x: startPosition.x, y: startPosition.y});
     }
 
     onPlayerDead() {
@@ -414,14 +413,14 @@ export class GameMap {
             const x = cell.center.x;
             const y = cell.center.y;
             const index = x + '_' + y;
-            const node = new NavigationNode(x, y, 'cell_' + cell.id);
+            const node = new NavigationNode(x, y, 'cell_' + cell.id, cell);
             navigationGrid.set(index, node);
 
             for (const connection of cell.connections) {
                 const x = connection.point[0];
                 const y = connection.point[1];
                 const index = x + '_' + y;
-                const node = new NavigationNode(x, y, cell.id + '_' + connection.cell.id);
+                const node = new NavigationNode(x, y, cell.id + '_' + connection.cell.id, null);
                 navigationGrid.set(index, node);
             }
         }
@@ -456,10 +455,11 @@ export class GameMap {
 let debugId = 0;
 
 class NavigationNode {
-    constructor(posX, posY, id) {
+    constructor(posX, posY, id, cell) {
         this.x = posX;
         this.y = posY;
         this.id = id;
+        this.cell = cell;
         this.connections = [];
     }
 
@@ -477,6 +477,9 @@ class Cell {
         this.id = debugId;
         debugId++;
         this.left = left;
+        if (right === -85) {
+            console.warn('CELL', this);
+        }
         this.right = right;
         this.bottom = bottom;
         this.top = top;
@@ -608,7 +611,6 @@ class Cell {
     }
 
     buildHorizontalChilds() {
-
         let horPositions = this.blocks.map(block => [block.posX, block.posX + block.width]).flat();
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
@@ -617,15 +619,17 @@ class Cell {
         let prevLeft = this.left;
 
         for (const posX of horPositions) {
-            const child = new Cell(
-                prevLeft,
-                posX,
-                this.bottom,
-                this.top,
-                this.blocks,
-            );
-            child.buildVerticalChilds();
-            this.childs.push(child);
+            if (prevLeft < posX) {
+                const child = new Cell(
+                    prevLeft,
+                    posX,
+                    this.bottom,
+                    this.top,
+                    this.blocks,
+                );
+                child.buildVerticalChilds();
+                this.childs.push(child);
+            }
             prevLeft = posX;
         }
     }
@@ -653,7 +657,7 @@ class Cell {
 
     #cleanBlocks(blocks) {
         return blocks.filter(block => {
-            if (block.isSolid ===false) return false;
+            if (block.isSolid === false) return false;
             if (block.posX >= this.right) return false;
             if (block.posX + block.width <= this.left) return false;
             if (block.posY <= this.bottom) return false;

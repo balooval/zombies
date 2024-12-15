@@ -1,3 +1,4 @@
+import * as MATH from '../utils/math.js';
 import * as SoundLoader from '../net/loaderSound.js';
 import * as SpriteFactory from '../spriteFactory.js';
 
@@ -111,7 +112,9 @@ class StateTravelGraph extends State {
 
 	onPathBlocked() {
 		console.log('onPathBlocked');
-		this.#getJourney();
+		// this.#getJourney();
+		this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
+		return;
 	}
 
 	#getJourney() {
@@ -134,7 +137,17 @@ class StateTravelGraph extends State {
 		}
 
 		const nextPoint = this.travelPoints.pop();
-		this.zombieMove.setDestination(nextPoint.x, nextPoint.y);
+		// console.log('nextPoint', nextPoint);
+
+		let destX = nextPoint.x;
+		let destY = nextPoint.y;
+		
+		if (nextPoint.cell) {
+			destX = MATH.randomValue(nextPoint.cell.left, nextPoint.cell.right);
+			destY = MATH.randomValue(nextPoint.cell.bottom, nextPoint.cell.top);
+			// console.log('Variation');
+		}
+		this.zombieMove.setDestination(destX, destY);
 	}
 
 	dispose() {
