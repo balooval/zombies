@@ -16,6 +16,7 @@ import {
 import AstarBuilder from '../astar/AStarBuilder.js';
 import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
+import Door from './door.js';
 import Evt from '../utils/event.js';
 import {FogEmiter} from '../fogEmiter.js';
 import {Hitbox} from '../collisionHitbox.js';
@@ -243,7 +244,12 @@ export class GameMap {
         const startCell = this.rootCell.getCellByPosition(startPos.x, startPos.y);
         const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
 
+        if (!endCell) {
+            console.warn(endPos);
+        }
+
         const nav = this.astar.launch(this.navigationGrid.get('cell_' + startCell.id), this.navigationGrid.get('cell_' + endCell.id));
+        console.log('nav', nav);
 
         for (const waypoint of nav) {
             positions.push(waypoint.node)
@@ -296,8 +302,9 @@ export class GameMap {
             return;
         }
 
-        const destCell = this.getRandomCell();
-		const startPosition = {x: destCell.center.x, y: destCell.center.y};
+        const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
+        // const destCell = this.getRandomCell();
+		// const startPosition = {x: destCell.center.x, y: destCell.center.y};
 
         Zombi.createZombi(this.player, this, startPosition);
     }
@@ -347,6 +354,10 @@ export class GameMap {
 
         for (const wall of blocksDescription.walls) {
             blocks.push(new Block(wall.x, wall.y, wall.width, wall.height));
+        }
+
+        for (const door of blocksDescription.doors) {
+            blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {

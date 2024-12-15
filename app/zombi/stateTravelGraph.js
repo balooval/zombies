@@ -127,6 +127,7 @@ class StateTravelGraph extends State {
 		}
 
 		const nextPoint = this.travelPoints.pop();
+		// console.log('nextPoint', nextPoint);
 		this.zombieMove.setDestination(nextPoint.x, nextPoint.y);
 	}
 

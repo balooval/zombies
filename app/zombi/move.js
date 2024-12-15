@@ -35,14 +35,20 @@ class Move {
 		
 		this.moveTranslation.update(this.position.x, this.position.y, newX, newY);
 
+		const wallHit = this.map.getWallsIntersections(this.moveTranslation).shift();
+
+		if (wallHit) {
+			console.log('MUR DEVANT MOI');
+			this.evt.fireEvent('REACH');
+			return;
+		}
+
 		this.map.checkBlood(this.moveTranslation);
 
 		this.position.x = newX;
 		this.position.y = newY;
 
-		// if (this.moveSpeed > 0) {
-			Renderer.setFogFlux(this.moveTranslation.startX, this.moveTranslation.startY, this.moveTranslation.destX, this.moveTranslation.destY, 15, 0.5);
-		// }
+		Renderer.setFogFlux(this.moveTranslation.startX, this.moveTranslation.startY, this.moveTranslation.destX, this.moveTranslation.destY, 15, 0.5);
 
 		const distanceFromTargetX = this.destX - this.position.x;
 		const distanceFromTargetY = this.destY - this.position.y;
