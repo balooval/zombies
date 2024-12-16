@@ -9,6 +9,7 @@ import {Hitbox} from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
+import Shotgun from './weapons/shotgun.js';
 import {
 	Vector2
 } from '../vendor/three.module.js';
@@ -33,6 +34,9 @@ export function createRandomBonus(choices, destPos, map) {
 
 		case 'BonusGrenade':
 			return new BonusGrenade(destPos.x, destPos.y, map);
+
+		case 'BonusShotgun':
+			return new BonusShotgun(destPos.x, destPos.y, map);
 	}
 }
 
@@ -73,6 +77,14 @@ export class Bonus {
 		this.sprite.dispose();
 		this.hitBox.dispose();
 		pool.delete(this);
+	}
+}
+
+export class BonusShotgun extends Bonus {
+
+	constructor(posX, posY, map) {
+		super(map, posX, posY, 'bonusShotgun');
+		this.weapon = new Shotgun(map);
 	}
 }
 

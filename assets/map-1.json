@@ -14,12 +14,13 @@
             "BonusMine",
             "BonusEgg",
             "BonusMinigun",
-            "BonusGrenade"
+            "BonusGrenade",
+            "BonusShotgun"
         ]
     },
 
     "addZombiRate": 80,
-    "maxZombiesCount": 3,
+    "maxZombiesCount": 5,
     "zombiesSpawnLocations": [
         {
             "x": 1,

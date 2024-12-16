@@ -24,6 +24,7 @@ import {Hitbox} from './collisionHitbox.js';
 import MineLauncher from './weapons/mineLauncher.js';
 import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
+import Shotgun from './weapons/shotgun.js';
 import Translation from './translation.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
@@ -63,7 +64,8 @@ export class Player {
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
-		const baseWeapon = new RayLauncher(this.map);
+		// const baseWeapon = new RayLauncher(this.map);
+		const baseWeapon = new Shotgun(this.map);
 		// const baseWeapon = new BulletLauncher(this.map);
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();

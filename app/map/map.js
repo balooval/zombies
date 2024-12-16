@@ -320,8 +320,8 @@ export class GameMap {
 
         const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
 
-        // this.createZombie(startPosition.x, startPosition.y, 'ENTER');
-        this.createZombie(startPosition.x, startPosition.y, 'STILL_GUARD');
+        this.createZombie(startPosition.x, startPosition.y, 'ENTER');
+        // this.createZombie(startPosition.x, startPosition.y, 'STILL_GUARD');
     }
 
     createZombie(posX, posY, firstState) {

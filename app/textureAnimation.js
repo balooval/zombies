@@ -240,7 +240,7 @@ const spriteSheets = new Map(Object.entries({
 		frames: [],
 	},
 	bonusBullet: {
-		textureId: 'bonusBullet',
+		textureId: 'bonusWeapons',
 		frames: [],
 	},
 	batte: {
@@ -252,15 +252,15 @@ const spriteSheets = new Map(Object.entries({
 		frames: [],
 	},
 	bonusGrenade: {
-		textureId: 'bonusGrenade',
+		textureId: 'bonusWeapons',
 		frames: [],
 	},
 	bonusBatte: {
-		textureId: 'bonusBatte',
+		textureId: 'bonusWeapons',
 		frames: [],
 	},
 	bonusMinigun: {
-		textureId: 'bonusMinigun',
+		textureId: 'bonusWeapons',
 		frames: [],
 	},
 	pointer: {
@@ -289,6 +289,10 @@ const spriteSheets = new Map(Object.entries({
 	},
 	woodenBox: {
 		textureId: 'woodenBox',
+		frames: [],
+	},
+	bonusWeapons: {
+		textureId: 'bonusWeapons',
 		frames: [],
 	},
 }));
@@ -325,12 +329,12 @@ const animations = {
 		framesToDisplay: [1],
 	},
 	bonusGrenade: {
-		spriteSheet: 'bonusGrenade',
+		spriteSheet: 'bonusWeapons',
 		stepsByFrame: -1,
-		framesToDisplay: [0],
+		framesToDisplay: [1],
 	},
 	bonusBatte: {
-		spriteSheet: 'bonusBatte',
+		spriteSheet: 'bonusWeapons',
 		stepsByFrame: -1,
 		framesToDisplay: [0],
 	},
@@ -340,9 +344,14 @@ const animations = {
 		framesToDisplay: [0, 1, 2, 3, 4, 5, 6, 7],
 	},
 	bonusMinigun: {
-		spriteSheet: 'bonusMinigun',
+		spriteSheet: 'bonusWeapons',
 		stepsByFrame: -1,
-		framesToDisplay: [0],
+		framesToDisplay: [3],
+	},
+	bonusShotgun: {
+		spriteSheet: 'bonusWeapons',
+		stepsByFrame: -1,
+		framesToDisplay: [5],
 	},
 	batteIdle: {
 		spriteSheet: 'batte',
@@ -355,9 +364,9 @@ const animations = {
 		framesToDisplay: [0, 1, 2, 3, 4],
 	},
 	bonusBullet: {
-		spriteSheet: 'bonusBullet',
+		spriteSheet: 'bonusWeapons',
 		stepsByFrame: -1,
-		framesToDisplay: [0],
+		framesToDisplay: [4],
 	},
 	screenGameOver: {
 		spriteSheet: 'screenGameOver',
