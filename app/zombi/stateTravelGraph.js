@@ -112,7 +112,6 @@ class StateTravelGraph extends State {
 
 	onPathBlocked() {
 		console.log('onPathBlocked');
-		// this.#getJourney();
 		this.entity.setState('PAUSE_AND_SEARCH', this.zombieMove.moveTranslation.angle);
 		return;
 	}

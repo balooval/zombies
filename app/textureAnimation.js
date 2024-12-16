@@ -369,6 +369,11 @@ const animations = {
 		stepsByFrame: 20,
 		framesToDisplay: [0, 1, 2, 3],
 	},
+	zombiVioletStill: {
+		spriteSheet: 'zombiVioletWalk',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	zombiVioletAtack: {
 		spriteSheet: 'zombiVioletAtack',
 		stepsByFrame: 15,

@@ -8,6 +8,7 @@ import StateFollow from './stateFollow.js'
 import StateHole from './stateHole.js'
 import StatePauseAndSearch from './statePauseAndSearch.js'
 import StateSlide from './stateSlide.js'
+import StateStillGuard from './stateStillGuard.js'
 import StateTravelGraph from './stateTravelGraph.js'
 import Translation from '../translation.js';
 
@@ -17,6 +18,7 @@ export function createZombi(player, map, startPosition, firstState) {
 	const zombiStates = new Map();
 	zombiStates.set('ENTER', new StateHole(startPosition));
 	zombiStates.set('WALK', new StateTravelGraph(startPosition, map, player));
+	zombiStates.set('STILL_GUARD', new StateStillGuard(startPosition, map, player));
 	zombiStates.set('FOLLOW', new StateFollow(startPosition, player, map));
 	zombiStates.set('SLIDE', new StateSlide(startPosition, map));
 	zombiStates.set('ATTACK', new StateAttack(startPosition, map));
