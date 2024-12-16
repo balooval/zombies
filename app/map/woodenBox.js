@@ -42,9 +42,10 @@ class WoodenBox extends BlockBase {
 
     #break() {
         SoundLoader.play('woodenBoxBreak');
-        createRandomBonus(this.onBreak.bonus, {x: this.centerX, y: this.centerY}, this.map);
         this.map.removeBlock(this);
         this.dispose();
+        createRandomBonus(this.onBreak.bonus, {x: this.centerX, y: this.centerY}, this.map);
+        this.onBreak.zombies.forEach(firstState => this.map.createZombie(this.centerX, this.centerY, firstState));
     }
 
     getWorldCollisionBox() {

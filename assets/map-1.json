@@ -19,7 +19,7 @@
     },
 
     "addZombiRate": 80,
-    "maxZombiesCount": 5,
+    "maxZombiesCount": 0,
     "zombiesSpawnLocations": [
         {
             "x": 1,
@@ -191,7 +191,8 @@
                 "width": 10,
                 "height": 10,
                 "onBreak": {
-                    "bonus": ["BonusMine"]
+                    "bonus": ["BonusMine"],
+                    "zombies": []
                 }
             },
             {
@@ -200,7 +201,10 @@
                 "width": 9,
                 "height": 9,
                 "onBreak": {
-                    "bonus": []
+                    "bonus": [],
+                    "zombies": [
+                        "WALK"
+                    ]
                 }
             }
         ],

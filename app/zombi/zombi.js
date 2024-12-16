@@ -13,7 +13,7 @@ import Translation from '../translation.js';
 
 export const pool = new Map();
 
-export function createZombi(player, map, startPosition) {
+export function createZombi(player, map, startPosition, firstState) {
 	const zombiStates = new Map();
 	zombiStates.set('ENTER', new StateHole(startPosition));
 	zombiStates.set('WALK', new StateTravelGraph(startPosition, map, player));
@@ -21,14 +21,14 @@ export function createZombi(player, map, startPosition) {
 	zombiStates.set('SLIDE', new StateSlide(startPosition, map));
 	zombiStates.set('ATTACK', new StateAttack(startPosition, map));
 	zombiStates.set('PAUSE_AND_SEARCH', new StatePauseAndSearch(startPosition, map, player));
-	const zombi = new Zombi(zombiStates, map, startPosition, player);
+	const zombi = new Zombi(zombiStates, map, startPosition, player, firstState);
 	pool.set(zombi, zombi);
 }
 
 export class Zombi extends EntityWithStates{
 
-	constructor(states, map, position, player) {
-		super(states);
+	constructor(states, map, position, player, firstState) {
+		super(states, firstState);
 		this.map = map;
 		this.position = position;
 		this.targetPlayer = player;

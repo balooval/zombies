@@ -2,7 +2,7 @@ import * as AnimationControl from './animationControl.js';
 
 class EntityWithStates {
 
-	constructor(states) {
+	constructor(states, firstState) {
 		this.currentState = null;
 		this.states = states;
 		this.isDisposed = false;
@@ -11,7 +11,7 @@ class EntityWithStates {
 			state.setEntity(this);
 		}
 		
-		this.setState('ENTER');
+		this.setState(firstState);
 		
 		AnimationControl.registerToUpdate(this);
 	}

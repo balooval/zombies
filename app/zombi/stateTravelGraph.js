@@ -121,7 +121,6 @@ class StateTravelGraph extends State {
 		this.test ++;
 		const destCell = this.map.getRandomCell();
 		const destPos = destCell.center;
-		// const destPos = {x: 70, y: 15};
 		this.travelPoints = this.map.getTravel(this.position, destPos);
 
 	}
