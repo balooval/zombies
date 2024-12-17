@@ -1,10 +1,12 @@
 import * as AnimationControl from './animationControl.js';
 import * as Light from './light.js';
+import * as MATH from './utils/math.js';
 import * as SpriteFactory from './spriteFactory.js';
 
 import {
 	ANIMATION_END_EVENT,
 } from './textureAnimation.js';
+import {DISPOSE_EVENT} from './map/map.js';
 
 class FxSprite {
 
@@ -38,5 +40,23 @@ export class HitSprite extends FxSprite {
 			this.light.dispose();
 		}
 		super.dispose();
+	}
+}
+
+export class DeadZombieSprite {
+
+	constructor(map, x, y, angle) {
+		this.map = map;
+		const animation = MATH.randomElement(['zombiVioletDeadA', 'zombiVioletDeadB']);
+		this.sprite = SpriteFactory.createAnimatedSprite(17, 17, animation);
+		this.sprite.setPosition(x, y);
+		this.sprite.setDepth(1);
+		this.sprite.setRotation(angle);
+		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
+	}
+
+	dispose() {
+		this.sprite.dispose();
+		this.map.evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 }

@@ -82,7 +82,7 @@ export class Player {
 		
 		this.translation = new Translation();
 
-		this.sprite = SpriteFactory.createAnimatedSprite(10, 10, 'playerWalk');
+		this.sprite = SpriteFactory.createAnimatedSprite(9, 9, 'playerWalk');
 		this.sprite.setPosition(this.position.x, this.position.y);
 
 		CollisionResolver.checkCollisionWithLayer(this, 'BONUS');

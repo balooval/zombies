@@ -174,6 +174,14 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'zombiVioletWalk',
 		frames: [],
 	},
+	zombiVioletDeadA: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
+	zombiVioletDeadB: {
+		textureId: 'zombiVioletWalk',
+		frames: [],
+	},
 	zombiWalk: {
 		textureId: 'zombiWalk',
 		frames: [],
@@ -392,6 +400,16 @@ const animations = {
 		spriteSheet: 'zombiVioletHit',
 		stepsByFrame: -1,
 		framesToDisplay: [6],
+	},
+	zombiVioletDeadA: {
+		spriteSheet: 'zombiVioletHit',
+		stepsByFrame: -1,
+		framesToDisplay: [7],
+	},
+	zombiVioletDeadB: {
+		spriteSheet: 'zombiVioletHit',
+		stepsByFrame: -1,
+		framesToDisplay: [8],
 	},
 	zombiWalk: {
 		spriteSheet: 'zombiWalk',
