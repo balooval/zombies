@@ -18,6 +18,7 @@ import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
 import Door from './door.js';
 import Evt from '../utils/event.js';
+import Exit from './exit.js';
 import {FogEmiter} from '../fogEmiter.js';
 import {Hitbox} from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
@@ -86,7 +87,23 @@ export class GameMap {
         this.lights = this.placeLights(mapDescription.lights);
         this.fogEmiters = this.placeFog(mapDescription.fog);
 
-        // this.spreadBlood(40, 0, 2, {x:2, y:0});
+        this.exits = [];
+    }
+
+    start(player, nextExit) {
+        const startPosition = {
+            x: this.mapDescription.enterPositions[nextExit].x,
+            y: this.mapDescription.enterPositions[nextExit].y,
+        };
+        this.player = player;
+        this.player.initPosition(startPosition);
+        this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+
+        this.#addBonus(0);
+        this.#addZombi(0);
+        this.#placeZombies(this.mapDescription.zombiesPositions);
+        
+        this.exits = this.#buildExits(this.mapDescription.exits);
     }
 
     onWallsChanged() {
@@ -251,6 +268,8 @@ export class GameMap {
         const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
 
         if (!endCell) {
+            console.log('this.rootCell', this.rootCell);
+            console.log('endPos', endPos);
             console.warn(startCell);
         }
 
@@ -286,14 +305,6 @@ export class GameMap {
         return MATH.randomElement(flat);
     }
 
-    start() {
-        this.player = new Player(this, this.playerStartPosition);
-        this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
-
-        this.#addZombi(0);
-        this.#addBonus(0);
-    }
-
     #addBonus(step) {
         Stepper.stopListenStep(Stepper.curStep, this, this.#addBonus);
         this.nextBonusStep = Stepper.curStep + this.addBonusRate;
@@ -307,6 +318,12 @@ export class GameMap {
         const destPos = destCell.center;
 
         Bonus.createRandomBonus(this.bonusChoices, destPos, this);
+    }
+
+    #placeZombies(zombiesPositions) {
+        for (const zombiePosition of zombiesPositions) {
+            this.createZombie(zombiePosition.x, zombiePosition.y, zombiePosition.state);
+        }
     }
 
     #addZombi(step) {
@@ -374,23 +391,27 @@ export class GameMap {
         return wallHitsWithDistance;
     }
 
-    dispose() {
-        CollisionResolver.removeFromLayer(this, 'MAP');
-        this.player.dispose();
-        this.sprite.dispose();
-        this.blocks.forEach(block => block.dispose());
-        this.lights.forEach(light => light.dispose());
-        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
-        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
-        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
-        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
-        this.evt.fireEvent(DISPOSE_EVENT);
-        this.evt.dispose();
-    }
-
     removeBlock(blockToRemove) {
         this.blocks = this.blocks.filter(block => block !== blockToRemove);
         this.onWallsChanged();
+    }
+
+    #buildExits(exitsDescription) {
+        const exits = [];
+
+        for (const exit of exitsDescription) {
+            exits.push(new Exit(
+                this,
+                exit.x,
+                exit.y,
+                exit.width,
+                exit.height,
+                exit.nextMap,
+                exit.nextExit
+            ));
+        }
+
+        return exits;
     }
 
     #buildBlocks(blocksDescription) {
@@ -488,6 +509,21 @@ export class GameMap {
         }
 
         return res;
+    }
+
+    dispose() {
+        CollisionResolver.removeFromLayer(this, 'MAP');
+        // this.player.dispose();
+        this.sprite.dispose();
+        this.exits.forEach(exit => exit.dispose());
+        this.blocks.forEach(block => block.dispose());
+        this.lights.forEach(light => light.dispose());
+        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
+        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
+        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
+        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+        this.evt.fireEvent(DISPOSE_EVENT);
+        this.evt.dispose();
     }
 }
 
@@ -683,13 +719,15 @@ class Cell {
         let prevBottom = this.bottom;
 
         for (const posY of vertPositions) {
-            this.childs.push(new Cell(
-                this.left,
-                this.right,
-                prevBottom,
-                posY,
-                this.blocks,
-            ));
+            if (prevBottom < posY) {
+                this.childs.push(new Cell(
+                    this.left,
+                    this.right,
+                    prevBottom,
+                    posY,
+                    this.blocks,
+                ));
+            }
             prevBottom = posY;
         }
     }

@@ -7,7 +7,6 @@ export class BulletLauncher extends Weapon {
 	constructor(map) {
 		super(10);
 		
-		this.map = map;
 		this.icon = 'bullet';
 		this.ammo = 60;
 	}
@@ -20,7 +19,7 @@ export class BulletLauncher extends Weapon {
 		// }
 
 		SoundLoader.play('eggLaunch');
-		const arrow = new Bullet(this.map, this.owner.position.x, this.owner.position.y, this.owner.viewAngle);
+		const arrow = new Bullet(this.owner.position.x, this.owner.position.y, this.owner.viewAngle);
 		super.launchProjectile();
 	}
 }

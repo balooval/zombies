@@ -11,15 +11,42 @@ import {
 }  from './map/map.js';
 
 import GameOverScreen from './ui/gameOverScreen.js';
+import {Player} from './player.js';
 
 let gameLevel;
 let mapDescription;
+let player;
+const loadedMaps = new Map();
+
+const defaultMapDescription = {
+	fog: [],
+	enterPositions: {
+		default: {
+			x: 0,
+			y: 0,
+		},
+	},
+	exits: [],
+	zombiesPositions: [],
+	lights: {
+		rectLights: [],
+		pointLights: [],
+	}
+};
 
 export function loadMap(fileName) {
+	if (loadedMaps.has(fileName) === true) {
+		return new Promise(resolve => {
+			mapDescription = loadedMaps.get(fileName);
+			resolve()
+		});
+	}
+
 	return fetch(`./assets/${fileName}`)
 	.then(response => response.json())
 	.then(loadedMapDescription => {
-		mapDescription = loadedMapDescription;
+		mapDescription = {...defaultMapDescription, ...loadedMapDescription};
+		loadedMaps.set(fileName, mapDescription);
 	});
 }
 
@@ -32,6 +59,10 @@ export function getCurrentLevel() {
 	return gameLevel;
 }
 
+export function getCurrentMap() {
+	return gameLevel.map;
+}
+
 class GameLevel {
 
 	constructor() {
@@ -42,22 +73,22 @@ class GameLevel {
 		AnimationControl.registerToUpdate(Stepper);
 		Renderer.start();
 		AnimationControl.start();
-		this.#startMap();
+		this.#startMap('default', {x: 0, y: 0});
 		Clock.start();
 
 		Input.evt.addEventListener('DOWN_80', null, this.onPressPause); // P
 	}
 
-	#startMap() {
+	#startMap(nextExit) {
+		// console.log('mapDescription', mapDescription);
 		this.map = new GameMap(mapDescription);
-		this.map.start();
+		if (!player) {
+			player = new Player(this.map, mapDescription.enterPositions[nextExit]);
+		}
+		this.map.start(player, nextExit);
+		// Clock.play();
 		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
-		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.onMapDispose);
 		Input.evt.addEventListener('DOWN_66', this.map, this.map.dispose); // B
-	}
-
-	success() {
-		// TODO
 	}
 
 	gameOver() {
@@ -70,11 +101,13 @@ class GameLevel {
 		Clock.switchPause();
 	}
 
-	onMapDispose() {
-		Input.evt.removeEventListener('DOWN_66', this.map, this.map.dispose); // B
-		loadMap('map-shadow.json').then(() => this.#startMap());
+	goToMap(nextMap, nextExit) {
+		// Clock.pause();
+		this.map.dispose();
+		this.map = null;
+		loadMap(nextMap).then(() => this.#startMap(nextExit));
 	}
-	
+
 	dispose() {
 		this.map.evt.removeEventListener(GAME_OVER_EVENT, this, this.gameOver);
 	}

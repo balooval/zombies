@@ -5,14 +5,15 @@ import * as SoundLoader from './../net/loaderSound.js';
 import * as SpriteFactory from './../spriteFactory.js';
 
 import CollisionResolver from './../collisionResolver.js';
+import {DISPOSE_EVENT}  from '../map/map.js';
 import {HitSprite} from './../fxSprites.js';
 import {Hitbox} from './../collisionHitbox.js';
 import {Vector2} from './../../vendor/three.module.js';
+import {getCurrentMap} from '../gameLevel.js';
 
 class Bullet {
 
-	constructor(map, posX, posY, angle) {
-		this.map = map;
+	constructor(posX, posY, angle) {
 		this.angle = angle;
 		const speed = 2;
 		
@@ -27,6 +28,8 @@ class Bullet {
 
 		this.sprite = SpriteFactory.createAnimatedSprite(3, 3, 'bullet');
 		this.sprite.setPosition(this.position.x, this.position.y);
+
+		getCurrentMap().evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 
 	onCollide(collisions, layersName) {
@@ -84,6 +87,7 @@ class Bullet {
 	}
 
 	dispose() {
+		getCurrentMap().evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 		CollisionResolver.forgotCollisionWithLayer(this, 'WALLS');
 		CollisionResolver.forgotCollisionWithLayer(this, 'ENNEMIES');
 		AnimationControl.unregisterToUpdate(this);

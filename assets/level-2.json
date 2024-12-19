@@ -1,0 +1,158 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTiles",
+
+    "playerStartPosition": {
+        "x": -72,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": -65,
+            "y": 0
+        },
+        "right": {
+            "x": 70,
+            "y": 36
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesPositions": [
+        {
+            "x": 50,
+            "y": 30,
+            "state": "STILL_GUARD"
+        }
+    ],
+
+    "lights": {
+        "rectLights": [],
+        "pointLights": [
+            {
+                "type": "pointLight",
+                "size": 30,
+                "x": -70,
+                "y": -50,
+                "color": "#ff5050"
+            },
+            {
+                "type": "pointLight",
+                "size": 40,
+                "x": -20,
+                "y": -50,
+                "color": "#a0a050"
+            },
+            {
+                "type": "pointLight",
+                "size": 40,
+                "x": 25,
+                "y": -50,
+                "color": "#a0a050"
+            },
+            {
+                "type": "pointLight",
+                "size": 40,
+                "x": 70,
+                "y": -50,
+                "color": "#a0a050"
+            }
+        ]
+    },
+
+    "exits": [
+        {
+            "x": -80,
+            "y": 5,
+            "width": 5,
+            "height": 19,
+            "nextMap": "level-1.json",
+            "nextExit": "right"
+        },
+        {
+            "x": 75,
+            "y": 36,
+            "width": 5,
+            "height": 19,
+            "nextMap": "level-3.json",
+            "nextExit": "default"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [],
+
+        "box": [],
+
+        "doors": [],
+
+        "walls": [
+            {
+                "comment": "limite haut",
+                "x": -85,
+                "y": 65,
+                "width": 170,
+                "height": 10
+            },
+
+            {
+                "comment": "limite bas",
+                "x": -20,
+                "y": -55,
+                "width": 100,
+                "height": 10
+            },
+            {
+                "comment": "limite bas",
+                "x": -85,
+                "y": -30,
+                "width": 65,
+                "height": 50
+            },
+
+            {
+                "comment": "limite gauche",
+                "x": -85,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            },
+
+            {
+                "comment": "mur droite",
+                "x": 75,
+                "y": 10,
+                "width": 10,
+                "height": 100
+            },
+            
+            {
+                "comment": "limite droite",
+                "x": 80,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            }
+
+        ]
+    }
+}

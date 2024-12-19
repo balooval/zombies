@@ -15,10 +15,28 @@ export function switchPause() {
 	isPaused = !isPaused;
 
 	if (isPaused === true) {
-		lastPauseTime = getCurrentTime();
+		pause();
 	} else {
-		pauseTotalDuration += getCurrentTime() - lastPauseTime;
+		play();
 	}
+}
+
+export function play() {
+	if (isPaused === false) {
+		return;
+	}
+
+	isPaused = false;
+	pauseTotalDuration += getCurrentTime() - lastPauseTime;
+}
+
+export function pause() {
+	if (isPaused === true) {
+		return;
+	}
+
+	isPaused = true;
+	lastPauseTime = getCurrentTime();
 }
 
 export function getPlayTime() {

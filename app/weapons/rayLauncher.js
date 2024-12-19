@@ -5,11 +5,11 @@ import * as SoundLoader from './../net/loaderSound.js';
 import CollisionResolver from './../collisionResolver.js';
 import {HitSprite} from './../fxSprites.js';
 import Weapon from './baseWeapon.js';
+import {getCurrentMap} from '../gameLevel.js';
 
 export class RayLauncher extends Weapon {
 	constructor(map) {
 		super(30);
-		this.map = map;
 		this.icon = 'pistolIcon';
 		this.ammo = 20;
 	}
@@ -70,7 +70,7 @@ export class RayLauncher extends Weapon {
 			point: {x: destX, y: destY},
 		};
 
-		const wallHit = this.map.getWallsIntersections(segment).shift();
+		const wallHit = getCurrentMap().getWallsIntersections(segment).shift();
 
 		if (wallHit !== undefined) {
 			res.wall = true;
