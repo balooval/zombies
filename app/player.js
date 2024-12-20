@@ -65,8 +65,8 @@ export class Player {
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
 		// const baseWeapon = new RayLauncher();
-		// const baseWeapon = new Shotgun();
-		const baseWeapon = new BulletLauncher();
+		const baseWeapon = new Shotgun();
+		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();
 		// const baseWeapon = new Minigun();
@@ -275,11 +275,11 @@ export class Player {
 	}
 
 	onWheelDown() {
-		this.#getNextAvailableWeapon(-1);
+		this.#getNextAvailableWeapon(1);
 	}
 	
 	onWheelUp() {
-		this.#getNextAvailableWeapon(1);
+		this.#getNextAvailableWeapon(-1);
 	}
 
 	#getNextAvailableWeapon(direction) {

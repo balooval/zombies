@@ -16,6 +16,7 @@ import {
 import AstarBuilder from '../astar/AStarBuilder.js';
 import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
+import {DeadZombieSprite} from '../fxSprites.js';
 import Door from './door.js';
 import Evt from '../utils/event.js';
 import Exit from './exit.js';
@@ -59,6 +60,11 @@ export class GameMap {
         this.bloodContext = this.bloodCanvas.getContext('2d', {willReadFrequently: true});
         this.bloodPixels = null;
 
+        if (this.mapDescription.floorBlood) {
+            this.bloodContext.drawImage(this.mapDescription.floorBlood, 0, 0);
+            this.#drawBloodIntoBackground();
+        }
+
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
         this.player = null;
@@ -101,9 +107,14 @@ export class GameMap {
 
         this.#addBonus(0);
         this.#addZombi(0);
-        this.#placeZombies(this.mapDescription.zombiesPositions);
+        this.#placeZombies(this.mapDescription.zombiesDescriptions);
+        this.#placeZombiesCorpses(this.mapDescription.zombiesCorpses);
         
         this.exits = this.#buildExits(this.mapDescription.exits);
+    }
+
+    exportBloodCanvas() {
+        return createImageBitmap(this.bloodCanvas);
     }
 
     onWallsChanged() {
@@ -320,9 +331,15 @@ export class GameMap {
         Bonus.createRandomBonus(this.bonusChoices, destPos, this);
     }
 
-    #placeZombies(zombiesPositions) {
-        for (const zombiePosition of zombiesPositions) {
-            this.createZombie(zombiePosition.x, zombiePosition.y, zombiePosition.state);
+    #placeZombies(zombiesDescriptions) {
+        for (const zombieDescription of zombiesDescriptions) {
+            this.createZombie(zombieDescription.id, zombieDescription.x, zombieDescription.y, zombieDescription.state);
+        }
+    }
+    
+    #placeZombiesCorpses(zombiesCorpses) {
+        for (const corpse of zombiesCorpses) {
+            new DeadZombieSprite(this, corpse.x, corpse.y, corpse.angle, corpse.animation);
         }
     }
 
@@ -337,12 +354,13 @@ export class GameMap {
 
         const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
 
-        this.createZombie(startPosition.x, startPosition.y, 'ENTER');
+        const id = new Date().getTime() + '_' + Math.random();
+        this.createZombie(id, startPosition.x, startPosition.y, 'ENTER');
         // this.createZombie(startPosition.x, startPosition.y, 'STILL_GUARD');
     }
 
-    createZombie(posX, posY, firstState) {
-        Zombi.createZombi(this.player, this, {x: posX, y: posY}, firstState);
+    createZombie(id, posX, posY, firstState) {
+        const zombie = Zombi.createZombi(id, this.player, this, {x: posX, y: posY}, firstState);
     }
 
     onPlayerDead() {
@@ -686,7 +704,12 @@ class Cell {
     }
 
     buildHorizontalChilds() {
-        let horPositions = this.blocks.map(block => [block.posX, block.posX + block.width]).flat();
+        let horPositions = this.blocks
+        .map(block => [block.posX, block.posX + block.width])
+        .flat()
+        .filter(posX => posX <= MAX_X)
+        .filter(posX => posX >= MIN_X)
+        console.log('horPositions', horPositions);
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
         horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));

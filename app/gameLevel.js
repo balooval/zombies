@@ -5,7 +5,6 @@ import * as Renderer from './renderer.js';
 import * as Stepper from './utils/stepper.js';
 
 import {
-	DISPOSE_EVENT,
 	GAME_OVER_EVENT,
 	GameMap,
 }  from './map/map.js';
@@ -16,7 +15,9 @@ import {Player} from './player.js';
 let gameLevel;
 let mapDescription;
 let player;
+let currentMapFile = 'none';
 const loadedMaps = new Map();
+const mapPersistance = {};
 
 const defaultMapDescription = {
 	fog: [],
@@ -27,7 +28,10 @@ const defaultMapDescription = {
 		},
 	},
 	exits: [],
-	zombiesPositions: [],
+	zombiesDescriptions: [],
+	deadZombies: [],
+	zombiesCorpses: [],
+	floorBlood: null,
 	lights: {
 		rectLights: [],
 		pointLights: [],
@@ -35,9 +39,12 @@ const defaultMapDescription = {
 };
 
 export function loadMap(fileName) {
+	currentMapFile = fileName;
+
 	if (loadedMaps.has(fileName) === true) {
 		return new Promise(resolve => {
-			mapDescription = loadedMaps.get(fileName);
+			const loadedDescription = loadedMaps.get(fileName);
+			mapDescription = applyMapPersistance(loadedDescription);
 			resolve()
 		});
 	}
@@ -45,7 +52,12 @@ export function loadMap(fileName) {
 	return fetch(`./assets/${fileName}`)
 	.then(response => response.json())
 	.then(loadedMapDescription => {
-		mapDescription = {...defaultMapDescription, ...loadedMapDescription};
+		mapPersistance[fileName] = {
+			deadZombies: [],
+			zombiesCorpses: [],
+		};
+		const defaultDescriptionCopy = JSON.parse(JSON.stringify(defaultMapDescription))
+		mapDescription = {...defaultDescriptionCopy, ...loadedMapDescription};
 		loadedMaps.set(fileName, mapDescription);
 	});
 }
@@ -63,10 +75,19 @@ export function getCurrentMap() {
 	return gameLevel.map;
 }
 
+function applyMapPersistance(description) {
+	description.zombiesCorpses = mapPersistance[currentMapFile].zombiesCorpses;
+	description.floorBlood = mapPersistance[currentMapFile].floorBlood;
+	description.zombiesDescriptions = description.zombiesDescriptions.filter(zombieDescription => mapPersistance[currentMapFile].deadZombies.includes(zombieDescription.id) === false);
+	
+	return description;
+}
+
 class GameLevel {
 
 	constructor() {
 		this.map = null;
+		
 	}
 
 	start() {
@@ -80,11 +101,13 @@ class GameLevel {
 	}
 
 	#startMap(nextExit) {
-		// console.log('mapDescription', mapDescription);
 		this.map = new GameMap(mapDescription);
 		if (!player) {
 			player = new Player(this.map, mapDescription.enterPositions[nextExit]);
 		}
+
+		// console.log('this.mapPersistance[currentMapFile]', mapPersistance[currentMapFile]);
+
 		this.map.start(player, nextExit);
 		// Clock.play();
 		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
@@ -103,9 +126,24 @@ class GameLevel {
 
 	goToMap(nextMap, nextExit) {
 		// Clock.pause();
-		this.map.dispose();
-		this.map = null;
-		loadMap(nextMap).then(() => this.#startMap(nextExit));
+
+		this.map.exportBloodCanvas().then(image => {
+			mapPersistance[currentMapFile].floorBlood = image;
+			this.map.dispose();
+			this.map = null;
+			return loadMap(nextMap);
+		}).then(() => this.#startMap(nextExit));
+	}
+
+	persist(type, data) {
+		switch (type) {
+			case 'ZOMBIE_CORPSE':
+				mapPersistance[currentMapFile].zombiesCorpses.push(data);
+			break;
+			case 'ZOMBIE_DIE':
+				mapPersistance[currentMapFile].deadZombies.push(data.id);
+			break;
+		}
 	}
 
 	dispose() {

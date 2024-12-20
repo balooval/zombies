@@ -36,10 +36,17 @@
     "maxZombiesCount": 0,
     "zombiesSpawnLocations": [],
     
-    "zombiesPositions": [
+    "zombiesDescriptions": [
         {
+            "id": "A",
             "x": 50,
             "y": 30,
+            "state": "STILL_GUARD"
+        },
+        {
+            "id": "B",
+            "x": -15,
+            "y": -49,
             "state": "STILL_GUARD"
         }
     ],
@@ -49,31 +56,17 @@
         "pointLights": [
             {
                 "type": "pointLight",
-                "size": 30,
-                "x": -70,
-                "y": -50,
-                "color": "#ff5050"
+                "size": 150,
+                "x": -50,
+                "y": 0,
+                "color": "#a0a0a0"
             },
             {
                 "type": "pointLight",
-                "size": 40,
-                "x": -20,
-                "y": -50,
-                "color": "#a0a050"
-            },
-            {
-                "type": "pointLight",
-                "size": 40,
-                "x": 25,
-                "y": -50,
-                "color": "#a0a050"
-            },
-            {
-                "type": "pointLight",
-                "size": 40,
-                "x": 70,
-                "y": -50,
-                "color": "#a0a050"
+                "size": 150,
+                "x": 35,
+                "y": 5,
+                "color": "#a0a0a0"
             }
         ]
     },

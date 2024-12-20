@@ -49,9 +49,8 @@ export class HitSprite extends FxSprite {
 
 export class DeadZombieSprite {
 
-	constructor(map, x, y, angle) {
+	constructor(map, x, y, angle, animation) {
 		this.map = getCurrentMap();
-		const animation = MATH.randomElement(['zombiVioletDeadA', 'zombiVioletDeadB']);
 		this.sprite = SpriteFactory.createAnimatedSprite(17, 17, animation);
 		this.sprite.setPosition(x, y);
 		this.sprite.setDepth(1);

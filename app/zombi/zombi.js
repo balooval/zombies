@@ -3,6 +3,7 @@ import * as SoundLoader from '../net/loaderSound.js';
 
 import {DISPOSE_EVENT} from '../map/map.js';
 import EntityWithStates from '../entityWithStates.js'
+import Evt from '../utils/event.js';
 import StateAttack from './stateAttack.js'
 import StateFollow from './stateFollow.js'
 import StateHole from './stateHole.js'
@@ -11,10 +12,11 @@ import StateSlide from './stateSlide.js'
 import StateStillGuard from './stateStillGuard.js'
 import StateTravelGraph from './stateTravelGraph.js'
 import Translation from '../translation.js';
+import {getCurrentLevel} from '../gameLevel.js';
 
 export const pool = new Map();
 
-export function createZombi(player, map, startPosition, firstState) {
+export function createZombi(id, player, map, startPosition, firstState) {
 	const zombiStates = new Map();
 	zombiStates.set('ENTER', new StateHole(startPosition));
 	zombiStates.set('WALK', new StateTravelGraph(startPosition, map, player));
@@ -23,14 +25,17 @@ export function createZombi(player, map, startPosition, firstState) {
 	zombiStates.set('SLIDE', new StateSlide(startPosition, map));
 	zombiStates.set('ATTACK', new StateAttack(startPosition, map));
 	zombiStates.set('PAUSE_AND_SEARCH', new StatePauseAndSearch(startPosition, map, player));
-	const zombi = new Zombi(zombiStates, map, startPosition, player, firstState);
+	const zombi = new Zombi(id, zombiStates, map, startPosition, player, firstState);
 	pool.set(zombi, zombi);
+	return zombi;
 }
 
 export class Zombi extends EntityWithStates{
 
-	constructor(states, map, position, player, firstState) {
+	constructor(id, states, map, position, player, firstState) {
 		super(states, firstState);
+		this.id = id;
+		this.evt = new Evt();
 		this.map = map;
 		this.position = position;
 		this.targetPlayer = player;
@@ -50,6 +55,7 @@ export class Zombi extends EntityWithStates{
 		this.hitCooldown = Math.max(0, this.hitCooldown - 1);
 
 		if (this.life <= 0) {
+			getCurrentLevel().persist('ZOMBIE_DIE', this);
 			this.dispose();
 		}
 	}
