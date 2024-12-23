@@ -88,6 +88,10 @@
 			"url": "assets/map-tiles.png"
 		},
 		{
+			"id": "mapTilesB",
+			"url": "assets/map-tiles-b.png"
+		},
+		{
 			"id": "wallTop",
 			"url": "assets/wall-top.png"
 		},

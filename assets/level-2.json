@@ -1,7 +1,7 @@
 {
     "comment": "Level 2",
     
-    "backgroundImage": "mapTiles",
+    "backgroundImage": "mapTilesB",
 
     "playerStartPosition": {
         "x": -72,
@@ -16,6 +16,14 @@
         "right": {
             "x": 70,
             "y": 36
+        },
+        "bottom": {
+            "x": -50,
+            "y": -23
+        },
+        "top": {
+            "x": -50,
+            "y": 48
         }
     },
 
@@ -87,6 +95,22 @@
             "height": 19,
             "nextMap": "level-3.json",
             "nextExit": "default"
+        },
+        {
+            "x": -60,
+            "y": -29,
+            "width": 20,
+            "height": 5,
+            "nextMap": "level-4.json",
+            "nextExit": "default"
+        },
+        {
+            "x": -60,
+            "y": 58,
+            "width": 20,
+            "height": 5,
+            "nextMap": "level-5.json",
+            "nextExit": "default"
         }
     ],
 
@@ -99,6 +123,14 @@
         "doors": [],
 
         "walls": [
+            {
+                "comment": "comptoir",
+                "x": -5,
+                "y": -30,
+                "width": 65,
+                "height": 7
+            },
+
             {
                 "comment": "limite haut",
                 "x": -85,

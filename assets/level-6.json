@@ -1,0 +1,99 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTilesB",
+
+    "playerStartPosition": {
+        "x": -72,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": 20,
+            "y": 10
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesDescriptions": [
+        {
+            "id": "A",
+            "x": 2,
+            "y": -17,
+            "state": "STILL_GUARD"
+        }
+    ],
+
+    "lights": {
+        "rectLights": [],
+        "pointLights": []
+    },
+
+    "exits": [
+        {
+            "x": 25,
+            "y": 15,
+            "width": 5,
+            "height": 15,
+            "nextMap": "level-5.json",
+            "nextExit": "top"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [],
+
+        "box": [],
+
+        "doors": [],
+
+        "walls": [
+            {
+                "comment": "haut",
+                "x": -85,
+                "y": 65,
+                "width": 180,
+                "height": 30
+            },
+            {
+                "comment": "bas",
+                "x": -40,
+                "y": -25,
+                "width": 180,
+                "height": 40
+            },
+            {
+                "comment": "gauche",
+                "x": -85,
+                "y": 65,
+                "width": 70,
+                "height": 130
+            },
+            {
+                "comment": "droite",
+                "x": 25,
+                "y": 65,
+                "width": 70,
+                "height": 130
+            }
+        ]
+    }
+}

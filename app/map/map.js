@@ -709,7 +709,6 @@ class Cell {
         .flat()
         .filter(posX => posX <= MAX_X)
         .filter(posX => posX >= MIN_X)
-        console.log('horPositions', horPositions);
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
         horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));
