@@ -22,7 +22,7 @@ class Exit extends BlockBase {
 
         this.hitBox = new FakeHitbox();
         
-        const margin = 2;
+        const margin = 1;
         this.interactiveHitBox = new Hitbox(this.posX - margin, this.posX + this.width + margin, this.posY - this.height - margin, this.posY + margin, true);
         this.sprite = SpriteFactory.createFlatRectangleSprite(
             this.posX + this.width / 2,

@@ -79,6 +79,8 @@ export class GameMap {
         this.maxZombiesCount = mapDescription.maxZombiesCount;
         this.nextZombiStep = 0;
 
+        this.doors = [];
+
         this.blocks = this.#buildBlocks(mapDescription.blocks);
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
@@ -120,6 +122,12 @@ export class GameMap {
     onWallsChanged() {
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
+    }
+
+    openDoor(doorId) {
+        this.doors
+        .filter(door => door.id === doorId)
+        .forEach(door => door.turnOn());
     }
 
     placeBlood(x, y, size) {
@@ -444,8 +452,20 @@ export class GameMap {
             blocks.push(new BlockObstacle(obstacle.texture, obstacle.x, obstacle.y, obstacle.width, obstacle.height));
         }
 
-        for (const door of blocksDescription.doors) {
-            blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
+        for (const doorDescription of blocksDescription.doors) {
+            const door = new Door(
+                this,
+                doorDescription.id,
+                doorDescription.x,
+                doorDescription.y,
+                doorDescription.width,
+                doorDescription.height,
+                doorDescription.openState,
+                doorDescription.isOpen,
+                doorDescription.selfOpen
+            );
+            blocks.push(door);
+            this.doors.push(door);
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {
@@ -533,6 +553,7 @@ export class GameMap {
     dispose() {
         CollisionResolver.removeFromLayer(this, 'MAP');
         // this.player.dispose();
+        this.doors = [];
         this.sprite.dispose();
         this.exits.forEach(exit => exit.dispose());
         this.blocks.forEach(block => block.dispose());

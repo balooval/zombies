@@ -8,13 +8,16 @@ import {FakeHitbox, Hitbox} from '../collisionHitbox.js';
 
 import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
+import {getCurrentLevel} from '../gameLevel.js';
 
 class Door extends BlockBase {
-    constructor(map, posX, posY, width, height, openState) {
+    constructor(map, id, posX, posY, width, height, openState, isOpen, selfOpen) {
         super(posX, posY, width, height);
         
         this.map = map;
+        this.id = id;
         this.openState = openState;
+        this.selfOpen = selfOpen;
         this.label = "E pour ouvrir";
         this.centerX = this.posX + (this.width * 0.5);
         this.centerY = this.posY - (this.height * 0.5);
@@ -33,11 +36,17 @@ class Door extends BlockBase {
 
         this.touchedPlayer = false;
         this.stepToHide = 0;
-        this.isOpen = false;
+        this.isOpen = isOpen;
+
+        if (this.isOpen) {
+            this.#open();
+        }
 
         CollisionResolver.addToLayer(this, 'WALLS');
 
-        CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
+        if (this.selfOpen === true) {
+            CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
+        }
     }
 
     getWorldCollisionBox() {
@@ -59,15 +68,11 @@ class Door extends BlockBase {
     onHide() {
         Stepper.stopListenStep(this.stepToHide, this, this.onHide);
         InteractivePopup.hide();
-        Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        Input.evt.removeEventListener('DOWN_69', this, this.turnOn);
         this.touchedPlayer = false;
     }
 
-    onKeyDown() {
-        
-        // CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        // Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
-        
+    turnOn() {
         if (this.isOpen === true) {
             this.#close();
         } else {
@@ -92,6 +97,8 @@ class Door extends BlockBase {
             this.openState.height,
             0x00ff00
         );
+
+        getCurrentLevel().persist('DOOR', this);
     }
 
     #close() {
@@ -109,11 +116,13 @@ class Door extends BlockBase {
             this.height,
             0xff0000
         );
+
+        getCurrentLevel().persist('DOOR', this);
     }
 
     #onPlayerTouch(players) {
         if (this.touchedPlayer === false) {
-            Input.evt.addEventListener('DOWN_69', this, this.onKeyDown);
+            Input.evt.addEventListener('DOWN_69', this, this.turnOn);
         }
         
         this.touchedPlayer = true;

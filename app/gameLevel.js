@@ -63,6 +63,7 @@ export function loadMap(fileName) {
 			deadZombies: [],
 			zombiesCorpses: [],
 			woodenBox: [],
+			doors: {},
 		};
 		const defaultDescriptionCopy = JSON.parse(JSON.stringify(defaultMapDescription))
 		mapDescription = {...defaultDescriptionCopy, ...loadedMapDescription};
@@ -88,6 +89,10 @@ function applyMapPersistance(description) {
 	description.floorBlood = mapPersistance[currentMapFile].floorBlood;
 	description.zombiesDescriptions = description.zombiesDescriptions.filter(zombieDescription => mapPersistance[currentMapFile].deadZombies.includes(zombieDescription.id) === false);
 	description.blocks.box = description.blocks.box.filter(box => mapPersistance[currentMapFile].woodenBox.includes(box.id) === false);
+
+	description.blocks.doors.forEach(door => {
+		door.isOpen = mapPersistance[currentMapFile].doors[`door_${door.id}`] ?? false;
+	});
 	
 	return description;
 }
@@ -154,6 +159,9 @@ class GameLevel {
 			break;
 			case 'WOODEN_BOX':
 				mapPersistance[currentMapFile].woodenBox.push(data.id);
+			break;
+			case 'DOOR':
+				mapPersistance[currentMapFile].doors[`door_${data.id}`] = data.isOpen;
 			break;
 		}
 	}
