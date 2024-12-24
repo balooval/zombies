@@ -53,7 +53,7 @@ export class DeadZombieSprite {
 		this.map = getCurrentMap();
 		this.sprite = SpriteFactory.createAnimatedSprite(17, 17, animation);
 		this.sprite.setPosition(x, y);
-		this.sprite.setDepth(1);
+		this.sprite.setDepth(10);
 		this.sprite.setRotation(angle);
 		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
 	}

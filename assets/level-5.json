@@ -81,7 +81,41 @@
 
         "interactiveBlocks": [],
 
-        "box": [],
+        "box": [
+            {
+                "id": "A",
+                "x": -15,
+                "y": 53,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": ["BonusMine"],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "B",
+                "x": -14,
+                "y": 42.5,
+                "width": 8,
+                "height": 8,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "C",
+                "x": -4.5,
+                "y": 54,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            }
+        ],
 
         "doors": [],
 

@@ -44,7 +44,7 @@ function loadRessourcesList(ressourcesUrl) {
 	.then(ressourcesList => Promise.all([
 		SoundLoader.loadBatch(ressourcesList.sounds),
 		TextureLoader.loadBatch(ressourcesList.textures),
-		GameLevel.loadMap('level-2.json')
+		GameLevel.loadMap('level-6.json')
 		// GameLevel.loadMap('map-2.json')
 		// GameLevel.loadMap('map-shadow.json')
 	]));

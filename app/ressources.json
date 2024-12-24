@@ -80,6 +80,10 @@
 
 	"textures": [
 		{
+			"id": "furnitureBrown",
+			"url": "assets/furniture-brown.png"
+		},
+		{
 			"id": "woodenBox",
 			"url": "assets/wodden-box.png"
 		},

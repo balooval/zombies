@@ -35,8 +35,8 @@
     "zombiesDescriptions": [
         {
             "id": "A",
-            "x": 2,
-            "y": -17,
+            "x": -4,
+            "y": -22,
             "state": "STILL_GUARD"
         }
     ],
@@ -61,7 +61,41 @@
 
         "interactiveBlocks": [],
 
-        "box": [],
+        "box": [
+            {
+                "id": "A",
+                "x": -12,
+                "y": 32,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "B",
+                "x": -13,
+                "y": -5,
+                "width": 12,
+                "height": 12,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "C",
+                "x": 2,
+                "y": -7,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            }
+        ],
 
         "doors": [],
 

@@ -303,9 +303,18 @@ const spriteSheets = new Map(Object.entries({
 		textureId: 'bonusWeapons',
 		frames: [],
 	},
+	furnitureBrown: {
+		textureId: 'furnitureBrown',
+		frames: [],
+	},
 }));
 
 const animations = {
+	furnitureBrown: {
+		spriteSheet: 'furnitureBrown',
+		stepsByFrame: -1,
+		framesToDisplay: [0],
+	},
 	woodenBox: {
 		spriteSheet: 'woodenBox',
 		stepsByFrame: -1,

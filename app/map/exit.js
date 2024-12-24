@@ -32,6 +32,8 @@ class Exit extends BlockBase {
             0x102030
         );
 
+        this.sprite.setDepth(1);
+
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
     }
 

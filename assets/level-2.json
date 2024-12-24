@@ -121,15 +121,19 @@
         "box": [],
 
         "doors": [],
-
-        "walls": [
+        
+        "obstacles": [
             {
                 "comment": "comptoir",
+                "texture": "furnitureBrown",
                 "x": -5,
                 "y": -30,
                 "width": 65,
                 "height": 7
-            },
+            }
+        ],
+
+        "walls": [
 
             {
                 "comment": "limite haut",

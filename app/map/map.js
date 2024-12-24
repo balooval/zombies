@@ -7,6 +7,7 @@ import * as Stepper from '../utils/stepper.js';
 import * as TextureLoader from '../net/loaderTexture.js';
 import * as Zombi from '../zombi/zombi.js';
 
+import {BlockObstacle, BlockWall} from './block.js';
 import { CanvasTexture, NearestFilter, Vector2 } from '../../vendor/three.module.js';
 import {
     PLAYER_IS_DEAD_EVENT,
@@ -14,7 +15,6 @@ import {
 } from '../player.js';
 
 import AstarBuilder from '../astar/AStarBuilder.js';
-import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
 import {DeadZombieSprite} from '../fxSprites.js';
 import Door from './door.js';
@@ -332,6 +332,7 @@ export class GameMap {
     }
 
     #placeZombies(zombiesDescriptions) {
+        // return;
         for (const zombieDescription of zombiesDescriptions) {
             this.createZombie(zombieDescription.id, zombieDescription.x, zombieDescription.y, zombieDescription.state);
         }
@@ -434,21 +435,17 @@ export class GameMap {
 
     #buildBlocks(blocksDescription) {
         const blocks = [];
-        // Pour DEBUG, correspond au schéma papier
-        // blocks.push(new Block(-30, 40, 30, 10));
-        // blocks.push(new Block(-10, -10, 50, 10));
-        // blocks.push(new Block(-30, -25, 30, 10));
 
         for (const wall of blocksDescription.walls) {
-            blocks.push(new Block(wall.x, wall.y, wall.width, wall.height));
+            blocks.push(new BlockWall(wall.x, wall.y, wall.width, wall.height));
+        }
+
+        for (const obstacle of blocksDescription.obstacles ?? []) {
+            blocks.push(new BlockObstacle(obstacle.texture, obstacle.x, obstacle.y, obstacle.width, obstacle.height));
         }
 
         for (const door of blocksDescription.doors) {
             blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
-        }
-
-        for (const box of blocksDescription.box) {
-            blocks.push(new WoodenBox(this, box.x, box.y, box.width, box.height, box.onBreak));
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {
@@ -462,6 +459,10 @@ export class GameMap {
                 interactiveBlock.onActive,
                 interactiveBlock.isSolid,
             ));
+        }
+
+        for (const box of blocksDescription.box) {
+            blocks.push(new WoodenBox(this, box.id, box.x, box.y, box.width, box.height, box.onBreak));
         }
 
         return blocks;
