@@ -5,21 +5,69 @@ import * as Renderer from './renderer.js';
 import * as Stepper from './utils/stepper.js';
 
 import {
-	DISPOSE_EVENT,
 	GAME_OVER_EVENT,
 	GameMap,
 }  from './map/map.js';
 
 import GameOverScreen from './ui/gameOverScreen.js';
+import {Player} from './player.js';
 
 let gameLevel;
 let mapDescription;
+let player;
+let currentMapFile = 'none';
+const loadedMaps = new Map();
+const mapPersistance = {};
+
+const defaultMapDescription = {
+	fog: [],
+	enterPositions: {
+		default: {
+			x: 0,
+			y: 0,
+		},
+	},
+	exits: [],
+	zombiesDescriptions: [],
+	deadZombies: [],
+	blocks: {
+		interactiveBlocks: [],
+		box: [],
+		doors: [],
+		obstacles: [],
+		walls: [],
+	},
+	zombiesCorpses: [],
+	floorBlood: null,
+	lights: {
+		rectLights: [],
+		pointLights: [],
+	}
+};
 
 export function loadMap(fileName) {
+	currentMapFile = fileName;
+
+	if (loadedMaps.has(fileName) === true) {
+		return new Promise(resolve => {
+			const loadedDescription = loadedMaps.get(fileName);
+			mapDescription = applyMapPersistance(loadedDescription);
+			resolve()
+		});
+	}
+
 	return fetch(`./assets/${fileName}`)
 	.then(response => response.json())
 	.then(loadedMapDescription => {
-		mapDescription = loadedMapDescription;
+		mapPersistance[fileName] = {
+			deadZombies: [],
+			zombiesCorpses: [],
+			woodenBox: [],
+			doors: {},
+		};
+		const defaultDescriptionCopy = JSON.parse(JSON.stringify(defaultMapDescription))
+		mapDescription = {...defaultDescriptionCopy, ...loadedMapDescription};
+		loadedMaps.set(fileName, mapDescription);
 	});
 }
 
@@ -32,32 +80,52 @@ export function getCurrentLevel() {
 	return gameLevel;
 }
 
+export function getCurrentMap() {
+	return gameLevel.map;
+}
+
+function applyMapPersistance(description) {
+	description.zombiesCorpses = mapPersistance[currentMapFile].zombiesCorpses;
+	description.floorBlood = mapPersistance[currentMapFile].floorBlood;
+	description.zombiesDescriptions = description.zombiesDescriptions.filter(zombieDescription => mapPersistance[currentMapFile].deadZombies.includes(zombieDescription.id) === false);
+	description.blocks.box = description.blocks.box.filter(box => mapPersistance[currentMapFile].woodenBox.includes(box.id) === false);
+
+	description.blocks.doors.forEach(door => {
+		door.isOpen = mapPersistance[currentMapFile].doors[`door_${door.id}`] ?? false;
+	});
+	
+	return description;
+}
+
 class GameLevel {
 
 	constructor() {
 		this.map = null;
+		
 	}
 
 	start() {
 		AnimationControl.registerToUpdate(Stepper);
 		Renderer.start();
 		AnimationControl.start();
-		this.#startMap();
+		this.#startMap('default', {x: 0, y: 0});
 		Clock.start();
 
 		Input.evt.addEventListener('DOWN_80', null, this.onPressPause); // P
 	}
 
-	#startMap() {
+	#startMap(nextExit) {
 		this.map = new GameMap(mapDescription);
-		this.map.start();
-		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
-		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.onMapDispose);
-		Input.evt.addEventListener('DOWN_66', this.map, this.map.dispose); // B
-	}
+		if (!player) {
+			player = new Player(this.map, mapDescription.enterPositions[nextExit]);
+		}
 
-	success() {
-		// TODO
+		// console.log('this.mapPersistance[currentMapFile]', mapPersistance[currentMapFile]);
+
+		this.map.start(player, nextExit);
+		// Clock.play();
+		this.map.evt.addEventListener(GAME_OVER_EVENT, this, this.gameOver);
+		Input.evt.addEventListener('DOWN_66', this.map, this.map.dispose); // B
 	}
 
 	gameOver() {
@@ -70,11 +138,34 @@ class GameLevel {
 		Clock.switchPause();
 	}
 
-	onMapDispose() {
-		Input.evt.removeEventListener('DOWN_66', this.map, this.map.dispose); // B
-		loadMap('map-shadow.json').then(() => this.#startMap());
+	goToMap(nextMap, nextExit) {
+		// Clock.pause();
+
+		this.map.exportBloodCanvas().then(image => {
+			mapPersistance[currentMapFile].floorBlood = image;
+			this.map.dispose();
+			this.map = null;
+			return loadMap(nextMap);
+		}).then(() => this.#startMap(nextExit));
 	}
-	
+
+	persist(type, data) {
+		switch (type) {
+			case 'ZOMBIE_CORPSE':
+				mapPersistance[currentMapFile].zombiesCorpses.push(data);
+			break;
+			case 'ZOMBIE_DIE':
+				mapPersistance[currentMapFile].deadZombies.push(data.id);
+			break;
+			case 'WOODEN_BOX':
+				mapPersistance[currentMapFile].woodenBox.push(data.id);
+			break;
+			case 'DOOR':
+				mapPersistance[currentMapFile].doors[`door_${data.id}`] = data.isOpen;
+			break;
+		}
+	}
+
 	dispose() {
 		this.map.evt.removeEventListener(GAME_OVER_EVENT, this, this.gameOver);
 	}

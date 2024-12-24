@@ -265,6 +265,10 @@ export class FlatRectangleSprite {
 		this.mesh.position.set(x, y, this.depthPosition);
 	}
 
+	setDepth(depthPosition) {
+		this.mesh.position.z = depthPosition;
+	}
+
 	display() {
 		this.render.scene.add(this.mesh);
 	}

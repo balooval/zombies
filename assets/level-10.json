@@ -1,0 +1,103 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTilesB",
+
+    "playerStartPosition": {
+        "x": -60,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": -29,
+            "y": -5
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesDescriptions": [
+
+    ],
+
+    "lights": {
+        "rectLights": [],
+
+        "pointLights": [
+            {
+                "type": "pointLight",
+                "size": 100,
+                "x": 3,
+                "y": -3,
+                "color": "#a0a0a0"
+            }
+        ]
+    },
+
+    "exits": [
+        {
+            "x": -37,
+            "y": 5,
+            "width": 3,
+            "height": 20,
+            "nextMap": "level-7.json",
+            "nextExit": "right"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [],
+
+        "box": [],
+
+        "doors": [],
+
+        "walls": [
+            {
+                "comment": "haut",
+                "x": -85,
+                "y": 60,
+                "width": 170,
+                "height": 40
+            },
+            {
+                "comment": "bas",
+                "x": -85,
+                "y": -30,
+                "width": 180,
+                "height": 50
+            },
+            {
+                "comment": "gauche",
+                "x": -85,
+                "y": 30,
+                "width": 50,
+                "height": 80
+            },
+            {
+                "comment": "droite",
+                "x": 50,
+                "y": 30,
+                "width": 40,
+                "height": 80
+            }
+        ]
+    }
+}

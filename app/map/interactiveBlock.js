@@ -8,6 +8,7 @@ import {FakeHitbox, Hitbox} from '../collisionHitbox.js';
 
 import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
+import {getCurrentMap} from '../gameLevel.js';
 
 class InteractiveBlock extends BlockBase {
     constructor(map, posX, posY, width, height, label, onActive, isSolid) {
@@ -15,6 +16,7 @@ class InteractiveBlock extends BlockBase {
 
         this.map = map;
         this.label = label;
+        this.onActive = onActive;
         this.isSolid = isSolid;
         this.centerX = this.posX + (this.width * 0.5);
         this.centerY = this.posY - (this.height * 0.5);
@@ -36,8 +38,8 @@ class InteractiveBlock extends BlockBase {
 
         this.touchedPlayer = false;
         this.stepToHide = 0;
-        this.lightAreOn = false;
-        this.onDuration = onActive.duration;
+        this.isActive = false;
+        this.onDuration = this.onActive.duration;
 
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
 
@@ -46,19 +48,19 @@ class InteractiveBlock extends BlockBase {
             // new Light.BlinkRectLight(-75, 40, 120, 30),
         ];
 
-        this.#buildLights(onActive);
+        this.#buildLights(this.onActive.lights);
 
         this.lights.forEach(light => light.turnOff());
 
         
     }
 
-    #buildLights(onActive) {
-        if (!onActive.lights) {
+    #buildLights(lights) {
+        if (!lights) {
             return;
         }
 
-        for (const light of onActive.lights) {
+        for (const light of lights) {
             if (light.type === 'rectLight') {
                 this.lights.push(new Light.RectLight(light.x, light.y, light.width, light.height));
             }
@@ -97,16 +99,20 @@ class InteractiveBlock extends BlockBase {
     }
 
     onKeyDown() {
-        if (this.lightAreOn === true) {
-            return;
-        }
+        // if (this.isActive === true) {
+        //     return;
+        // }
         
-        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
+        // CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
+        // Input.evt.removeEventListener('DOWN_69', this, this.onKeyDown);
         
         this.lights.forEach(light => light.turnOn());
-        CollisionResolver.forgotCollisionWithLayer(this, 'PLAYER');
-        this.lightAreOn = true;
+
+        const map = getCurrentMap();
+        this.onActive.doors.forEach(doorId => map.openDoor(doorId));
+
+
+        this.isActive = true;
 
         if (this.onDuration > 0) {
             Stepper.listenStep(Stepper.curStep + this.onDuration, this, this.turnOff);
@@ -116,7 +122,7 @@ class InteractiveBlock extends BlockBase {
     turnOff() {
         Stepper.stopListenStep(Stepper.curStep, this, this.turnOff);
         this.lights.forEach(light => light.turnOff());
-        this.lightAreOn = false;
+        this.isActive = false;
         CollisionResolver.checkCollisionWithLayer(this, 'PLAYER');
     }
 

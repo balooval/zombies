@@ -1,0 +1,217 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTilesB",
+
+    "playerStartPosition": {
+        "x": -72,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": -71,
+            "y": 0
+        },
+        "right": {
+            "x": 70,
+            "y": 36
+        },
+        "bottom": {
+            "x": -50,
+            "y": -23
+        },
+        "top": {
+            "x": -50,
+            "y": 48
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesDescriptions": [
+        {
+            "id": "A",
+            "x": 50,
+            "y": 30,
+            "state": "STILL_GUARD"
+        },
+        {
+            "id": "B",
+            "x": -15,
+            "y": -49,
+            "state": "STILL_GUARD"
+        }
+    ],
+
+    "lights": {
+        "rectLights": [],
+        "pointLights": [
+            {
+                "type": "pointLight",
+                "size": 150,
+                "x": -50,
+                "y": 0,
+                "color": "#a0a0a0"
+            },
+            {
+                "type": "pointLight",
+                "size": 150,
+                "x": 35,
+                "y": 5,
+                "color": "#a0a0a0"
+            }
+        ]
+    },
+
+    "exits": [
+        {
+            "x": -80,
+            "y": 5,
+            "width": 5,
+            "height": 19,
+            "nextMap": "level-1.json",
+            "nextExit": "right"
+        },
+        {
+            "x": 75,
+            "y": 36,
+            "width": 5,
+            "height": 19,
+            "nextMap": "level-3.json",
+            "nextExit": "default"
+        },
+        {
+            "x": -60,
+            "y": -33,
+            "width": 20,
+            "height": 5,
+            "nextMap": "level-4.json",
+            "nextExit": "default"
+        },
+        {
+            "x": -60,
+            "y": 58,
+            "width": 20,
+            "height": 5,
+            "nextMap": "level-5.json",
+            "nextExit": "default"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [
+            {
+                "comment": "Door",
+                "x": 72,
+                "y": -51,
+                "width": 3,
+                "height": 3,
+                "label": "<b>E</b> pour ouvrir la porte",
+                "isSolid": false,
+                "onActive": {
+                    "duration": -1,
+                    "lights": [],
+                    "doors": ["A"]
+                }
+            }
+        ],
+
+        "box": [],
+
+        "doors": [
+            {
+                "id": "A",
+                "x": -65,
+                "y": -28,
+                "width": 30,
+                "height": 5 ,
+                "selfOpen": false,
+                "openState": {
+                    "x": -65,
+                    "y": -28,
+                    "width": 5,
+                    "height": 5
+                }
+            }
+        ],
+        
+        "obstacles": [
+            {
+                "comment": "comptoir",
+                "texture": "furnitureBrown",
+                "x": -5,
+                "y": -30,
+                "width": 65,
+                "height": 7
+            }
+        ],
+
+        "walls": [
+
+            {
+                "comment": "limite haut",
+                "x": -85,
+                "y": 65,
+                "width": 170,
+                "height": 10
+            },
+
+            {
+                "comment": "limite bas",
+                "x": -20,
+                "y": -55,
+                "width": 100,
+                "height": 10
+            },
+            {
+                "comment": "limite bas",
+                "x": -85,
+                "y": -30,
+                "width": 65,
+                "height": 50
+            },
+
+            {
+                "comment": "limite gauche",
+                "x": -85,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            },
+
+            {
+                "comment": "mur droite",
+                "x": 75,
+                "y": 10,
+                "width": 10,
+                "height": 100
+            },
+            
+            {
+                "comment": "limite droite",
+                "x": 80,
+                "y": 65,
+                "width": 5,
+                "height": 130
+            }
+
+        ]
+    }
+}

@@ -6,12 +6,14 @@ import BlockBase from './blockBase.js';
 import CollisionResolver from '../collisionResolver.js';
 import {Hitbox} from '../collisionHitbox.js';
 import {createRandomBonus} from '../bonus.js';
+import {getCurrentLevel} from '../gameLevel.js';
 
 class WoodenBox extends BlockBase {
-    constructor(map, posX, posY, width, height, onBreak) {
+    constructor(map, id, posX, posY, width, height, onBreak) {
         super(posX, posY, width, height);
 
         this.map = map;
+        this.id = id;
         this.onBreak = onBreak;
         this.life = 4;
 
@@ -28,6 +30,8 @@ class WoodenBox extends BlockBase {
             this.height,
             TextureLoader.get('woodenBox')
         );
+
+        this.sprite.setDepth(2);
 
         CollisionResolver.addToLayer(this, 'WALLS');
     }
@@ -46,6 +50,7 @@ class WoodenBox extends BlockBase {
         this.dispose();
         createRandomBonus(this.onBreak.bonus, {x: this.centerX, y: this.centerY}, this.map);
         this.onBreak.zombies.forEach(firstState => this.map.createZombie(this.centerX, this.centerY, firstState));
+        getCurrentLevel().persist('WOODEN_BOX', this);
     }
 
     getWorldCollisionBox() {

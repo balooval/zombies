@@ -9,10 +9,12 @@ import {
 	randomValue,
 } from './utils/math.js';
 
+import {DISPOSE_EVENT} from './map/map.js';
 import Interval from './utils/interval.js';
 import {
 	Vector2
 } from '../vendor/three.module.js';
+import {getCurrentMap} from './gameLevel.js';
 import {randomDirection} from './utils/math.js';
 
 export const BLOOD_WALK = 'BLOOD_WALK';
@@ -23,26 +25,6 @@ export const WOLF_FALLING = 'WOLF_FALLING';
 export const WOLF_FALLING_CLOUD = 'WOLF_FALLING_CLOUD';
 export const RAY = 'RAY';
 
-export class WolfFallingParticules {
-	constructor(entitie) {
-		this.entitie = entitie;
-		this.lastPosition = this.entitie.position.clone();
-		this.interval = new Interval(15, () => this.update(), true);
-		this.interval.start();
-	}
-
-	update() {
-		const speed = 20 - (this.lastPosition.distanceTo(this.entitie.position));
-		const radius = Math.max(1, speed / 8);
-		const count = Math.max(8, speed * 4);
-		createWolfCloud(this.entitie.position, radius, count);
-		this.lastPosition.copy(this.entitie.position);
-    }
-
-	dispose() {
-		this.interval.dispose();
-	}
-}
 
 export function create(type, position, direction) {
 	switch (type) {
@@ -149,30 +131,6 @@ function createBonusTake(position) {
 	}
 }
 
-function createWolfCloud(position, radius, count) {
-
-	for (let i = 0; i < count; i ++) {
-		const angle = randomDirection(3.14);
-		const offsetX = Math.cos(angle) * radius;
-		const offsetY = Math.sin(angle) * (radius * 0.5);
-
-		const color = randomElement([0x48526b, 0x384052]);
-		const velocityX = offsetX * 0.01;
-		const velocityY = offsetY * 0.01;
-		const particule = new Particule(
-			position.x + offsetX,
-			position.y + offsetY,
-			velocityX + randomDirection(0.02),
-			velocityY + randomDirection(0.02) + 0.2,
-			50,
-			0.98,
-			0.002,
-			0.9,
-			color,
-		);
-	}
-}
-
 function createEnnemiHit(position, direction) {
 	const count = 30;
 
@@ -197,6 +155,7 @@ function createEnnemiHit(position, direction) {
 		);
 	}
 }
+
 function createWolfFallingTrail(position) {
 	const count = 1;
 
@@ -264,6 +223,7 @@ function createBloodWalk(position) {
 
 class Particule {
 	constructor(posX, posY, velocityX, velocityY, stepDuration, scaleDecrease, gravity, airResistance, color, scale) {
+		this.map = getCurrentMap();
 		this.gravity = gravity;
 		this.airResistance = airResistance;
 		this.velX = velocityX;
@@ -278,6 +238,7 @@ class Particule {
 
 		this.shootInterval = new Interval(stepDuration, () => this.dispose(), false);
 		this.shootInterval.start();
+		this.map.evt.addEventListener(DISPOSE_EVENT, this, this.dispose);
 	}
 
 	move() {
@@ -297,6 +258,7 @@ class Particule {
 	}
 
 	dispose() {
+		this.map.evt.removeEventListener(DISPOSE_EVENT, this, this.dispose);
 		AnimationControl.unregisterToUpdate(this);
 		this.sprite.dispose();
 		this.shootInterval.dispose();

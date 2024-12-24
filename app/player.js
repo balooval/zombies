@@ -26,6 +26,7 @@ import Minigun from './weapons/minigun.js';
 import RayLauncher from './weapons/rayLauncher.js';
 import Shotgun from './weapons/shotgun.js';
 import Translation from './translation.js';
+import {getCurrentMap} from './gameLevel.js';
 
 export const PLAYER_IS_DEAD_EVENT = 'PLAYER_IS_DEAD_EVENT';
 
@@ -33,7 +34,6 @@ export class Player {
 
 	constructor(map, startPosition) {
 		this.evt = new Evt();
-		this.map = map;
 		this.lifePoints = 1;
 		this.acceleration = 0.05;
 		this.moveSpeed = 0.2;
@@ -64,12 +64,12 @@ export class Player {
 		this.endShotAnimatonStep = 0;
 		this.isShoting = false;
 		// const baseWeapon = new Batte();
-		// const baseWeapon = new RayLauncher(this.map);
-		const baseWeapon = new Shotgun(this.map);
-		// const baseWeapon = new BulletLauncher(this.map);
+		// const baseWeapon = new RayLauncher();
+		const baseWeapon = new Shotgun();
+		// const baseWeapon = new BulletLauncher();
 		// const baseWeapon = new MineLauncher();
 		// const baseWeapon = new GrenadeLauncher();
-		// const baseWeapon = new Minigun(this.map);
+		// const baseWeapon = new Minigun();
 		baseWeapon.setOwner(this);
 
 		this.weaponTargetPosition = {x: 0, y: 0};
@@ -93,6 +93,11 @@ export class Player {
 		this.ambiantLight.turnOn();
 		this.torchLight = new Light.SpotLight(0, 0, Math.PI / 4, {r: 255, g: 255, b: 200});
 		this.torchLight.turnOn();
+	}
+
+	initPosition(position) {
+		this.position = position;
+		this.sprite.setPosition(this.position.x, this.position.y);
 	}
 
 	onCollide(collisions, layersName) {
@@ -154,12 +159,17 @@ export class Player {
 	}
 
 	update() {
+		const map = getCurrentMap();
+		if (!map) {
+			return;
+		}
+		
 		this.hitCooldown = Math.max(0, this.hitCooldown - 1);
 		this.move();
 		this.#updateViewAngle();
 		this.weapon.update();
 
-		this.map.checkBlood(this.translation);
+		map.checkBlood(this.translation);
 	}
 	
 	#updateViewAngle() {
@@ -209,7 +219,7 @@ export class Player {
 	}
 
 	#applyTranslation() {
-		const wallHit = this.map.getWallsIntersections(this.translation).shift();
+		const wallHit = getCurrentMap().getWallsIntersections(this.translation).shift();
 
 		let newPosX = this.translation.destX;
 		let newPosY = this.translation.destY;
@@ -265,11 +275,11 @@ export class Player {
 	}
 
 	onWheelDown() {
-		this.#getNextAvailableWeapon(-1);
+		this.#getNextAvailableWeapon(1);
 	}
 	
 	onWheelUp() {
-		this.#getNextAvailableWeapon(1);
+		this.#getNextAvailableWeapon(-1);
 	}
 
 	#getNextAvailableWeapon(direction) {

@@ -1,0 +1,111 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTilesB",
+
+    "playerStartPosition": {
+        "x": -72,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": 0,
+            "y": 49
+        },
+        "right": {
+            "x": 72,
+            "y": -19
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesDescriptions": [],
+
+    "lights": {
+        "rectLights": [
+            {
+                "x": -20,
+                "y": 70,
+                "width": 40,
+                "height": 140
+            }
+        ],
+        "pointLights": []
+    },
+
+    "exits": [
+        {
+            "x": -10,
+            "y": 57,
+            "width": 20,
+            "height": 3,
+            "nextMap": "level-4.json",
+            "nextExit": "bottom"
+        },
+        {
+            "x": 77,
+            "y": -16,
+            "width": 4,
+            "height": 10,
+            "nextMap": "level-8.json",
+            "nextExit": "left"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [],
+
+        "box": [],
+
+        "doors": [],
+
+        "walls": [
+            {
+                "comment": "haut",
+                "x": -85,
+                "y": 65,
+                "width": 180,
+                "height": 10
+            },
+            {
+                "comment": "bas",
+                "x": -85,
+                "y": -55,
+                "width": 180,
+                "height": 10
+            },
+            {
+                "comment": "gauche",
+                "x": -81,
+                "y": 65,
+                "width": 3,
+                "height": 130
+            },
+            {
+                "comment": "droite",
+                "x": 78,
+                "y": 65,
+                "width": 3,
+                "height": 130
+            }
+        ]
+    }
+}

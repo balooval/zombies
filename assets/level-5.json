@@ -1,0 +1,153 @@
+{
+    "comment": "Level 2",
+    
+    "backgroundImage": "mapTiles",
+
+    "playerStartPosition": {
+        "x": -72,
+        "y": 0
+    },
+
+    "enterPositions": {
+        "default": {
+            "x": 0,
+            "y": -50
+        },
+        "top": {
+            "x": -9,
+            "y": 45
+        }
+    },
+
+    "bonus": {
+        "addBonusRate": 300,
+        "maxBonusCount": 2,
+        "choices": [
+            "BonusGun",
+            "BonusMine",
+            "BonusEgg",
+            "BonusMinigun",
+            "BonusGrenade",
+            "BonusShotgun"
+        ]
+    },
+
+    "addZombiRate": 80,
+    "maxZombiesCount": 0,
+    "zombiesSpawnLocations": [],
+    
+    "zombiesDescriptions": [],
+
+    "lights": {
+        "rectLights": [
+            {
+                "x": -25,
+                "y": 70,
+                "width": 60,
+                "height": 140
+            }
+        ],
+        "pointLights": []
+    },
+
+    "exits": [
+        {
+            "x": -10,
+            "y": -55,
+            "width": 30,
+            "height": 5,
+            "nextMap": "level-2.json",
+            "nextExit": "top"
+        },
+        {
+            "x": -18,
+            "y": 50,
+            "width": 4,
+            "height": 10,
+            "nextMap": "level-6.json",
+            "nextExit": "default"
+        },
+        {
+            "x": -18,
+            "y": -35,
+            "width": 4,
+            "height": 10,
+            "nextMap": "level-5.json",
+            "nextExit": "default"
+        }
+    ],
+
+    "blocks": {
+
+        "interactiveBlocks": [],
+
+        "box": [
+            {
+                "id": "A",
+                "x": -15,
+                "y": 53,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": ["BonusMine"],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "B",
+                "x": -14,
+                "y": 42.5,
+                "width": 8,
+                "height": 8,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            },
+            {
+                "id": "C",
+                "x": -4.5,
+                "y": 54,
+                "width": 10,
+                "height": 10,
+                "onBreak": {
+                    "bonus": [],
+                    "zombies": []
+                }
+            }
+        ],
+
+        "doors": [],
+
+        "walls": [
+            {
+                "comment": "haut",
+                "x": -85,
+                "y": 65,
+                "width": 180,
+                "height": 10
+            },
+            {
+                "comment": "bas",
+                "x": -85,
+                "y": -55,
+                "width": 180,
+                "height": 10
+            },
+            {
+                "comment": "gauche",
+                "x": -85,
+                "y": 65,
+                "width": 70,
+                "height": 130
+            },
+            {
+                "comment": "droite",
+                "x": 25,
+                "y": 65,
+                "width": 70,
+                "height": 130
+            }
+        ]
+    }
+}

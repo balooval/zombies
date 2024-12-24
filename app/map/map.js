@@ -7,6 +7,7 @@ import * as Stepper from '../utils/stepper.js';
 import * as TextureLoader from '../net/loaderTexture.js';
 import * as Zombi from '../zombi/zombi.js';
 
+import {BlockObstacle, BlockWall} from './block.js';
 import { CanvasTexture, NearestFilter, Vector2 } from '../../vendor/three.module.js';
 import {
     PLAYER_IS_DEAD_EVENT,
@@ -14,10 +15,11 @@ import {
 } from '../player.js';
 
 import AstarBuilder from '../astar/AStarBuilder.js';
-import Block from './block.js';
 import CollisionResolver from '../collisionResolver.js';
+import {DeadZombieSprite} from '../fxSprites.js';
 import Door from './door.js';
 import Evt from '../utils/event.js';
+import Exit from './exit.js';
 import {FogEmiter} from '../fogEmiter.js';
 import {Hitbox} from '../collisionHitbox.js';
 import InteractiveBlock from './interactiveBlock.js';
@@ -58,6 +60,11 @@ export class GameMap {
         this.bloodContext = this.bloodCanvas.getContext('2d', {willReadFrequently: true});
         this.bloodPixels = null;
 
+        if (this.mapDescription.floorBlood) {
+            this.bloodContext.drawImage(this.mapDescription.floorBlood, 0, 0);
+            this.#drawBloodIntoBackground();
+        }
+
         CollisionResolver.addToLayer(this, 'MAP');
         this.hitBox = new Hitbox(-8000, 8000, GROUND_POSITION - 20, GROUND_POSITION, true);
         this.player = null;
@@ -71,6 +78,8 @@ export class GameMap {
         this.addZombiRate = mapDescription.addZombiRate;
         this.maxZombiesCount = mapDescription.maxZombiesCount;
         this.nextZombiStep = 0;
+
+        this.doors = [];
 
         this.blocks = this.#buildBlocks(mapDescription.blocks);
         this.rootCell = this.#buildGraph();
@@ -86,12 +95,39 @@ export class GameMap {
         this.lights = this.placeLights(mapDescription.lights);
         this.fogEmiters = this.placeFog(mapDescription.fog);
 
-        // this.spreadBlood(40, 0, 2, {x:2, y:0});
+        this.exits = [];
+    }
+
+    start(player, nextExit) {
+        const startPosition = {
+            x: this.mapDescription.enterPositions[nextExit].x,
+            y: this.mapDescription.enterPositions[nextExit].y,
+        };
+        this.player = player;
+        this.player.initPosition(startPosition);
+        this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+
+        this.#addBonus(0);
+        this.#addZombi(0);
+        this.#placeZombies(this.mapDescription.zombiesDescriptions);
+        this.#placeZombiesCorpses(this.mapDescription.zombiesCorpses);
+        
+        this.exits = this.#buildExits(this.mapDescription.exits);
+    }
+
+    exportBloodCanvas() {
+        return createImageBitmap(this.bloodCanvas);
     }
 
     onWallsChanged() {
         this.rootCell = this.#buildGraph();
         this.navigationGrid = this.#buildNavigationGrid(this.rootCell);
+    }
+
+    openDoor(doorId) {
+        this.doors
+        .filter(door => door.id === doorId)
+        .forEach(door => door.turnOn());
     }
 
     placeBlood(x, y, size) {
@@ -251,6 +287,8 @@ export class GameMap {
         const endCell = this.rootCell.getCellByPosition(endPos.x, endPos.y);
 
         if (!endCell) {
+            console.log('this.rootCell', this.rootCell);
+            console.log('endPos', endPos);
             console.warn(startCell);
         }
 
@@ -286,14 +324,6 @@ export class GameMap {
         return MATH.randomElement(flat);
     }
 
-    start() {
-        this.player = new Player(this, this.playerStartPosition);
-        this.player.evt.addEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
-
-        this.#addZombi(0);
-        this.#addBonus(0);
-    }
-
     #addBonus(step) {
         Stepper.stopListenStep(Stepper.curStep, this, this.#addBonus);
         this.nextBonusStep = Stepper.curStep + this.addBonusRate;
@@ -309,6 +339,19 @@ export class GameMap {
         Bonus.createRandomBonus(this.bonusChoices, destPos, this);
     }
 
+    #placeZombies(zombiesDescriptions) {
+        // return;
+        for (const zombieDescription of zombiesDescriptions) {
+            this.createZombie(zombieDescription.id, zombieDescription.x, zombieDescription.y, zombieDescription.state);
+        }
+    }
+    
+    #placeZombiesCorpses(zombiesCorpses) {
+        for (const corpse of zombiesCorpses) {
+            new DeadZombieSprite(this, corpse.x, corpse.y, corpse.angle, corpse.animation);
+        }
+    }
+
     #addZombi(step) {
         Stepper.stopListenStep(Stepper.curStep, this, this.#addZombi);
         this.nextZombiStep = Stepper.curStep + this.addZombiRate;
@@ -320,12 +363,13 @@ export class GameMap {
 
         const startPosition = MATH.randomElement(this.zombiesSpawnLocations);
 
-        this.createZombie(startPosition.x, startPosition.y, 'ENTER');
+        const id = new Date().getTime() + '_' + Math.random();
+        this.createZombie(id, startPosition.x, startPosition.y, 'ENTER');
         // this.createZombie(startPosition.x, startPosition.y, 'STILL_GUARD');
     }
 
-    createZombie(posX, posY, firstState) {
-        Zombi.createZombi(this.player, this, {x: posX, y: posY}, firstState);
+    createZombie(id, posX, posY, firstState) {
+        const zombie = Zombi.createZombi(id, this.player, this, {x: posX, y: posY}, firstState);
     }
 
     onPlayerDead() {
@@ -374,42 +418,54 @@ export class GameMap {
         return wallHitsWithDistance;
     }
 
-    dispose() {
-        CollisionResolver.removeFromLayer(this, 'MAP');
-        this.player.dispose();
-        this.sprite.dispose();
-        this.blocks.forEach(block => block.dispose());
-        this.lights.forEach(light => light.dispose());
-        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
-        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
-        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
-        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
-        this.evt.fireEvent(DISPOSE_EVENT);
-        this.evt.dispose();
-    }
-
     removeBlock(blockToRemove) {
         this.blocks = this.blocks.filter(block => block !== blockToRemove);
         this.onWallsChanged();
     }
 
+    #buildExits(exitsDescription) {
+        const exits = [];
+
+        for (const exit of exitsDescription) {
+            exits.push(new Exit(
+                this,
+                exit.x,
+                exit.y,
+                exit.width,
+                exit.height,
+                exit.nextMap,
+                exit.nextExit
+            ));
+        }
+
+        return exits;
+    }
+
     #buildBlocks(blocksDescription) {
         const blocks = [];
-        // Pour DEBUG, correspond au schéma papier
-        // blocks.push(new Block(-30, 40, 30, 10));
-        // blocks.push(new Block(-10, -10, 50, 10));
-        // blocks.push(new Block(-30, -25, 30, 10));
 
         for (const wall of blocksDescription.walls) {
-            blocks.push(new Block(wall.x, wall.y, wall.width, wall.height));
+            blocks.push(new BlockWall(wall.x, wall.y, wall.width, wall.height));
         }
 
-        for (const door of blocksDescription.doors) {
-            blocks.push(new Door(this, door.x, door.y, door.width, door.height, door.openState));
+        for (const obstacle of blocksDescription.obstacles ?? []) {
+            blocks.push(new BlockObstacle(obstacle.texture, obstacle.x, obstacle.y, obstacle.width, obstacle.height));
         }
 
-        for (const box of blocksDescription.box) {
-            blocks.push(new WoodenBox(this, box.x, box.y, box.width, box.height, box.onBreak));
+        for (const doorDescription of blocksDescription.doors) {
+            const door = new Door(
+                this,
+                doorDescription.id,
+                doorDescription.x,
+                doorDescription.y,
+                doorDescription.width,
+                doorDescription.height,
+                doorDescription.openState,
+                doorDescription.isOpen,
+                doorDescription.selfOpen
+            );
+            blocks.push(door);
+            this.doors.push(door);
         }
 
         for (const interactiveBlock of blocksDescription.interactiveBlocks) {
@@ -423,6 +479,10 @@ export class GameMap {
                 interactiveBlock.onActive,
                 interactiveBlock.isSolid,
             ));
+        }
+
+        for (const box of blocksDescription.box) {
+            blocks.push(new WoodenBox(this, box.id, box.x, box.y, box.width, box.height, box.onBreak));
         }
 
         return blocks;
@@ -488,6 +548,22 @@ export class GameMap {
         }
 
         return res;
+    }
+
+    dispose() {
+        CollisionResolver.removeFromLayer(this, 'MAP');
+        // this.player.dispose();
+        this.doors = [];
+        this.sprite.dispose();
+        this.exits.forEach(exit => exit.dispose());
+        this.blocks.forEach(block => block.dispose());
+        this.lights.forEach(light => light.dispose());
+        this.fogEmiters.forEach(fogEmiter => fogEmiter.dispose());
+        Stepper.stopListenStep(this.nextBonusStep, this, this.#addBonus);
+        Stepper.stopListenStep(this.nextZombiStep, this, this.#addZombi);
+        this.player.evt.removeEventListener(PLAYER_IS_DEAD_EVENT, this, this.onPlayerDead);
+        this.evt.fireEvent(DISPOSE_EVENT);
+        this.evt.dispose();
     }
 }
 
@@ -650,7 +726,11 @@ class Cell {
     }
 
     buildHorizontalChilds() {
-        let horPositions = this.blocks.map(block => [block.posX, block.posX + block.width]).flat();
+        let horPositions = this.blocks
+        .map(block => [block.posX, block.posX + block.width])
+        .flat()
+        .filter(posX => posX <= MAX_X)
+        .filter(posX => posX >= MIN_X)
         horPositions.push(this.right);
         horPositions = [...new Set(horPositions)];
         horPositions = horPositions.toSorted((xA, xB) => Math.sign(xA - xB));
@@ -683,13 +763,15 @@ class Cell {
         let prevBottom = this.bottom;
 
         for (const posY of vertPositions) {
-            this.childs.push(new Cell(
-                this.left,
-                this.right,
-                prevBottom,
-                posY,
-                this.blocks,
-            ));
+            if (prevBottom < posY) {
+                this.childs.push(new Cell(
+                    this.left,
+                    this.right,
+                    prevBottom,
+                    posY,
+                    this.blocks,
+                ));
+            }
             prevBottom = posY;
         }
     }
